@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
+<persistence-unit name="persistenceUnit" transaction-type="JTA"> 
+        <provider>org.hibernate.ejb.HibernatePersistence</provider> 
+        <jta-data-source>java:jboss/datasources/lindaAnalyticsDS</jta-data-source>  
+        <properties>
+            <property name="hibernate.ejb.cfgfile" value="./hibernate.cfg.xml" />
+            <property name="hibernate.max_fetch_depth" value="2"/>
+            <property name="hibernate.show_sql" value="true" />
+        </properties> 
+    </persistence-unit>
+</persistence>
+
