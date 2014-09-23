@@ -4,18 +4,20 @@
  * and open the template in the editor.
  */
 
-package eu.linda.analytic.controller;
+package eu.linda.analytic.formats;
 
 import eu.linda.analytics.model.Analytics;
-import org.json.JSONArray;
+import java.util.AbstractList;
+import weka.core.Instances;
 
 /**
  *
  * @author eleni
  */
-abstract public class OutputFormat {
 
+abstract public class InputFormat {
 
-    abstract public void exportData(Analytics analytics,String dataToExport);
+    abstract public AbstractList importData(String pathToFile);
 
 }
+

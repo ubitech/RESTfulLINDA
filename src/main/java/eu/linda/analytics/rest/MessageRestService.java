@@ -39,7 +39,16 @@ public class MessageRestService {
         AnalyticsController analyticsController =  new AnalyticsController(analyticsFactory);
         
         Analytics analytics = analyticsController.connectToAnalyticsTable(Integer.parseInt(analytics_id));
-        analyticsController.runAnalytics(analytics.getAlgorithm_name(), analytics.getExportFormat());
+        
+         
+        String[] suffixes = analytics.getDocument().split("\\.");
+       
+        
+        String inputSuffix = suffixes[suffixes.length-1];
+        
+        System.out.println("suffix"+inputSuffix);
+        
+        analyticsController.runAnalytics(inputSuffix,analytics.getAlgorithm_name(), analytics.getExportFormat());
         /*
         System.out.println("analytics_category" + analytics_category);
         ConnectionController connectionController = new ConnectionController();

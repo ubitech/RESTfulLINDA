@@ -5,6 +5,7 @@
  */
 package eu.linda.analytics.weka.classifiers;
 
+import eu.linda.analytic.formats.InputFormat;
 import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.weka.utils.HelpfulFuncions;
@@ -27,15 +28,14 @@ import weka.experiment.*;
 public class M5POutput {
     
      HelpfulFuncions helpfulFuncions = new HelpfulFuncions();
+     InputFormat in;
 
-    public M5POutput() {
-        
+    public M5POutput(InputFormat in) {
+    this.in=in;
        
     }
 
     public Vector trainModelM5P(String datasourcePath) throws Exception {
-
-        System.out.println("Training...");
 
         /* load training data from database
          InstanceQuery query = new InstanceQuery();

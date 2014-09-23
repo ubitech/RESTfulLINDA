@@ -239,6 +239,14 @@ public class HelpfulFuncions {
         }
         return analytics;
     }
+        
+        
+        public void nicePrintMessage(String msg){
+        System.out.println("------------ "+msg+" ------------");
+        System.out.println("-------------------------------------------------------");
+
+        
+        }
 /*
     public static void main(String[] args) throws Exception {
 

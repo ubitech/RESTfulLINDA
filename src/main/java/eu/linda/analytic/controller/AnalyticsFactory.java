@@ -5,8 +5,11 @@
  */
 package eu.linda.analytic.controller;
 
-import eu.linda.analytic.output.ArffOutputFormat;
-import eu.linda.analytic.output.CSVOutputFormat;
+import eu.linda.analytic.formats.ArffInputFormat;
+import eu.linda.analytic.formats.ArffOutputFormat;
+import eu.linda.analytic.formats.CSVOutputFormat;
+import eu.linda.analytic.formats.InputFormat;
+import eu.linda.analytic.formats.OutputFormat;
 import eu.linda.analytics.weka.classifiers.J48AnalyticProcess;
 import eu.linda.analytics.weka.classifiers.M5PAnalyticProcess;
 import eu.linda.analytics.weka.generic.LinearRegressionAnalyticProcess;
@@ -17,28 +20,39 @@ import eu.linda.analytics.weka.generic.LinearRegressionAnalyticProcess;
  */
 public class AnalyticsFactory {
 
-    public AnalyticsInfo createAnalytics(String algorithm, String outputformat) {
+    public AnalyticsInfo createAnalytics(String inputformat, String algorithm, String outputformat) {
 
+        InputFormat inputFormat = null;
         AnalyticProcess analyticProcess = null;
         OutputFormat outputFormat = null;
 
-        if (algorithm.equalsIgnoreCase("J48")) {
-            analyticProcess = new J48AnalyticProcess();
-        } else if (algorithm.equalsIgnoreCase("M5P")) {
-            analyticProcess = new M5PAnalyticProcess();
-        } else if (algorithm.equalsIgnoreCase("LinearRegression")) {
-            analyticProcess = new LinearRegressionAnalyticProcess();
+        //Create Instances of InputFormat
+        if (inputformat.equalsIgnoreCase("arff")) {
+            inputFormat = new ArffInputFormat();
         }
+        
+        
+        
+        //Create AnalyticProcesses
+        if (algorithm.equalsIgnoreCase("J48")) {
+            analyticProcess = new J48AnalyticProcess(inputFormat);
+        } else if (algorithm.equalsIgnoreCase("M5P")) {
+            analyticProcess = new M5PAnalyticProcess(inputFormat);
+        } else if (algorithm.equalsIgnoreCase("LinearRegression")) {
+            analyticProcess = new LinearRegressionAnalyticProcess(inputFormat);
+        }
+
+        //Create Instances of OutputFormat
         if (outputformat.equalsIgnoreCase("csv")) {
             outputFormat = new CSVOutputFormat();
         } else if (outputformat.equalsIgnoreCase("arff")) {
             outputFormat = new ArffOutputFormat();
         }
-        
+
         AnalyticsInfo analyticsInfo = new AnalyticsInfo();
         analyticsInfo.setAnalyticProcess(analyticProcess);
         analyticsInfo.setOutputformat(outputFormat);
-        
+
         return analyticsInfo;
 
     }

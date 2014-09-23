@@ -3,11 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package eu.linda.analytics.weka.generic;
 
 import eu.linda.analytic.controller.AnalyticProcess;
+import eu.linda.analytic.formats.InputFormat;
+import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.model.Analytics;
+import eu.linda.analytics.weka.utils.HelpfulFuncions;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import weka.classifiers.functions.LinearRegression;
 
 /**
  *
@@ -15,14 +20,46 @@ import eu.linda.analytics.model.Analytics;
  */
 public class LinearRegressionAnalyticProcess extends AnalyticProcess {
 
-    @Override
-    public void train(Analytics a) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    LinearRegressionOutput linearRegressionOutput;
+    HelpfulFuncions helpfulFuncions;
+
+    public LinearRegressionAnalyticProcess(InputFormat in) {
+        
+        helpfulFuncions = new HelpfulFuncions();
+        helpfulFuncions.nicePrintMessage("Create analytic process for LinearRegression");
+        linearRegressionOutput = new LinearRegressionOutput(in);  
+        
     }
 
     @Override
-    public String eval(Analytics a) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void train(Analytics analytics) {
+        helpfulFuncions.nicePrintMessage("Train LinearRegression");
+
+        try {
+            LinearRegression linearRegressionmodel = linearRegressionOutput.getLinearRegressionEstimations(Configuration.docroot + analytics.getDocument());
+            helpfulFuncions.saveModel(linearRegressionmodel, analytics);
+            
+        } catch (Exception ex) {
+            Logger.getLogger(LinearRegressionAnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+       
     }
+
+    @Override
+    public String eval(Analytics analytics) {
+
+     String results = null;
+        try {
+            results = linearRegressionOutput.getLinearRegressionResults(analytics);
+        } catch (Exception ex) {
+            Logger.getLogger(LinearRegressionAnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+     return results;  
+     //connectionController.writeToFile(results, "resultdocument", analytics);
+
     
+    }
+
 }

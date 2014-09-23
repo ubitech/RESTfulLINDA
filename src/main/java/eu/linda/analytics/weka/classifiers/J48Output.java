@@ -5,8 +5,10 @@
  */
 package eu.linda.analytics.weka.classifiers;
 
+import eu.linda.analytic.formats.InputFormat;
 import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.model.Analytics;
+import java.util.AbstractList;
 import org.json.JSONArray;
 import weka.associations.Apriori;
 import weka.classifiers.Classifier;
@@ -16,20 +18,25 @@ import weka.classifiers.evaluation.output.prediction.PlainText;
 import weka.classifiers.trees.J48;
 import weka.core.Debug.Random;
 import weka.core.FastVector;
+import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils;
-import weka.core.converters.ConverterUtils.DataSource;
 
 public class J48Output {
 
-    public J48Output() {
+    InputFormat in;
+
+    public J48Output(InputFormat in) {
+        this.in = in;
     }
 
     public Classifier getJ48TreeModel(String datasourcePath) throws Exception {
         System.out.println("datasourcePath" + datasourcePath);
-        Instances data = ConverterUtils.DataSource.read(datasourcePath);
+        //Instances data = ConverterUtils.DataSource.read(datasourcePath);
         //Instances data = DataSource.read("/opt/weka-3-7-10/data/supermarket.arff");
-        data.setClassIndex(data.numAttributes() - 1);
+        //data.setClassIndex(data.numAttributes() - 1);
+        AbstractList<Instance> data1 = in.importData(datasourcePath);
+        Instances data = (Instances) data1;
 
         J48 tree = new J48(); // new instance of tree
 
@@ -102,15 +109,13 @@ public class J48Output {
             labeled.instance(i).setClassValue(clsLabel);
         }
 
-      JSONArray resultjson = new JSONArray();
-      resultjson.put(0,eval.toSummaryString());
-      resultjson.put(1,labeled.toString());
-      
+        JSONArray resultjson = new JSONArray();
+        resultjson.put(0, eval.toSummaryString());
+        resultjson.put(1, labeled.toString());
+
         return resultjson;
 
     }
-
-
 
     /**
      * Expects a dataset as first parameter. The last attribute is used as class

@@ -3,21 +3,17 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package eu.linda.analytic.output;
+package eu.linda.analytic.formats;
 
-import eu.linda.analytic.controller.OutputFormat;
 import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.db.DBSynchronizer;
 import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.weka.utils.HelpfulFuncions;
-import org.json.JSONArray;
 
 /**
  *
  * @author eleni
  */
-
-
 public class ArffOutputFormat extends OutputFormat {
 
     DBSynchronizer dbsynchronizer;
@@ -30,20 +26,17 @@ public class ArffOutputFormat extends OutputFormat {
 
     @Override
     public void exportData(Analytics analytics, String dataToExport) {
-        System.out.println("-------------------------------------------------------");
-        System.out.println("--------------------Export to Arff---------------------------");
-        System.out.println("-------------------------------------------------------");
-
+   
+        helpfulFuncions.nicePrintMessage("Export to Arff");
+        
         String[] splitedSourceFileName = analytics.getDocument().split(".arff");
 
         String targetFileName = (splitedSourceFileName[0] + "_" + analytics.getAlgorithm_name() + "_resultdocument.arff").replace("datasets", "results");
         String targetFileNameFullPath = Configuration.docroot + targetFileName;
-        
+
         helpfulFuncions.saveFile(targetFileNameFullPath, dataToExport);
         dbsynchronizer.updateLindaAnalytics(targetFileName, "resultdocument", analytics.getId());
 
     }
 
 }
-
-

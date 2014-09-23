@@ -6,6 +6,7 @@
 package eu.linda.analytics.weka.classifiers;
 
 import eu.linda.analytic.controller.AnalyticProcess;
+import eu.linda.analytic.formats.InputFormat;
 import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.weka.utils.HelpfulFuncions;
@@ -23,21 +24,17 @@ public class J48AnalyticProcess extends AnalyticProcess {
     J48Output j48Output;
     HelpfulFuncions helpfulFuncions;
 
-    public J48AnalyticProcess() {
-        System.out.println("-------------------------------------------------------");
-        System.out.println("------------Create analytic process for J48------------");
-        System.out.println("-------------------------------------------------------");
-
-        j48Output = new J48Output();
+    public J48AnalyticProcess(InputFormat in) {
         helpfulFuncions = new HelpfulFuncions();
+        helpfulFuncions.nicePrintMessage("Create analytic process for J48");
+        j48Output = new J48Output(in);
+        
     }
 
     @Override
     public void train(Analytics analytics) {
-        System.out.println("-------------------------------------------------------");
-        System.out.println("--------------------Train J48--------------------------");
-        System.out.println("-------------------------------------------------------");
 
+        helpfulFuncions.nicePrintMessage("Train J48");
         Classifier j48ClassifierModel;
         try {
             j48ClassifierModel = j48Output.getJ48TreeModel(Configuration.docroot + analytics.getDocument());
@@ -50,10 +47,8 @@ public class J48AnalyticProcess extends AnalyticProcess {
 
     @Override
     public String eval(Analytics analytics) {
-        System.out.println("-------------------------------------------------------");
-        System.out.println("--------------------Eval J48---------------------------");
-        System.out.println("-------------------------------------------------------");
 
+        helpfulFuncions.nicePrintMessage("Eval J48");
         JSONArray jsonresult = null;
         try {
             jsonresult = j48Output.getJ48TreeResultDataset(analytics);
@@ -64,7 +59,7 @@ public class J48AnalyticProcess extends AnalyticProcess {
             Logger.getLogger(J48AnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);
         }
         return jsonresult.getString(1);
-        
+
 //helpfulFuncions.writeToFile(jsonresult.getString(1), "resultdocument", analytics);
         //result = jsonresult.toString();
     }

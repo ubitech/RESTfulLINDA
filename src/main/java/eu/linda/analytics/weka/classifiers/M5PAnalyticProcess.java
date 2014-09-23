@@ -6,6 +6,7 @@
 package eu.linda.analytics.weka.classifiers;
 
 import eu.linda.analytic.controller.AnalyticProcess;
+import eu.linda.analytic.formats.InputFormat;
 import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.weka.utils.HelpfulFuncions;
@@ -23,21 +24,16 @@ public class M5PAnalyticProcess extends AnalyticProcess {
     M5POutput m5pOutput;
     HelpfulFuncions helpfulFuncions;
 
-    public M5PAnalyticProcess() {
-        System.out.println("-------------------------------------------------------");
-        System.out.println("------------Create analytic process for M5P------------");
-        System.out.println("-------------------------------------------------------");
-
-        m5pOutput = new M5POutput();
+    public M5PAnalyticProcess(InputFormat in) {
         helpfulFuncions = new HelpfulFuncions();
+        helpfulFuncions.nicePrintMessage("Create analytic process for M5P");
+        m5pOutput = new M5POutput(in);
+
     }
 
     @Override
     public void train(Analytics analytics) {
-        System.out.println("-------------------------------------------------------");
-        System.out.println("--------------------Train  M5P--------------------------");
-        System.out.println("-------------------------------------------------------");
-
+        helpfulFuncions.nicePrintMessage("Train  M5P");
         Vector M5Pmodel;
         try {
             M5Pmodel = m5pOutput.trainModelM5P(Configuration.docroot + analytics.getDocument());
@@ -50,10 +46,7 @@ public class M5PAnalyticProcess extends AnalyticProcess {
 
     @Override
     public String eval(Analytics analytics) {
-        System.out.println("-------------------------------------------------------");
-        System.out.println("--------------------Eval M5P---------------------------");
-        System.out.println("-------------------------------------------------------");
-
+         helpfulFuncions.nicePrintMessage("Eval M5P");
         JSONArray jsonresult = null;
         try {
             jsonresult = m5pOutput.predictM5P(analytics);

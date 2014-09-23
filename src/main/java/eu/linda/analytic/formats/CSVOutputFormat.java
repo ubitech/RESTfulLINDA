@@ -3,9 +3,8 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package eu.linda.analytic.output;
+package eu.linda.analytic.formats;
 
-import eu.linda.analytic.controller.OutputFormat;
 import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.db.DBSynchronizer;
 import eu.linda.analytics.model.Analytics;
@@ -28,10 +27,8 @@ public class CSVOutputFormat extends OutputFormat {
 
     @Override
     public void exportData(Analytics analytics, String dataToExport) {
-        System.out.println("-------------------------------------------------------");
-        System.out.println("--------------------Export to CSV---------------------------");
-        System.out.println("-------------------------------------------------------");
-
+   
+        helpfulFuncions.nicePrintMessage("Export to CSV");
         String[] splitedSourceFileName = analytics.getDocument().split(".arff");
 
         String targetFileName = (splitedSourceFileName[0] + "_" + analytics.getAlgorithm_name() + "_resultdocument.arff").replace("datasets", "results");

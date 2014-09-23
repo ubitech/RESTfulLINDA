@@ -6,16 +6,28 @@
 
 package eu.linda.analytic.controller;
 
+import eu.linda.analytic.formats.InputFormat;
+import eu.linda.analytic.formats.OutputFormat;
+
 /**
  *
  * @author eleni
  */
 public class AnalyticsInfo {
     
+    InputFormat inputformat;
     AnalyticProcess analyticProcess;
     OutputFormat outputformat;
 
     public AnalyticsInfo() {
+    }
+
+    public InputFormat getInputformat() {
+        return inputformat;
+    }
+
+    public void setInputformat(InputFormat inputformat) {
+        this.inputformat = inputformat;
     }
 
     public AnalyticProcess getAnalyticProcess() {

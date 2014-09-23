@@ -6,6 +6,8 @@
 
 package eu.linda.analytic.controller;
 
+import eu.linda.analytic.formats.InputFormat;
+import eu.linda.analytic.formats.OutputFormat;
 import eu.linda.analytics.db.ConnectionController;
 import eu.linda.analytics.db.DBSynchronizer;
 import eu.linda.analytics.model.Analytics;
@@ -25,13 +27,15 @@ public class AnalyticsController {
         this.factory = factory;
     }
     
-    public AnalyticsInfo runAnalytics(String algorithm,String ouputformat){
+    public AnalyticsInfo runAnalytics(String inputformat, String algorithm,String ouputformat){
    
+        InputFormat in;
         AnalyticProcess ap;
         OutputFormat out;
         
-        AnalyticsInfo info = factory.createAnalytics(algorithm,ouputformat);
+        AnalyticsInfo info = factory.createAnalytics(inputformat,algorithm,ouputformat);
         
+        in = info.getInputformat();
         ap = info.getAnalyticProcess();
         out = info.getOutputformat();
         

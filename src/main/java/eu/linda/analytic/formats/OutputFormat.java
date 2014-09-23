@@ -4,21 +4,16 @@
  * and open the template in the editor.
  */
 
-package eu.linda.analytic.controller;
+package eu.linda.analytic.formats;
 
-import eu.linda.analytic.formats.InputFormat;
 import eu.linda.analytics.model.Analytics;
-import org.json.JSONArray;
 
 /**
  *
  * @author eleni
  */
+abstract public class OutputFormat {
 
-abstract public class AnalyticProcess {
+    abstract public void exportData(Analytics analytics,String dataToExport);
 
-
-    abstract public void train(Analytics a);
-
-    abstract public String eval(Analytics a);
 }
