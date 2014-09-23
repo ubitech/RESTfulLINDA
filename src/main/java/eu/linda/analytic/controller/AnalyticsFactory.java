@@ -9,6 +9,7 @@ import eu.linda.analytic.output.ArffOutputFormat;
 import eu.linda.analytic.output.CSVOutputFormat;
 import eu.linda.analytics.weka.classifiers.J48AnalyticProcess;
 import eu.linda.analytics.weka.classifiers.M5PAnalyticProcess;
+import eu.linda.analytics.weka.generic.LinearRegressionAnalyticProcess;
 
 /**
  *
@@ -25,6 +26,8 @@ public class AnalyticsFactory {
             analyticProcess = new J48AnalyticProcess();
         } else if (algorithm.equalsIgnoreCase("M5P")) {
             analyticProcess = new M5PAnalyticProcess();
+        } else if (algorithm.equalsIgnoreCase("LinearRegression")) {
+            analyticProcess = new LinearRegressionAnalyticProcess();
         }
         if (outputformat.equalsIgnoreCase("csv")) {
             outputFormat = new CSVOutputFormat();
