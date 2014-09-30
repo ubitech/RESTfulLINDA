@@ -10,10 +10,8 @@ import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.model.Analytics;
 import java.util.AbstractList;
 import org.json.JSONArray;
-import weka.associations.Apriori;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
-import weka.classifiers.evaluation.Prediction;
 import weka.classifiers.evaluation.output.prediction.PlainText;
 import weka.classifiers.trees.J48;
 import weka.core.Debug.Random;
@@ -24,10 +22,10 @@ import weka.core.converters.ConverterUtils;
 
 public class J48Output {
 
-    InputFormat in;
+    InputFormat input;
 
     public J48Output(InputFormat in) {
-        this.in = in;
+        this.input = in;
     }
 
     public Classifier getJ48TreeModel(String datasourcePath) throws Exception {
@@ -35,9 +33,9 @@ public class J48Output {
         //Instances data = ConverterUtils.DataSource.read(datasourcePath);
         //Instances data = DataSource.read("/opt/weka-3-7-10/data/supermarket.arff");
         //data.setClassIndex(data.numAttributes() - 1);
-        AbstractList<Instance> data1 = in.importData(datasourcePath);
+        AbstractList<Instance> data1 = input.importData(datasourcePath);
         Instances data = (Instances) data1;
-
+        data.setClassIndex(data.numAttributes() - 1);
         J48 tree = new J48(); // new instance of tree
 
         String[] options = new String[1];
@@ -56,12 +54,20 @@ public class J48Output {
         System.out.println("datasourcePath" + Configuration.docroot + analytics.getDocument());
 
         //Train Data
-        Instances traindata = ConverterUtils.DataSource.read(Configuration.docroot + analytics.getDocument());
+        AbstractList<Instance> data1 = input.importData(Configuration.docroot + analytics.getDocument());
+        Instances traindata = (Instances) data1;
         traindata.setClassIndex(traindata.numAttributes() - 1);
+        //Instances traindata = ConverterUtils.DataSource.read(Configuration.docroot + analytics.getDocument());
+        //traindata.setClassIndex(traindata.numAttributes() - 1);
 
+        
+        
         //Test data
-        Instances testdata = ConverterUtils.DataSource.read(Configuration.docroot + analytics.getDocument());
+        AbstractList<Instance> data2 = input.importData(Configuration.docroot + analytics.getDocument());
+        Instances testdata = (Instances) data2;
         testdata.setClassIndex(testdata.numAttributes() - 1);
+        //Instances testdata = ConverterUtils.DataSource.read(Configuration.docroot + analytics.getDocument());
+        //testdata.setClassIndex(testdata.numAttributes() - 1);
 
         //Classifier model  
         Classifier model = (Classifier) weka.core.SerializationHelper.read(Configuration.docroot + analytics.getModel());
@@ -70,10 +76,10 @@ public class J48Output {
         //eval.evaluateModel(model, testdata);
 
         //evaluation 1
-        String[] options = new String[2];
-        options[0] = "-t";
-        options[1] = Configuration.docroot + analytics.getDocument();
-        System.out.println("evaluation an other try" + Evaluation.evaluateModel(model, options));
+        //String[] options = new String[2];
+        //options[0] = "-t";
+        //options[1] = Configuration.docroot + analytics.getDocument();
+        //System.out.println("evaluation an other try" + Evaluation.evaluateModel(model, options));
 
         // evaluation 2
         StringBuffer forPredictionsPrinting = new StringBuffer();

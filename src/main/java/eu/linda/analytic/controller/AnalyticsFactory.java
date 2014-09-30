@@ -7,6 +7,7 @@ package eu.linda.analytic.controller;
 
 import eu.linda.analytic.formats.ArffInputFormat;
 import eu.linda.analytic.formats.ArffOutputFormat;
+import eu.linda.analytic.formats.CSVInputFormat;
 import eu.linda.analytic.formats.CSVOutputFormat;
 import eu.linda.analytic.formats.InputFormat;
 import eu.linda.analytic.formats.OutputFormat;
@@ -29,6 +30,8 @@ public class AnalyticsFactory {
         //Create Instances of InputFormat
         if (inputformat.equalsIgnoreCase("arff")) {
             inputFormat = new ArffInputFormat();
+        }else if (inputformat.equalsIgnoreCase("csv")) {
+            inputFormat = new CSVInputFormat();
         }
         
         
