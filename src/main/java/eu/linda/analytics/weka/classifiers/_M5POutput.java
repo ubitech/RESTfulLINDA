@@ -8,7 +8,8 @@ package eu.linda.analytics.weka.classifiers;
 import eu.linda.analytic.formats.InputFormat;
 import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.model.Analytics;
-import eu.linda.analytics.weka.utils.HelpfulFuncions;
+import eu.linda.analytics.weka.utils.HelpfulFunctions;
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
@@ -25,13 +26,13 @@ import weka.experiment.*;
  *
  * @author eleni
  */
-public class M5POutput {
+public class _M5POutput {
     
-     HelpfulFuncions helpfulFuncions = new HelpfulFuncions();
-     InputFormat in;
+     HelpfulFunctions helpfulFuncions = new HelpfulFunctions();
+     InputFormat input;
 
-    public M5POutput(InputFormat in) {
-    this.in=in;
+    public _M5POutput(InputFormat input) {
+    this.input=input;
        
     }
 
@@ -47,9 +48,14 @@ public class M5POutput {
          data.setClassIndex(13);
          */
         //get datasource
-        Instances data = ConverterUtils.DataSource.read(datasourcePath);
+        //Instances data = ConverterUtils.DataSource.read(datasourcePath);
         //Instances data = DataSource.read("/opt/weka-3-7-10/data/supermarket.arff");
+        //data.setClassIndex(data.numAttributes() - 1);
+        
+        AbstractList<Instance> data1 = input.importData(datasourcePath);
+        Instances data = (Instances) data1;
         data.setClassIndex(data.numAttributes() - 1);
+        
         // train M5P
         M5P cl = new M5P();
         // further options...
@@ -73,16 +79,15 @@ public class M5POutput {
 
     public JSONArray predictM5P(Analytics analytics) throws Exception {
 
-        System.out.println("Predicting...");
-
-        Instances data = ConverterUtils.DataSource.read(Configuration.docroot + analytics.getTestdocument());
+        AbstractList<Instance> data1 = input.importData(Configuration.docroot + analytics.getTestdocument());
+        Instances data = (Instances) data1;
         data.setClassIndex(data.numAttributes() - 1);
 
-        //Classifier model  
-        //Classifier model = (M5P) weka.core.SerializationHelper.read(Configuration.docroot + analytics.getModel());
-        System.out.println("Predicting...");
+        //Instances data = ConverterUtils.DataSource.read(Configuration.docroot + analytics.getTestdocument());
+        //data.setClassIndex(data.numAttributes() - 1);
 
-        // read model and header
+         // read Classifier model and header
+        //Classifier model = (M5P) weka.core.SerializationHelper.read(Configuration.docroot + analytics.getModel());
         Vector v = (Vector) SerializationHelper.read(Configuration.docroot + analytics.getModel());
 
         //model evaluation
@@ -152,21 +157,14 @@ public class M5POutput {
 
             // Create empty instance with three attribute values
             Instance inst1 = new SparseInstance(3);
-            
-
            // Set instance's values for the attributes "length", "weight", and "position"
             System.out.println("======(atts.get(0)"+atts.get(0));
-            System.out.println("======(atts.get(1)"+atts.get(1));
-
-            System.out.println("======(atts.get(2)"+atts.get(2));
-
-            System.out.println("======(atts.get(3)"+atts.get(3));
+            
 
             inst1.setValue(atts.get(0), i);
             inst1.setValue(atts.get(1), inst.classValue());
             inst1.setValue(atts.get(2), pred);
             inst1.setValue(atts.get(3), error);
-           
             instances.add(i, inst1);
 
         }
@@ -177,7 +175,6 @@ public class M5POutput {
         resultjson.put(0, eval.toSummaryString());
         resultjson.put(1, helpfulFuncions.createArffFileFromArray(atts, instances).toString());
 
-        System.out.println("Predicting finished!");
 
         return resultjson;
 

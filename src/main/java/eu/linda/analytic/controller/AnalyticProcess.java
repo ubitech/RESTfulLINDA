@@ -8,7 +8,9 @@ package eu.linda.analytic.controller;
 
 import eu.linda.analytic.formats.InputFormat;
 import eu.linda.analytics.model.Analytics;
+import java.util.AbstractList;
 import org.json.JSONArray;
+import weka.core.Instances;
 
 /**
  *
@@ -20,5 +22,5 @@ abstract public class AnalyticProcess {
 
     abstract public void train(Analytics a);
 
-    abstract public String eval(Analytics a);
+    abstract public AbstractList eval(Analytics a);
 }

@@ -11,6 +11,7 @@ import eu.linda.analytic.formats.OutputFormat;
 import eu.linda.analytics.db.ConnectionController;
 import eu.linda.analytics.db.DBSynchronizer;
 import eu.linda.analytics.model.Analytics;
+import java.util.AbstractList;
 import org.json.JSONArray;
 
 /**
@@ -40,7 +41,7 @@ public class AnalyticsController {
         out = info.getOutputformat();
         
         ap.train(analytics);
-        String resultToExport = ap.eval(analytics);
+        AbstractList resultToExport = ap.eval(analytics);
         out.exportData(analytics,resultToExport);
         
         return info;

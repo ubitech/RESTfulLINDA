@@ -11,6 +11,9 @@ import eu.linda.analytic.formats.CSVInputFormat;
 import eu.linda.analytic.formats.CSVOutputFormat;
 import eu.linda.analytic.formats.InputFormat;
 import eu.linda.analytic.formats.OutputFormat;
+import eu.linda.analytic.formats.RDFOutputFormat;
+import eu.linda.analytic.formats.TXTOutputFormat;
+import eu.linda.analytics.weka.associations.AprioriAnalyticProcess;
 import eu.linda.analytics.weka.classifiers.J48AnalyticProcess;
 import eu.linda.analytics.weka.classifiers.M5PAnalyticProcess;
 import eu.linda.analytics.weka.generic.LinearRegressionAnalyticProcess;
@@ -20,7 +23,8 @@ import eu.linda.analytics.weka.generic.LinearRegressionAnalyticProcess;
  * @author eleni
  */
 public class AnalyticsFactory {
-
+    
+    
     public AnalyticsInfo createAnalytics(String inputformat, String algorithm, String outputformat) {
 
         InputFormat inputFormat = null;
@@ -43,6 +47,8 @@ public class AnalyticsFactory {
             analyticProcess = new M5PAnalyticProcess(inputFormat);
         } else if (algorithm.equalsIgnoreCase("LinearRegression")) {
             analyticProcess = new LinearRegressionAnalyticProcess(inputFormat);
+        } else if (algorithm.equalsIgnoreCase("Apriori")) {
+            analyticProcess = new AprioriAnalyticProcess(inputFormat);
         }
 
         //Create Instances of OutputFormat
@@ -50,7 +56,14 @@ public class AnalyticsFactory {
             outputFormat = new CSVOutputFormat();
         } else if (outputformat.equalsIgnoreCase("arff")) {
             outputFormat = new ArffOutputFormat();
+        } else if (outputformat.equalsIgnoreCase("txt")) {
+            outputFormat = new TXTOutputFormat();
+        }else {
+            // RDFXML , TTL , NTRIPLES
+            outputFormat = new RDFOutputFormat();
         }
+        
+        
 
         AnalyticsInfo analyticsInfo = new AnalyticsInfo();
         analyticsInfo.setAnalyticProcess(analyticProcess);

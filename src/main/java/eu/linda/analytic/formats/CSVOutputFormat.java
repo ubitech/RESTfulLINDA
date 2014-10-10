@@ -8,7 +8,8 @@ package eu.linda.analytic.formats;
 import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.db.DBSynchronizer;
 import eu.linda.analytics.model.Analytics;
-import eu.linda.analytics.weka.utils.HelpfulFuncions;
+import eu.linda.analytics.weka.utils.HelpfulFunctions;
+import java.util.AbstractList;
 import org.json.JSONArray;
 
 /**
@@ -18,30 +19,34 @@ import org.json.JSONArray;
 public class CSVOutputFormat extends OutputFormat {
 
     DBSynchronizer dbsynchronizer;
-    HelpfulFuncions helpfulFuncions;
+    HelpfulFunctions helpfulFuncions;
 
     public CSVOutputFormat() {
         dbsynchronizer = new DBSynchronizer();
-        helpfulFuncions = new HelpfulFuncions();
+        helpfulFuncions = new HelpfulFunctions();
     }
 
     @Override
-    public void exportData(Analytics analytics, String dataToExport) {
-   
-        helpfulFuncions.nicePrintMessage("Export to CSV");
-        String[] splitedSourceFileName = analytics.getDocument().split(".arff");
+    public void exportData(Analytics analytics, AbstractList dataToExport) {
+        if (dataToExport.size() != 0) {
 
-        String targetFileName = (splitedSourceFileName[0] + "_" + analytics.getAlgorithm_name() + "_resultdocument.arff").replace("datasets", "results");
+            helpfulFuncions.nicePrintMessage("Export to CSV");
+            String[] splitedSourceFileName = analytics.getDocument().split(".arff");
 
-        String targetFileNameFullPath = Configuration.docroot + targetFileName;
-        helpfulFuncions.saveFile(targetFileNameFullPath, dataToExport.toString());
+            String targetFileName = (splitedSourceFileName[0] + "_" + analytics.getAlgorithm_name() + "_resultdocument.arff").replace("datasets", "results");
 
-        String targetFileNameCSV = (splitedSourceFileName[0] + "_" + analytics.getAlgorithm_name() + "_resultdocument." + analytics.getExportFormat()).replace("datasets", "results");
-        String targetFileNameCSVFull = Configuration.docroot + targetFileNameCSV;
+            String targetFileNameFullPath = Configuration.docroot + targetFileName;
+            helpfulFuncions.saveFile(targetFileNameFullPath, dataToExport.toString());
 
-        helpfulFuncions.saveFileAsCSV(targetFileNameFullPath, targetFileNameCSVFull);
-        dbsynchronizer.updateLindaAnalytics(targetFileNameCSV, "resultdocument", analytics.getId());
+            String targetFileNameCSV = (splitedSourceFileName[0] + "_" + analytics.getAlgorithm_name() + "_resultdocument." + analytics.getExportFormat()).replace("datasets", "results");
+            String targetFileNameCSVFull = Configuration.docroot + targetFileNameCSV;
 
+            helpfulFuncions.saveFileAsCSV(targetFileNameFullPath, targetFileNameCSVFull);
+            dbsynchronizer.updateLindaAnalytics(targetFileNameCSV, "resultdocument", analytics.getId());
+
+        } else {
+            helpfulFuncions.nicePrintMessage("There are no data to be exported to CSV");
+        }
     }
 
 }

@@ -10,27 +10,29 @@ import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.model.Analytics;
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.util.AbstractList;
 import org.json.JSONArray;
 import weka.classifiers.functions.LinearRegression;
 import weka.core.Instance;
 import weka.core.Instances;
-import weka.core.converters.ConverterUtils;
 
-public class LinearRegressionOutput {
+public class _LinearRegressionOutput {
 
-    InputFormat in;
+    InputFormat input;
 
-    public LinearRegressionOutput(InputFormat in) {
-        this.in = in;
+    public _LinearRegressionOutput(InputFormat input) {
+        this.input = input;
     }
 
-    public LinearRegression getLinearRegressionEstimations(String datasourcePath) throws Exception {
+    public LinearRegression getLinearRegressionEstimations(String datasourcePath,boolean datasetContainsMetadataInfo) throws Exception {
 
-        System.out.println("datasourcePath edoooo: " + datasourcePath);
+
         //load data
-        Instances data = ConverterUtils.DataSource.read(datasourcePath);
+        boolean excludeMetadataInfo = datasetContainsMetadataInfo;
+        AbstractList<Instance> data1 = input.importData(datasourcePath);
+        Instances data = (Instances) data1;
         data.setClassIndex(data.numAttributes() - 1);
-
+        
         //build model
         LinearRegression model = new LinearRegression();
         model.buildClassifier(data); //the last instance with missing    class is   not used
@@ -44,10 +46,21 @@ public class LinearRegressionOutput {
 
     }
 
-    public String getLinearRegressionResults(Analytics analytics) throws Exception {
+    public JSONArray getLinearRegressionResults(Analytics analytics) throws Exception {
 
         //load data
-        Instances data = ConverterUtils.DataSource.read(Configuration.docroot + analytics.getTestdocument());
+        AbstractList<Instance> data1 = input.importData(Configuration.docroot + analytics.getTestdocument());
+        Instances data = (Instances) data1;
+        
+        boolean datasetContainsMetadataInfo = false;
+        if (analytics.getExportFormat().equalsIgnoreCase("rdf")) {
+            datasetContainsMetadataInfo = true;
+        }
+
+
+        //data.setClassIndex(data.numAttributes() - 1);
+        
+        //Instances data = ConverterUtils.DataSource.read(Configuration.docroot + analytics.getTestdocument());
 
         //load model
         LinearRegression model = (LinearRegression) weka.core.SerializationHelper.read(Configuration.docroot + analytics.getModel());
@@ -66,7 +79,11 @@ public class LinearRegressionOutput {
             labeled.instance(i).setClassValue(clsLabel);
         }
 
-        return labeled.toString();
+        JSONArray resultjson = new JSONArray();
+        resultjson.put(0, "");
+        resultjson.put(1, labeled.toString());
+
+        return resultjson;
 
     }
 

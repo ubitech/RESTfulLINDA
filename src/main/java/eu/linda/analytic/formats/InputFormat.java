@@ -6,16 +6,14 @@
 
 package eu.linda.analytic.formats;
 
-import eu.linda.analytics.model.Analytics;
 import java.util.AbstractList;
-import weka.core.Instances;
 
 /**
  *
  * @author eleni
  */
 
-abstract public class InputFormat {
+abstract public class InputFormat { 
 
     abstract public AbstractList importData(String pathToFile);
 

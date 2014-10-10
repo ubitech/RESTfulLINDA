@@ -20,19 +20,20 @@ import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils;
 
-public class J48Output {
+public class _J48Output {
 
     InputFormat input;
 
-    public J48Output(InputFormat in) {
+    public _J48Output(InputFormat in) {
         this.input = in;
     }
 
-    public Classifier getJ48TreeModel(String datasourcePath) throws Exception {
+    public Classifier getJ48TreeModel(String datasourcePath, boolean datasetContainsMetadataInfo) throws Exception {
         System.out.println("datasourcePath" + datasourcePath);
         //Instances data = ConverterUtils.DataSource.read(datasourcePath);
         //Instances data = DataSource.read("/opt/weka-3-7-10/data/supermarket.arff");
         //data.setClassIndex(data.numAttributes() - 1);
+        boolean excludeMetadataInfo = datasetContainsMetadataInfo;
         AbstractList<Instance> data1 = input.importData(datasourcePath);
         Instances data = (Instances) data1;
         data.setClassIndex(data.numAttributes() - 1);

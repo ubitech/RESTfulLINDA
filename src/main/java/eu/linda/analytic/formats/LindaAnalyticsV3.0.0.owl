@@ -1,0 +1,294 @@
+<?xml version="1.0"?>
+
+
+<!DOCTYPE rdf:RDF [
+    <!ENTITY terms "http://purl.org/dc/terms/" >
+    <!ENTITY prov "http://www.w3.org/ns/prov#" >
+    <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
+    <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
+    <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
+    <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+    <!ENTITY sio "http://semanticscience.org/ontology/sio.owl#" >
+]>
+
+
+<rdf:RDF xmlns="http://www.semanticweb.org/root/ontologies/2014/9/untitled-ontology-11#"
+     xml:base="http://www.semanticweb.org/root/ontologies/2014/9/untitled-ontology-11"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:prov="http://www.w3.org/ns/prov#"
+     xmlns:terms="http://purl.org/dc/terms/"
+     xmlns:sio="http://semanticscience.org/ontology/sio.owl#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+    <owl:Ontology rdf:about="http://www.semanticweb.org/root/ontologies/2014/9/untitled-ontology-11">
+        <owl:imports rdf:resource="http://semanticscience.org/ontology/sio-v1.0.10-release.owl"/>
+    </owl:Ontology>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Annotation properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://semanticscience.org/ontology/sio.owl#attributeValue -->
+
+    <owl:AnnotationProperty rdf:about="&sio;attributeValue"/>
+    
+
+
+    <!-- http://semanticscience.org/ontology/sio.owl#errorMeans -->
+
+    <owl:AnnotationProperty rdf:about="&sio;errorMeans"/>
+    
+
+
+    <!-- http://semanticscience.org/ontology/sio.owl#predictedValue -->
+
+    <owl:AnnotationProperty rdf:about="&sio;predictedValue"/>
+    
+
+
+    <!-- http://www.w3.org/2002/07/owl#sameAs -->
+
+    <owl:AnnotationProperty rdf:about="&owl;sameAs"/>
+    
+
+
+    <!-- http://www.w3.org/ns/prov#actedOnBehalfOf -->
+
+    <owl:AnnotationProperty rdf:about="&prov;actedOnBehalfOf"/>
+    
+
+
+    <!-- http://www.w3.org/ns/prov#wasAssociatedWith -->
+
+    <owl:AnnotationProperty rdf:about="&prov;wasAssociatedWith"/>
+    
+
+
+    <!-- http://www.w3.org/ns/prov#wasDerivedFrom -->
+
+    <owl:AnnotationProperty rdf:about="&prov;wasDerivedFrom"/>
+    
+
+
+    <!-- http://www.w3.org/ns/prov#wasGeneratedBy -->
+
+    <owl:AnnotationProperty rdf:about="&prov;wasGeneratedBy"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://semanticscience.org/ontology/sio.owl#Software -->
+
+    <owl:Class rdf:about="&sio;Software">
+        <rdfs:subClassOf rdf:resource="&prov;Agent"/>
+        <prov:actedOnBehalfOf rdf:resource="&sio;User"/>
+    </owl:Class>
+    
+
+
+    <!-- http://semanticscience.org/ontology/sio.owl#User -->
+
+    <owl:Class rdf:about="&sio;User">
+        <rdfs:subClassOf rdf:resource="&prov;Agent"/>
+    </owl:Class>
+    
+
+
+    <!-- http://semanticscience.org/ontology/sio.owl#analytic_process -->
+
+    <owl:Class rdf:about="&sio;analytic_process">
+        <rdfs:subClassOf rdf:resource="&prov;Activity"/>
+        <terms:description rdf:resource="&xsd;string"/>
+        <terms:identifier rdf:resource="&xsd;string"/>
+        <owl:versionInfo rdf:resource="&xsd;string"/>
+    </owl:Class>
+    
+
+
+    <!-- http://semanticscience.org/ontology/sio.owl#analytics_input_node -->
+
+    <owl:Class rdf:about="&sio;analytics_input_node">
+        <rdfs:subClassOf rdf:resource="&prov;Entity"/>
+    </owl:Class>
+    
+
+
+    <!-- http://semanticscience.org/ontology/sio.owl#analytics_result_node -->
+
+    <owl:Class rdf:about="&sio;analytics_result_node">
+        <rdfs:subClassOf rdf:resource="&prov;Entity"/>
+        <prov:wasGeneratedBy rdf:resource="&sio;analytic_process"/>
+        <prov:wasDerivedFrom rdf:resource="&sio;analytics_input_node"/>
+        <sio:predictedValue rdf:resource="&xsd;string"/>
+        <sio:attributeValue rdf:resource="&xsd;string"/>
+        <sio:errorMeans rdf:resource="&xsd;string"/>
+    </owl:Class>
+    
+
+
+    <!-- http://semanticscience.org/resource/SIO_000000 -->
+
+    <rdf:Description rdf:about="http://semanticscience.org/resource/SIO_000000">
+        <rdfs:subClassOf rdf:resource="&sio;analytic_process"/>
+    </rdf:Description>
+    
+
+
+    <!-- http://www.w3.org/ns/prov#Activity -->
+
+    <owl:Class rdf:about="&prov;Activity">
+        <prov:wasAssociatedWith rdf:resource="&sio;Software"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.w3.org/ns/prov#Agent -->
+
+    <owl:Class rdf:about="&prov;Agent"/>
+    
+
+
+    <!-- http://www.w3.org/ns/prov#Entity -->
+
+    <owl:Class rdf:about="&prov;Entity"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://semanticscience.org/ontology/sio.owl#AnalyticsResultNode1 -->
+
+    <owl:NamedIndividual rdf:about="&sio;AnalyticsResultNode1">
+        <rdf:type rdf:resource="&sio;analytics_result_node"/>
+        <prov:wasGeneratedBy rdf:resource="&sio;LindaAnalyticProcess"/>
+        <prov:wasDerivedFrom rdf:resource="&sio;openRDFNode1"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://semanticscience.org/ontology/sio.owl#AnalyticsResultNode2 -->
+
+    <owl:NamedIndividual rdf:about="&sio;AnalyticsResultNode2">
+        <rdf:type rdf:resource="&sio;analytics_result_node"/>
+        <prov:wasGeneratedBy rdf:resource="&sio;LindaAnalyticProcess"/>
+        <prov:wasDerivedFrom rdf:resource="&sio;openRDFNode2"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://semanticscience.org/ontology/sio.owl#AnalyticsResultNode3 -->
+
+    <owl:NamedIndividual rdf:about="&sio;AnalyticsResultNode3">
+        <rdf:type rdf:resource="&sio;analytics_result_node"/>
+        <prov:wasGeneratedBy rdf:resource="&sio;LindaAnalyticProcess"/>
+        <prov:wasDerivedFrom rdf:resource="&sio;openRDFNode3"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://semanticscience.org/ontology/sio.owl#J48 -->
+
+    <owl:NamedIndividual rdf:about="&sio;J48">
+        <rdf:type rdf:resource="http://semanticscience.org/resource/SIO_000127"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://semanticscience.org/ontology/sio.owl#LinDAnalyticsModule -->
+
+    <owl:NamedIndividual rdf:about="&sio;LinDAnalyticsModule">
+        <rdf:type rdf:resource="&sio;Software"/>
+        <prov:actedOnBehalfOf rdf:resource="&sio;LindaUser"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://semanticscience.org/ontology/sio.owl#LindaAnalyticProcess -->
+
+    <owl:NamedIndividual rdf:about="&sio;LindaAnalyticProcess">
+        <rdf:type rdf:resource="&sio;analytic_process"/>
+        <terms:identifier rdf:datatype="&xsd;integer">45</terms:identifier>
+        <terms:description>J48 Linda Analytic Process to a given dataset.bla bla bla</terms:description>
+        <owl:versionInfo>1.0.0</owl:versionInfo>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://semanticscience.org/ontology/sio.owl#LindaUser -->
+
+    <owl:NamedIndividual rdf:about="&sio;LindaUser">
+        <rdf:type rdf:resource="&sio;User"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://semanticscience.org/ontology/sio.owl#analytics_input_node -->
+
+    <owl:NamedIndividual rdf:about="&sio;analytics_input_node">
+        <owl:sameAs rdf:resource="&xsd;anyURI"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://semanticscience.org/ontology/sio.owl#openRDFNode1 -->
+
+    <owl:NamedIndividual rdf:about="&sio;openRDFNode1">
+        <rdf:type rdf:resource="&sio;analytics_input_node"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://semanticscience.org/ontology/sio.owl#openRDFNode2 -->
+
+    <owl:NamedIndividual rdf:about="&sio;openRDFNode2">
+        <rdf:type rdf:resource="&sio;analytics_input_node"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://semanticscience.org/ontology/sio.owl#openRDFNode3 -->
+
+    <owl:NamedIndividual rdf:about="&sio;openRDFNode3">
+        <rdf:type rdf:resource="&sio;analytics_input_node"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.w3.org/2001/XMLSchema#anyURI -->
+
+    <owl:NamedIndividual rdf:about="&xsd;anyURI"/>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 3.5.0) http://owlapi.sourceforge.net -->
+
