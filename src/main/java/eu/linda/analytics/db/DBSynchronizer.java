@@ -7,9 +7,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
-import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -48,7 +45,11 @@ public class DBSynchronizer {
                         rs.getString("modelReadable"),
                         rs.getString("processinfo"),
                         rs.getString("resultdocument"),
-                        rs.getString("exportFormat")
+                        rs.getString("exportFormat"),
+                        rs.getInt("version"),
+                        rs.getString("description"),
+                        rs.getBoolean("publishedToTriplestore"),
+                        rs.getString("loadedRDFContext")       
                 );
                 
                 analytics.setAlgorithm_name(rs.getString("name"));
@@ -150,5 +151,47 @@ public class DBSynchronizer {
             System.out.println("ERROR SEVERE"+ ex);
         }
     }//EoM updateParent   
+    
+    
+    public void updateLindaAnalyticsVersion(int version, int analytics_id) {
+        try {
+            String query = "update analytics_analytics set version=? where id=?";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, version+1);
+            preparedStatement.setInt(2, analytics_id);
+            preparedStatement.executeUpdate();
+
+        } catch (SQLException ex) {
+            Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("ERROR SEVERE"+ ex);
+        }
+    }//EoM updateParent 
+    
+    
+     public void updateLindaAnalyticsRDFInfo(String rdfContextURL,boolean publishedToTriplestore, int analytics_id) {
+        try {
+            
+            String rdfContextInfo = "";
+            if (!rdfContextURL.equalsIgnoreCase("")){
+               rdfContextInfo =   "Result RDF file has been succesfully loaded to LinDA Triplestore."
+                    + "You can access the rdf file at : <a href="+rdfContextURL+">" + rdfContextURL +"</a> ."
+                    + "You can submit a new query to the consumption application "
+                    + "in order to explore the rdf output in compination with the rest data of triplestore";
+            
+            }
+            
+           
+            String query = "update analytics_analytics set loadedRDFContext=?, publishedToTriplestore=? where id=?";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, rdfContextInfo);
+            preparedStatement.setBoolean(2, publishedToTriplestore);
+            preparedStatement.setInt(3, analytics_id);
+            preparedStatement.executeUpdate();
+
+        } catch (SQLException ex) {
+            Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("ERROR SEVERE"+ ex);
+        }
+    }//EoM updateParent 
    
 }//EoC

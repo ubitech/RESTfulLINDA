@@ -39,7 +39,7 @@ public class MessageRestService {
         
         manageOpenrdfLindaRepo.loadtotriplestore(analytics);
         
-        return Response.status(200).entity("Makari...Analytic Process has runned").build();
+        return Response.status(200).entity("RDF file has been succesfully published at Linda common server triplestore").build();
 
     }
 

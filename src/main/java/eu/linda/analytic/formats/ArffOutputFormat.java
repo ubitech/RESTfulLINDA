@@ -39,6 +39,7 @@ public class ArffOutputFormat extends OutputFormat {
 
             helpfulFuncions.saveFile(targetFileNameFullPath, dataToExport.toString());
             dbsynchronizer.updateLindaAnalytics(targetFileName, "resultdocument", analytics.getId());
+            dbsynchronizer.updateLindaAnalyticsVersion(analytics.getVersion(),analytics.getId());
        
         } else {
             helpfulFuncions.nicePrintMessage("There are no data to be exported to Arff");

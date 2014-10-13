@@ -14,7 +14,7 @@ public class Analytics {
     public Analytics() {
     }
 
-    public Analytics(int id, int category_id, int algorithm_id, String document, String testdocument, String model,String modelReadable,String processinfo, String resultdocument, String exportFormat) {
+    public Analytics(int id, int category_id, int algorithm_id, String document, String testdocument, String model,String modelReadable,String processinfo, String resultdocument, String exportFormat, int version, String description, boolean publishedToTriplestore,String loadedRDFContext) {
         this.id = id;
         this.category_id = category_id;
         this.algorithm_id = algorithm_id;
@@ -25,6 +25,10 @@ public class Analytics {
         this.processinfo = processinfo;
         this.resultdocument = resultdocument;
         this.exportFormat = exportFormat;
+        this.version= version;
+        this.description= description;
+        this.publishedToTriplestore = publishedToTriplestore;
+        this.loadedRDFContext = loadedRDFContext;
     }
     
     
@@ -52,6 +56,17 @@ public class Analytics {
 
 
     private String exportFormat;
+    
+    private int version;
+    
+    private String description;
+    
+    private boolean publishedToTriplestore;
+    
+    private String loadedRDFContext;
+    
+    
+    
 
     public int getId() {
         return id;
@@ -144,7 +159,38 @@ public class Analytics {
     public void setAlgorithm_name(String algorithm_name) {
         this.algorithm_name = algorithm_name;
     }
-    
+
+    public int getVersion() {
+        return version;
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public boolean isPublishedToTriplestore() {
+        return publishedToTriplestore;
+    }
+
+    public void setPublishedToTriplestore(boolean publishedToTriplestore) {
+        this.publishedToTriplestore = publishedToTriplestore;
+    }
+
+    public String getLoadedRDFContext() {
+        return loadedRDFContext;
+    }
+
+    public void setLoadedRDFContext(String loadedRDFContext) {
+        this.loadedRDFContext = loadedRDFContext;
+    }
     
 
 

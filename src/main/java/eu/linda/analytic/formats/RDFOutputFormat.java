@@ -86,6 +86,8 @@ public class RDFOutputFormat extends OutputFormat {
             }
 
             dbsynchronizer.updateLindaAnalytics(targetFileName, "resultdocument", analytics.getId());
+            dbsynchronizer.updateLindaAnalyticsVersion(analytics.getVersion(),analytics.getId());
+            dbsynchronizer.updateLindaAnalyticsRDFInfo("",false,analytics.getId());
 
         } else {
             helpfulFuncions.nicePrintMessage("There are no data to be exported to RDF");

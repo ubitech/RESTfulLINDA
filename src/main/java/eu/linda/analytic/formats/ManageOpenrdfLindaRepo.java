@@ -10,9 +10,11 @@ package eu.linda.analytic.formats;
  * @author eleni
  */
 import eu.linda.analytics.config.Configuration;
+import eu.linda.analytics.db.DBSynchronizer;
 import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.weka.utils.HelpfulFunctions;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -30,7 +32,6 @@ import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.http.HTTPRepository;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
-import org.openrdf.sail.memory.model.MemValueFactory;
 
 public class ManageOpenrdfLindaRepo {
 
@@ -44,10 +45,11 @@ public class ManageOpenrdfLindaRepo {
         DateFormat formatter = new SimpleDateFormat("ddMMyyyy");
         String today = formatter.format(date);
 
-        String datasetContextToString = "analytics" + a.getId()+ "V" + 1 + "Date" + today;
+        String datasetContextToString = "analytics" + a.getId() + "V" + a.getVersion() + "Date" + today;
+
         File file = new File(Configuration.docroot + a.getResultdocument());
-        String base = "http://localhost:8080/openrdf-sesame/repositories/myRepository/statements?context=:_" ;
-        String baseURI = base + datasetContextToString +"/";
+        String base = "http://localhost:8080/openrdf-sesame/repositories/" + repositoryID + "/statements?context=_:";
+        String baseURI = base + datasetContextToString + "/";
 
         try {
             repo.initialize();
@@ -56,7 +58,20 @@ public class ManageOpenrdfLindaRepo {
             try {
                 ValueFactory vf = ValueFactoryImpl.getInstance();
                 Resource datasetContext = vf.createBNode(datasetContextToString);
-                con.add(file, baseURI, RDFFormat.RDFXML, datasetContext);
+
+                if (a.getExportFormat().equalsIgnoreCase("RDFXML")) {
+                     con.add(file, baseURI, RDFFormat.RDFXML, datasetContext);
+
+                } else if (a.getExportFormat().equalsIgnoreCase("TTL")) {
+                     con.add(file, baseURI, RDFFormat.TURTLE, datasetContext);
+
+                } else if (a.getExportFormat().equalsIgnoreCase("NTRIPLES")) {
+                     con.add(file, baseURI, RDFFormat.NTRIPLES, datasetContext);
+                }
+               
+               
+
+                this.cleanLocalAnalyticsRepo(a, base + datasetContextToString);
 
             } catch (IOException ex) {
                 Logger.getLogger(ManageOpenrdfLindaRepo.class.getName()).log(Level.SEVERE, null, ex);
@@ -70,6 +85,17 @@ public class ManageOpenrdfLindaRepo {
         } catch (OpenRDFException e) {
             // handle exception
         }
+
+    }
+
+    /* after loading the rdf file at linda triplestore:
+     2. update publishedToTriplestore flag
+     3. fill loadedRDFContext field
+     */
+    public void cleanLocalAnalyticsRepo(Analytics a, String rdfContextURL) {
+
+        DBSynchronizer dbSynchronizer = new DBSynchronizer();
+        dbSynchronizer.updateLindaAnalyticsRDFInfo(rdfContextURL, true, a.getId());
 
     }
 
