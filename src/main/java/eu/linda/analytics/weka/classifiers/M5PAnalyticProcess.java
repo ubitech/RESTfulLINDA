@@ -5,8 +5,8 @@
  */
 package eu.linda.analytics.weka.classifiers;
 
-import eu.linda.analytic.controller.AnalyticProcess;
-import eu.linda.analytic.formats.InputFormat;
+import eu.linda.analytics.controller.AnalyticProcess;
+import eu.linda.analytics.formats.InputFormat;
 import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.weka.utils.HelpfulFunctions;
@@ -54,15 +54,22 @@ public class M5PAnalyticProcess extends AnalyticProcess {
         Vector M5Pmodel;
         try {
             //  M5Pmodel = m5pOutput.trainModelM5P(Configuration.docroot + analytics.getDocument());
-            AbstractList<Instance> data1 = input.importData(Configuration.docroot + analytics.getDocument());
-            Instances data = (Instances) data1;
-            
-             // remove dataset metadata (first two columns)    
-            if (analytics.getExportFormat().equalsIgnoreCase("rdf")) {
+            AbstractList<Instance> abstractListdata1;
+            Instances data;
+
+            // remove dataset metadata (first two columns)    
+            if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
+                abstractListdata1 = input.importData(Configuration.docroot + analytics.getDocument(), true);
+                data = (Instances) abstractListdata1;
                 HashMap<String, Instances> separatedData = helpfulFunctions.separateDataFromMetadataInfo(data);
                 data = separatedData.get("newData");
+            } else {
+
+                abstractListdata1 = input.importData(Configuration.docroot + analytics.getDocument(), false);
+                data = (Instances) abstractListdata1;
+
             }
-            
+
             data.setClassIndex(data.numAttributes() - 1);
 
             // train M5P
@@ -92,17 +99,20 @@ public class M5PAnalyticProcess extends AnalyticProcess {
         HashMap<String, Instances> separatedData = null;
         AbstractList dataToReturn = null;
         try {
-            //jsonresult = m5pOutput.predictM5P(analytics);
 
-            AbstractList<Instance> data1 = input.importData(Configuration.docroot + analytics.getTestdocument());
-            Instances data = (Instances) data1;
-            
-             if (analytics.getExportFormat().equalsIgnoreCase("rdf")) {
+            AbstractList<Instance> abstractList;
+            Instances data;
+
+            if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
+                abstractList = input.importData(Configuration.docroot + analytics.getTestdocument(), true);
+                data = (Instances) abstractList;
                 separatedData = helpfulFunctions.separateDataFromMetadataInfo(data);
                 data = separatedData.get("newData");
+            } else {
+                abstractList = input.importData(Configuration.docroot + analytics.getTestdocument(), false);
+                data = (Instances) abstractList;
             }
-            
-            
+
             data.setClassIndex(data.numAttributes() - 1);
             Vector v = (Vector) SerializationHelper.read(Configuration.docroot + analytics.getModel());
 
@@ -129,8 +139,10 @@ public class M5PAnalyticProcess extends AnalyticProcess {
 
             List<Instance> instances = new ArrayList<Instance>();
 
-            System.out.println("inst# ,    actual, ->  predicted ,   error");
+           // System.out.println("inst# ,    actual, ->  predicted ,   error");
             String result = "inst# ,    actual,   predicted ,   error  \n";
+            int dataLength = data.numAttributes();
+            
             for (int i = 0; i < data.numInstances(); i++) {
                 Instance curr = data.instance(i);
 
@@ -167,34 +179,19 @@ public class M5PAnalyticProcess extends AnalyticProcess {
 
                 // predict class
                 double pred = cl.classifyInstance(inst);
-                double error = pred - inst.classValue();
-                result += i + " , " + inst.classValue() + " , " + pred + " , " + error + "\n";
-
-                // Create empty instance with three attribute values
-                Instance inst1 = new SparseInstance(3);
-                // Set instance's values for the attributes "length", "weight", and "position"
-                System.out.println("======(atts.get(0)" + atts.get(0));
-
-                inst1.setValue(atts.get(0), i);
-                inst1.setValue(atts.get(1), inst.classValue());
-                inst1.setValue(atts.get(2), pred);
-                inst1.setValue(atts.get(3), error);
-                instances.add(i, inst1);
+                //double error = pred - inst.classValue();
+                curr.setClassValue(pred);
 
             }
 
-            Instances preparedata = helpfulFunctions.createArffFileFromArray(atts, instances);
-            
-             if (analytics.getExportFormat().equalsIgnoreCase("rdf")) {
-                Instances mergedData = helpfulFunctions.mergeDataAndMetadataInfo(preparedata, separatedData.get("metaData"));
-                dataToReturn= mergedData;
+            if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
+                Instances mergedData = helpfulFunctions.mergeDataAndMetadataInfo(data, separatedData.get("metaData"));
+                dataToReturn = mergedData;
 
             } else {
-                 dataToReturn = preparedata;
+                dataToReturn = data;
             }
-            
-            
-            
+
             helpfulFunctions.writeToFile(eval.toSummaryString(), "processinfo", analytics);
 
         } catch (Exception ex) {

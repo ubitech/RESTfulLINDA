@@ -1,8 +1,8 @@
 package eu.linda.analytics.rest;
 
-import eu.linda.analytic.controller.AnalyticsController;
-import eu.linda.analytic.controller.AnalyticsFactory;
-import eu.linda.analytic.formats.ManageOpenrdfLindaRepo;
+import eu.linda.analytics.controller.AnalyticsController;
+import eu.linda.analytics.controller.AnalyticsFactory;
+import eu.linda.analytics.formats.ManageOpenrdfLindaRepo;
 import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.weka.utils.HelpfulFunctions;
 import javax.ws.rs.GET;

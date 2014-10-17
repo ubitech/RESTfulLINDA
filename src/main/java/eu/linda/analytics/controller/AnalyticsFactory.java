@@ -3,16 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package eu.linda.analytic.controller;
+package eu.linda.analytics.controller;
 
-import eu.linda.analytic.formats.ArffInputFormat;
-import eu.linda.analytic.formats.ArffOutputFormat;
-import eu.linda.analytic.formats.CSVInputFormat;
-import eu.linda.analytic.formats.CSVOutputFormat;
-import eu.linda.analytic.formats.InputFormat;
-import eu.linda.analytic.formats.OutputFormat;
-import eu.linda.analytic.formats.RDFOutputFormat;
-import eu.linda.analytic.formats.TXTOutputFormat;
+import eu.linda.analytics.formats.ArffInputFormat;
+import eu.linda.analytics.formats.ArffOutputFormat;
+import eu.linda.analytics.formats.CSVInputFormat;
+import eu.linda.analytics.formats.CSVOutputFormat;
+import eu.linda.analytics.formats.InputFormat;
+import eu.linda.analytics.formats.OutputFormat;
+import eu.linda.analytics.formats.RDFOutputFormat;
+import eu.linda.analytics.formats.TXTOutputFormat;
 import eu.linda.analytics.weka.associations.AprioriAnalyticProcess;
 import eu.linda.analytics.weka.classifiers.J48AnalyticProcess;
 import eu.linda.analytics.weka.classifiers.M5PAnalyticProcess;

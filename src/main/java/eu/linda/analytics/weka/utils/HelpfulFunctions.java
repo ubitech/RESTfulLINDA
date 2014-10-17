@@ -27,11 +27,12 @@ import weka.filters.unsupervised.attribute.Remove;
 /**
  * Generates a little ARFF file with different attribute types.
  *
- * @author FracPete
  */
 public class HelpfulFunctions {
+      DBSynchronizer dbsynchronizer;
 
     public HelpfulFunctions() {
+       dbsynchronizer= new DBSynchronizer();
 
     }
 
@@ -48,7 +49,7 @@ public class HelpfulFunctions {
             // serialize && save model
             weka.core.SerializationHelper.write(Configuration.docroot + targetFileName, model);
 
-            DBSynchronizer dbsynchronizer = new DBSynchronizer();
+            
             dbsynchronizer.updateLindaAnalyticsModel(targetFileName, analytics.getId());
 
             analytics.setModel(targetFileName);
@@ -76,36 +77,11 @@ public class HelpfulFunctions {
 
     public boolean writeToFile(String content, String column, Analytics analytics) {
 
-        DBSynchronizer dbsynchronizer = new DBSynchronizer();
         //prepare target file name
         String[] splitedSourceFileName = analytics.getDocument().split(".arff");
 
         String targetFileName = "";
-        /*
-         if (column.equalsIgnoreCase("resultdocument")) {
-         targetFileName = (splitedSourceFileName[0] + "_" + analytics.getAlgorithm_name() + "_resultdocument.arff").replace("datasets", "results");
 
-         String targetFileNameFullPath = Configuration.docroot + targetFileName;
-         saveFile(targetFileNameFullPath, content);
-
-         System.out.println("====analytics.getExportFormat()==="+analytics.getExportFormat());
-             
-         if (analytics.getExportFormat().equalsIgnoreCase("csv")) {
-             
-         System.out.println("====eimai mesa sto csv===");
-
-               
-         String targetFileNameCSV = (splitedSourceFileName[0] + "_" + analytics.getAlgorithm_name() + "_resultdocument." + analytics.getExportFormat()).replace("datasets", "results");
-         String targetFileNameCSVFull = Configuration.docroot + targetFileNameCSV;
-
-         saveFileAsCSV(targetFileNameFullPath, targetFileNameCSVFull);
-         dbsynchronizer.updateLindaAnalytics(targetFileNameCSV, column, analytics.getId());
-
-         } else {
-         dbsynchronizer.updateLindaAnalytics(targetFileName, column, analytics.getId());
-         }
-
-         } else */
         if (column.equalsIgnoreCase("processinfo")) {
             targetFileName = (splitedSourceFileName[0] + "_" + analytics.getAlgorithm_id() + "_processinfo.txt").replace("datasets", "results");
             String targetFileNameFullPath = Configuration.docroot + targetFileName;
@@ -139,6 +115,14 @@ public class HelpfulFunctions {
         return true;
     }
 
+    public void deleteFile(String fileToDelete) {
+        File file = new File(Configuration.docroot + fileToDelete);
+
+        if (!file.exists()) {
+            file.delete();
+        }
+    }
+
     public boolean saveFileAsCSV(String targetFileNameFullPath, String targetFileNameCSVFull) {
 
         try {
@@ -162,34 +146,9 @@ public class HelpfulFunctions {
         }
         return true;
     }
-
+/*
     public Instances createArffFileFromArray(ArrayList<Attribute> atts, List<Instance> instances) {
-        /*
-         //ArrayList<Attribute> atts = new ArrayList<Attribute>();
-         List<Instance> instances = new ArrayList<Instance>();
-         double[][] data = {{4058.0, 4059.0, 4060.0, 214.0, 1710.0, 2452.0, 2473.0, 2474.0, 2475.0, 2476.0, 2477.0, 2478.0, 2688.0, 2905.0, 2906.0, 2907.0, 2908.0, 2909.0, 2950.0, 2969.0, 2970.0, 3202.0, 3342.0, 3900.0, 4007.0, 4052.0, 4058.0, 4059.0, 4060.0},
-         {19.0, 20.0, 21.0, 31.0, 103.0, 136.0, 141.0, 142.0, 143.0, 144.0, 145.0, 146.0, 212.0, 243.0, 244.0, 245.0, 246.0, 247.0, 261.0, 270.0, 271.0, 294.0, 302.0, 340.0, 343.0, 354.0, 356.0, 357.0, 358.0}};
 
-         int numDimensions = 2;
-
-         int numInstances = 3;
-
-         for (int dim = 0; dim < numDimensions; dim++) {
-         Attribute current = new Attribute("Attribute" + dim, dim);
-         if (dim == 0) {
-         for (int obj = 0; obj < numInstances; obj++) {
-         instances.add(new SparseInstance(numDimensions));
-         }
-         }
-
-         for (int obj = 0; obj < numInstances; obj++) {
-         instances.get(obj).setValue(current, data[dim][obj]);
-         //System.out.println("current"+current);
-         }
-
-         atts.add(current);
-         }
-         */
         Instances newDataset = new Instances("Dataset", atts, instances.size());
 
         for (Instance inst : instances) {
@@ -199,7 +158,7 @@ public class HelpfulFunctions {
         System.out.println("dataset arff" + newDataset.toString());
 
         return newDataset;
-    }
+    }*/
 
     public Analytics saveModelasVector(Vector model, Analytics analytics) throws Exception {
         String[] splitedSourceFileName = analytics.getDocument().split(".arff");
@@ -249,17 +208,15 @@ public class HelpfulFunctions {
 
     public HashMap separateDataFromMetadataInfo(Instances data) {
         String[] options = new String[2];
-        options[0] = "-R";                              // "range"
+        options[0] = "-R";    // "range"
         options[1] = "1,2";
         Instances newData = null;
         Instances metaData = null;
         try {
-            Remove remove = new Remove();               // new instance of filter
-
-            remove.setOptions(options);                 // set options
-
-            remove.setInputFormat(data);                // inform filter about dataset **AFTER** setting options
-            newData = Filter.useFilter(data, remove);   // apply filter                
+            Remove remove = new Remove();             // new instance of filter
+            remove.setOptions(options);               // set options
+            remove.setInputFormat(data);              // inform filter about dataset **AFTER** setting options
+            newData = Filter.useFilter(data, remove); // apply filter                
             newData.setClassIndex(newData.numAttributes() - 1);
 
             remove.setInvertSelection(true);
@@ -275,8 +232,6 @@ public class HelpfulFunctions {
         resultMap.put("newData", newData);
         resultMap.put("metaData", metaData);
 
-        //System.out.println("--newData--"+newData);
-        //System.out.println("--metaData--"+metaData);
         return resultMap;
     }
 
@@ -297,7 +252,6 @@ public class HelpfulFunctions {
                 mergedData.instance(i).setValue(1, metadata.get(i).stringValue(1));
             }
 
-           //JSONArray mergedDataArray  = new JSONArray();
         } catch (Exception ex) {
             Logger.getLogger(HelpfulFunctions.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -313,48 +267,35 @@ public class HelpfulFunctions {
         }
         return false;
     }
-    
-     public Analytics connectToAnalyticsTable(int id) {
+
+    public Analytics connectToAnalyticsTable(int id) {
         ConnectionController connectionController = new ConnectionController();
         connectionController.readProperties();
-        DBSynchronizer dbsynchronizer = new DBSynchronizer();
         Analytics analytics = dbsynchronizer.getlindaAnalytics_analytics(id);
         return analytics;
     }
-    /*
-     public static void main(String[] args) throws Exception {
 
-     ArrayList<Attribute> atts = new ArrayList<Attribute>();
-     List<Instance> instances = new ArrayList<Instance>();
-     double[][] data = {{4058.0, 4059.0, 4060.0, 214.0, 1710.0, 2452.0, 2473.0, 2474.0, 2475.0, 2476.0, 2477.0, 2478.0, 2688.0, 2905.0, 2906.0, 2907.0, 2908.0, 2909.0, 2950.0, 2969.0, 2970.0, 3202.0, 3342.0, 3900.0, 4007.0, 4052.0, 4058.0, 4059.0, 4060.0},
-     {19.0, 20.0, 21.0, 31.0, 103.0, 136.0, 141.0, 142.0, 143.0, 144.0, 145.0, 146.0, 212.0, 243.0, 244.0, 245.0, 246.0, 247.0, 261.0, 270.0, 271.0, 294.0, 302.0, 340.0, 343.0, 354.0, 356.0, 357.0, 358.0}};
+    public void updateProcessMessageToAnalyticsTable(String message, int id) {
+        dbsynchronizer.updateLindaAnalyticsProcessMessage(message, id);
 
-     int numDimensions = 2;
+    }
 
-     int numInstances = 3;
+    public void deleteResultDocumentFromAnalytcsTable(int id) {
+        dbsynchronizer.emptyLindaAnalyticsResultDocument(id);
 
-     for (int dim = 0; dim < numDimensions; dim++) {
-     Attribute current = new Attribute("Attribute" + dim, dim);
-     if (dim == 0) {
-     for (int obj = 0; obj < numInstances; obj++) {
-     instances.add(new SparseInstance(numDimensions));
-     }
-     }
+    }
 
-     for (int obj = 0; obj < numInstances; obj++) {
-     instances.get(obj).setValue(current, data[dim][obj]);
-     //System.out.println("current"+current);
-     }
+    public void cleanPreviousInfo(Analytics analytics) {
+        
+        //delete result document
+        deleteFile(analytics.getResultdocument());
+        deleteFile(analytics.getProcessinfo());
+        //empty the analytic result document
+        deleteResultDocumentFromAnalytcsTable(analytics.getId());
+                
 
-     atts.add(current);
-     }
+    }
 
-     Instances newDataset = new Instances("Dataset", atts, instances.size());
+    
 
-     for (Instance inst : instances) {
-     newDataset.add(inst);
-     }
-     System.out.println("dataset arff" + newDataset.toString());
-     }
-     */
 }

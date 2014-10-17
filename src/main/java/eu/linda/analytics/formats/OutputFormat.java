@@ -4,18 +4,17 @@
  * and open the template in the editor.
  */
 
-package eu.linda.analytic.formats;
+package eu.linda.analytics.formats;
 
+import eu.linda.analytics.model.Analytics;
 import java.util.AbstractList;
 
 /**
  *
  * @author eleni
  */
+abstract public class OutputFormat {
 
-abstract public class InputFormat { 
-
-    abstract public AbstractList importData(String pathToFile);
+    abstract public void exportData(Analytics analytics,AbstractList dataToExport);
 
 }
-

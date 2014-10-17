@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package eu.linda.analytic.formats;
+package eu.linda.analytics.formats;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import eu.linda.analytics.config.Configuration;
@@ -73,7 +73,7 @@ public class RDFOutputFormat extends OutputFormat {
                     fileName = targetFileNameFullPath + ".nt";
                     targetFileName = targetFileName + ".nt";
                     outToSave = new FileWriter(fileName);
-                    model.write(outToSave, "NTRIPLES");
+                    model.write(outToSave, "N3");
 
                 }
                 outToSave.close();
@@ -86,11 +86,14 @@ public class RDFOutputFormat extends OutputFormat {
             }
 
             dbsynchronizer.updateLindaAnalytics(targetFileName, "resultdocument", analytics.getId());
-            dbsynchronizer.updateLindaAnalyticsVersion(analytics.getVersion(),analytics.getId());
-            dbsynchronizer.updateLindaAnalyticsRDFInfo("",false,analytics.getId());
+            dbsynchronizer.updateLindaAnalyticsVersion(analytics.getVersion(), analytics.getId());
+            dbsynchronizer.updateLindaAnalyticsRDFInfo("", false, analytics.getId());
 
         } else {
             helpfulFuncions.nicePrintMessage("There are no data to be exported to RDF");
+            if (!analytics.getResultdocument().equalsIgnoreCase("")) {
+                helpfulFuncions.cleanPreviousInfo(analytics);
+            }
         }
 
     }

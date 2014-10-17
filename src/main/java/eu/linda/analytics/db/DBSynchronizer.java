@@ -1,6 +1,5 @@
 package eu.linda.analytics.db;
 
-
 import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.model.Classification;
 import java.sql.Connection;
@@ -49,11 +48,11 @@ public class DBSynchronizer {
                         rs.getInt("version"),
                         rs.getString("description"),
                         rs.getBoolean("publishedToTriplestore"),
-                        rs.getString("loadedRDFContext")       
+                        rs.getString("loadedRDFContext")
                 );
-                
+
                 analytics.setAlgorithm_name(rs.getString("name"));
-                
+
                 break;
             }
         } catch (SQLException ex) {
@@ -62,8 +61,8 @@ public class DBSynchronizer {
         return analytics;
 
     }//EoM   
-    
-        /*
+
+    /*
      * Fetch analytics_analytics by id
      */
     public Classification getlindaAnalytics_classification(int id) {
@@ -84,9 +83,9 @@ public class DBSynchronizer {
                         rs.getString("resultdocument"),
                         rs.getString("exportFormat")
                 );
-                
+
                 classification.setAlgorithm_name(rs.getString("name"));
-                
+
                 break;
             }
         } catch (SQLException ex) {
@@ -95,18 +94,16 @@ public class DBSynchronizer {
         return classification;
 
     }//EoM  
-    
-    
+
     /*
      * Update LINDA Analytics with result file
-    */
-    
-        /*
+     */
+    /*
      * Updates an Item
      */
-    public void updateLindaAnalytics(String resultPath,String column, int analytics_id) {
+    public void updateLindaAnalytics(String resultPath, String column, int analytics_id) {
         try {
-            String query = "update analytics_analytics set "+column+"=? where id=?";
+            String query = "update analytics_analytics set " + column + "=? where id=?";
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, resultPath);
             preparedStatement.setInt(2, analytics_id);
@@ -114,11 +111,11 @@ public class DBSynchronizer {
 
         } catch (SQLException ex) {
             Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("ERROR SEVERE"+ ex);
+            System.out.println("ERROR SEVERE" + ex);
         }
     }//EoM updateParent   
-    
-            /*
+
+    /*
      * Updates an Item
      */
     public void updateLindaAnalyticsModel(String resultPath, int analytics_id) {
@@ -131,11 +128,11 @@ public class DBSynchronizer {
 
         } catch (SQLException ex) {
             Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("ERROR SEVERE"+ ex);
+            System.out.println("ERROR SEVERE" + ex);
         }
     }//EoM updateParent   
-    
-                /*
+
+    /*
      * Updates an Item
      */
     public void updateLindaAnalyticsModelReadable(String resultPath, int analytics_id) {
@@ -148,39 +145,36 @@ public class DBSynchronizer {
 
         } catch (SQLException ex) {
             Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("ERROR SEVERE"+ ex);
+            System.out.println("ERROR SEVERE" + ex);
         }
     }//EoM updateParent   
-    
-    
+
     public void updateLindaAnalyticsVersion(int version, int analytics_id) {
         try {
             String query = "update analytics_analytics set version=? where id=?";
             PreparedStatement preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setInt(1, version+1);
+            preparedStatement.setInt(1, version + 1);
             preparedStatement.setInt(2, analytics_id);
             preparedStatement.executeUpdate();
 
         } catch (SQLException ex) {
             Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("ERROR SEVERE"+ ex);
+            System.out.println("ERROR SEVERE" + ex);
         }
     }//EoM updateParent 
-    
-    
-     public void updateLindaAnalyticsRDFInfo(String rdfContextURL,boolean publishedToTriplestore, int analytics_id) {
+
+    public void updateLindaAnalyticsRDFInfo(String rdfContextURL, boolean publishedToTriplestore, int analytics_id) {
         try {
-            
+
             String rdfContextInfo = "";
-            if (!rdfContextURL.equalsIgnoreCase("")){
-               rdfContextInfo =   "Result RDF file has been succesfully loaded to LinDA Triplestore."
-                    + "You can access the rdf file at : <a href="+rdfContextURL+">" + rdfContextURL +"</a> ."
-                    + "You can submit a new query to the consumption application "
-                    + "in order to explore the rdf output in compination with the rest data of triplestore";
-            
+            if (!rdfContextURL.equalsIgnoreCase("")) {
+                rdfContextInfo = "Result RDF file has been succesfully loaded to LinDA Triplestore."
+                        + "You can access the rdf file at : <a href=" + rdfContextURL + ">" + rdfContextURL + "</a> ."
+                        + "You can submit a new query to the consumption application "
+                        + "in order to explore the rdf output in compination with the rest data of triplestore";
+
             }
-            
-           
+
             String query = "update analytics_analytics set loadedRDFContext=?, publishedToTriplestore=? where id=?";
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, rdfContextInfo);
@@ -190,8 +184,39 @@ public class DBSynchronizer {
 
         } catch (SQLException ex) {
             Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("ERROR SEVERE"+ ex);
+            System.out.println("ERROR SEVERE" + ex);
         }
     }//EoM updateParent 
-   
+
+    public void updateLindaAnalyticsProcessMessage(String message, int analytics_id) {
+        try {
+
+            String query = "update analytics_analytics set processMessage=? where id=?";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, message);
+            preparedStatement.setInt(2, analytics_id);
+            preparedStatement.executeUpdate();
+
+        } catch (SQLException ex) {
+            Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("ERROR SEVERE" + ex);
+        }
+    }//EoM updateParent 
+
+    public void emptyLindaAnalyticsResultDocument(int analytics_id) {
+        try {
+            
+            String query = "update analytics_analytics set processinfo=? , resultdocument=? where id=?";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, "");
+            preparedStatement.setString(2, "");
+            preparedStatement.setInt(3, analytics_id);
+            preparedStatement.executeUpdate();
+
+        } catch (SQLException ex) {
+            Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("ERROR SEVERE" + ex);
+        }
+    }//EoM updateParent 
+
 }//EoC

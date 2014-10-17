@@ -5,8 +5,8 @@
  */
 package eu.linda.analytics.weka.associations;
 
-import eu.linda.analytic.controller.AnalyticProcess;
-import eu.linda.analytic.formats.InputFormat;
+import eu.linda.analytics.controller.AnalyticProcess;
+import eu.linda.analytics.formats.InputFormat;
 import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.weka.utils.HelpfulFunctions;
@@ -21,6 +21,7 @@ import org.json.JSONArray;
 import weka.associations.Apriori;
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.filters.Filter;
 
 /**
  *
@@ -28,7 +29,6 @@ import weka.core.Instances;
  */
 public class AprioriAnalyticProcess extends AnalyticProcess {
 
-    _AprioriOutput aprioriOutput;
     HelpfulFunctions helpfulFunctions;
     InputFormat input;
 
@@ -49,21 +49,32 @@ public class AprioriAnalyticProcess extends AnalyticProcess {
     @Override
     public AbstractList eval(Analytics analytics) {
 
-        helpfulFunctions.nicePrintMessage("Eval Apriori");
-        JSONArray jsonresult = null;
         try {
-            //jsonresult = aprioriOutput.getAprioriRules(Configuration.docroot + analytics.getDocument());
+            helpfulFunctions.nicePrintMessage("Eval Apriori");
 
-            AbstractList<Instance> data1 = input.importData(Configuration.docroot + analytics.getDocument());
-            Instances data = (Instances) data1;
-            
-            
+            AbstractList<Instance> abstractListdata;
+            Instances data;
+
             // remove dataset metadata (first two columns)    
             if (analytics.getExportFormat().equalsIgnoreCase("rdf")) {
+
+                abstractListdata = input.importData(Configuration.docroot + analytics.getDocument(), true);
+                data = (Instances) abstractListdata;
                 HashMap<String, Instances> separatedData = helpfulFunctions.separateDataFromMetadataInfo(data);
                 data = separatedData.get("newData");
+            } else {
+
+                abstractListdata = input.importData(Configuration.docroot + analytics.getDocument(), false);
+                data = (Instances) abstractListdata;
+
             }
-       
+
+            weka.filters.unsupervised.attribute.StringToNominal ff = new weka.filters.unsupervised.attribute.StringToNominal(); // new instance of filter
+            ff.setAttributeRange("1-"+data.numAttributes());
+            ff.setInputFormat(data);        // inform filter about dataset **AFTER** setting options
+            data = Filter.useFilter(data, ff);
+
+
             data.setClassIndex(data.numAttributes() - 1);
 
             // build associator
@@ -76,11 +87,11 @@ public class AprioriAnalyticProcess extends AnalyticProcess {
             // output associator
             System.out.println(apriori);
 
-
             helpfulFunctions.writeToFile(apriori.toString(), "processinfo", analytics);
 
         } catch (Exception ex) {
-            Logger.getLogger(_AprioriOutput.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(AprioriAnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);
+            helpfulFunctions.updateProcessMessageToAnalyticsTable(ex.toString(),analytics.getId());
         }
 
         //Apriori returns an empty list

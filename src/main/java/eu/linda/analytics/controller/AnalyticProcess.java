@@ -4,9 +4,9 @@
  * and open the template in the editor.
  */
 
-package eu.linda.analytic.controller;
+package eu.linda.analytics.controller;
 
-import eu.linda.analytic.formats.InputFormat;
+import eu.linda.analytics.formats.InputFormat;
 import eu.linda.analytics.model.Analytics;
 import java.util.AbstractList;
 import org.json.JSONArray;

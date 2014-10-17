@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package eu.linda.analytic.formats;
+package eu.linda.analytics.formats;
 
 /**
  *
@@ -14,7 +14,6 @@ import eu.linda.analytics.db.DBSynchronizer;
 import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.weka.utils.HelpfulFunctions;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -23,7 +22,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Resource;
-import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.repository.Repository;
@@ -66,7 +64,7 @@ public class ManageOpenrdfLindaRepo {
                      con.add(file, baseURI, RDFFormat.TURTLE, datasetContext);
 
                 } else if (a.getExportFormat().equalsIgnoreCase("NTRIPLES")) {
-                     con.add(file, baseURI, RDFFormat.NTRIPLES, datasetContext);
+                     con.add(file, baseURI, RDFFormat.N3, datasetContext);
                 }
                
                

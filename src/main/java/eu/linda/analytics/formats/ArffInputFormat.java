@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package eu.linda.analytic.formats;
+package eu.linda.analytics.formats;
 
 import eu.linda.analytics.weka.utils.HelpfulFunctions;
 import java.util.AbstractList;
@@ -29,7 +29,7 @@ public class ArffInputFormat extends InputFormat {
 
 
     @Override
-    public AbstractList importData(String pathToFile) {
+    public AbstractList importData(String pathToFile, boolean isForRDFOutput) {
 
     helpfulFuncions.nicePrintMessage("import Arff file "+pathToFile);
     

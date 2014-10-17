@@ -5,16 +5,17 @@
  */
 package eu.linda.analytics.weka.classifiers;
 
-import eu.linda.analytic.controller.AnalyticProcess;
-import eu.linda.analytic.formats.InputFormat;
+import eu.linda.analytics.controller.AnalyticProcess;
+import eu.linda.analytics.formats.InputFormat;
 import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.weka.utils.HelpfulFunctions;
 import java.util.AbstractList;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.json.JSONArray;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.evaluation.output.prediction.PlainText;
@@ -30,14 +31,12 @@ import weka.core.Instances;
  */
 public class J48AnalyticProcess extends AnalyticProcess {
 
-    _J48Output j48Output;
     HelpfulFunctions helpfulFunctions;
     InputFormat input;
 
     public J48AnalyticProcess(InputFormat input) {
         helpfulFunctions = new HelpfulFunctions();
         helpfulFunctions.nicePrintMessage("Create analytic process for J48");
-        //j48Output = new J48Output(input);
         this.input = input;
 
     }
@@ -47,14 +46,21 @@ public class J48AnalyticProcess extends AnalyticProcess {
 
         helpfulFunctions.nicePrintMessage("Train J48");
         try {
-            AbstractList<Instance> data1 = input.importData(Configuration.docroot + analytics.getDocument());
-            Instances data = (Instances) data1;
+            AbstractList<Instance> abstractListdata;
+            Instances data;
 
             //Classifier j48ClassifierModel = j48Output.getJ48TreeModel(Configuration.docroot + analytics.getDocument(),datasetContainsMetadataInfo);
             // remove dataset metadata (first two columns)    
-            if (analytics.getExportFormat().equalsIgnoreCase("rdf")) {
+            if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
+                abstractListdata = input.importData(Configuration.docroot + analytics.getDocument(), true);
+                data = (Instances) abstractListdata;
                 HashMap<String, Instances> separatedData = helpfulFunctions.separateDataFromMetadataInfo(data);
                 data = separatedData.get("newData");
+            } else {
+
+                abstractListdata = input.importData(Configuration.docroot + analytics.getDocument(), false);
+                data = (Instances) abstractListdata;
+
             }
 
             data.setClassIndex(data.numAttributes() - 1);
@@ -88,23 +94,41 @@ public class J48AnalyticProcess extends AnalyticProcess {
         //jsonresult = j48Output.getJ48TreeResultDataset(analytics);
 
             //Train Data
-            AbstractList<Instance> data1 = input.importData(Configuration.docroot + analytics.getDocument());
-            Instances traindata = (Instances) data1;
+            AbstractList<Instance> abstractListdata1;
+            Instances traindata;
 
             //Test data
-            AbstractList<Instance> data2 = input.importData(Configuration.docroot + analytics.getDocument());
-            Instances testdata = (Instances) data2;
+            AbstractList<Instance> abstractListdata2;
+            Instances testdata;
 
-            if (analytics.getExportFormat().equalsIgnoreCase("rdf")) {
+            if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
+                abstractListdata1 = input.importData(Configuration.docroot + analytics.getDocument(), true);
+                traindata = (Instances) abstractListdata1;
                 separatedTrainData = helpfulFunctions.separateDataFromMetadataInfo(traindata);
                 traindata = separatedTrainData.get("newData");
 
+                abstractListdata2 = input.importData(Configuration.docroot + analytics.getTestdocument(), true);
+                testdata = (Instances) abstractListdata2;
                 separatedEvalData = helpfulFunctions.separateDataFromMetadataInfo(testdata);
                 testdata = separatedEvalData.get("newData");
+            } else {
+
+                abstractListdata1 = input.importData(Configuration.docroot + analytics.getDocument(), false);
+                traindata = (Instances) abstractListdata1;
+
+                abstractListdata2 = input.importData(Configuration.docroot + analytics.getTestdocument(), false);
+                testdata = (Instances) abstractListdata2;
+
             }
 
             traindata.setClassIndex(traindata.numAttributes() - 1);
             testdata.setClassIndex(testdata.numAttributes() - 1);
+
+            if (traindata.numAttributes() != testdata.numAttributes()) {
+                helpfulFunctions.updateProcessMessageToAnalyticsTable("Train Dataset has not the same"
+                        + " attributes with Evaluation dataset! Please create a new analytic process!", analytics.getId());
+                 return (AbstractList) new LinkedList();
+            }
 
             //Classifier model  
             Classifier model = (Classifier) weka.core.SerializationHelper.read(Configuration.docroot + analytics.getModel());
@@ -133,12 +157,23 @@ public class J48AnalyticProcess extends AnalyticProcess {
                 labeled.instance(i).setClassValue(clsLabel);
             }
 
-            dataToReturn = labeled;
+           
+            
+             if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
+                Instances mergedData = helpfulFunctions.mergeDataAndMetadataInfo(labeled, separatedEvalData.get("metaData"));
+                dataToReturn = mergedData;
+
+            } else {
+                dataToReturn = labeled;
+            }
 
             helpfulFunctions.writeToFile(eval.toSummaryString(), "processinfo", analytics);
 
         } catch (Exception ex) {
             Logger.getLogger(J48AnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);
+            helpfulFunctions.updateProcessMessageToAnalyticsTable(ex.toString(), analytics.getId()); 
+            return (AbstractList) new LinkedList();
+
         }
         return dataToReturn;
 

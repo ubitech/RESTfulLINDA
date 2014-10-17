@@ -5,8 +5,8 @@
  */
 package eu.linda.analytics.weka.generic;
 
-import eu.linda.analytic.controller.AnalyticProcess;
-import eu.linda.analytic.formats.InputFormat;
+import eu.linda.analytics.controller.AnalyticProcess;
+import eu.linda.analytics.formats.InputFormat;
 import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.weka.utils.HelpfulFunctions;
@@ -14,7 +14,6 @@ import java.util.AbstractList;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.json.JSONArray;
 import weka.classifiers.functions.LinearRegression;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -24,8 +23,6 @@ import weka.core.Instances;
  * @author eleni
  */
 public class LinearRegressionAnalyticProcess extends AnalyticProcess {
-
-    _LinearRegressionOutput linearRegressionOutput;
     HelpfulFunctions helpfulFunctions;
     InputFormat input;
 
@@ -45,13 +42,19 @@ public class LinearRegressionAnalyticProcess extends AnalyticProcess {
 
         try {
 
-            AbstractList<Instance> data1 = input.importData(Configuration.docroot + analytics.getDocument());
-            Instances data = (Instances) data1;
+            AbstractList<Instance> data1;
+            Instances data;
 
             // remove dataset metadata (first two columns)    
-            if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat()) ) {
+            if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
+                data1 = input.importData(Configuration.docroot + analytics.getDocument(), true);
+                data = (Instances) data1;
                 HashMap<String, Instances> separatedData = helpfulFunctions.separateDataFromMetadataInfo(data);
                 data = separatedData.get("newData");
+
+            } else {
+                data1 = input.importData(Configuration.docroot + analytics.getDocument(), false);
+                data = (Instances) data1;
             }
 
             data.setClassIndex(data.numAttributes() - 1);
@@ -83,15 +86,21 @@ public class LinearRegressionAnalyticProcess extends AnalyticProcess {
         HashMap<String, Instances> separatedData = null;
         try {
             //load data
-            AbstractList<Instance> data1 = input.importData(Configuration.docroot + analytics.getTestdocument());
-            Instances data = (Instances) data1;
+            AbstractList<Instance> abstractlistdata;
+            Instances data;
 
-            if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat()) ) {
+            if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
+                abstractlistdata = input.importData(Configuration.docroot + analytics.getTestdocument(), true);
+                data = (Instances) abstractlistdata;
+
                 separatedData = helpfulFunctions.separateDataFromMetadataInfo(data);
                 data = separatedData.get("newData");
+            } else {
+                abstractlistdata = input.importData(Configuration.docroot + analytics.getTestdocument(), false);
+                data = (Instances) abstractlistdata;
+
             }
-            
-            
+
             //load model
             LinearRegression model = (LinearRegression) weka.core.SerializationHelper.read(Configuration.docroot + analytics.getModel());
 
@@ -110,16 +119,14 @@ public class LinearRegressionAnalyticProcess extends AnalyticProcess {
             }
 
            //<--in linear regression there is no process info text-->
-            
-
-            if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat()) ) {
+            if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
                 Instances mergedData = helpfulFunctions.mergeDataAndMetadataInfo(labeled, separatedData.get("metaData"));
-                dataToReturn= mergedData;
+                dataToReturn = mergedData;
 
             } else {
-                dataToReturn= labeled;
+                dataToReturn = labeled;
             }
-            
+
         } catch (Exception ex) {
             Logger.getLogger(LinearRegressionAnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);
         }
