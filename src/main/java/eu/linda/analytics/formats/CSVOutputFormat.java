@@ -11,6 +11,7 @@ import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.weka.utils.HelpfulFunctions;
 import java.util.AbstractList;
 import org.json.JSONArray;
+import org.rosuda.JRI.Rengine;
 
 /**
  *
@@ -31,7 +32,7 @@ public class CSVOutputFormat extends OutputFormat {
         if (dataToExport.size() != 0) {
 
             helpfulFuncions.nicePrintMessage("Export to CSV");
-            String[] splitedSourceFileName = analytics.getDocument().split(".arff");
+            String[] splitedSourceFileName = analytics.getDocument().split("\\.");
 
             String targetFileName = (splitedSourceFileName[0] + "_" + analytics.getAlgorithm_name() + "_resultdocument.arff").replace("datasets", "results");
 
@@ -51,6 +52,24 @@ public class CSVOutputFormat extends OutputFormat {
                 helpfulFuncions.cleanPreviousInfo(analytics);
             }
         }
+    }
+
+    @Override
+    public void exportData(Analytics analytics, Rengine re) {
+
+        helpfulFuncions.nicePrintMessage("Export to CSV");
+        String[] splitedSourceFileName = analytics.getDocument().split("\\.");
+
+        String targetFileName = (splitedSourceFileName[0] + "_" + analytics.getAlgorithm_name() + "_resultdocument.csv").replace("datasets", "results");
+
+        String targetFileNameFullPath = Configuration.docroot + targetFileName;
+        System.out.println("targetFileNameFullPath"+targetFileNameFullPath);
+        re.eval("write.csv(df_to_export, file = '"+targetFileNameFullPath+"',row.names=FALSE);");
+        re.eval("rm(list=ls());");
+
+        dbsynchronizer.updateLindaAnalytics(targetFileName, "resultdocument", analytics.getId());
+        dbsynchronizer.updateLindaAnalyticsVersion(analytics.getVersion(), analytics.getId());
+
     }
 
 }

@@ -10,6 +10,7 @@ import eu.linda.analytics.weka.utils.HelpfulFunctions;
 import java.util.AbstractList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.rosuda.JRI.Rengine;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils;
 import weka.filters.Filter;
@@ -29,7 +30,7 @@ public class ArffInputFormat extends InputFormat {
 
 
     @Override
-    public AbstractList importData(String pathToFile, boolean isForRDFOutput) {
+    public AbstractList importData4weka(String pathToFile, boolean isForRDFOutput) {
 
     helpfulFuncions.nicePrintMessage("import Arff file "+pathToFile);
     
@@ -64,5 +65,12 @@ public class ArffInputFormat extends InputFormat {
      return data;
     
     }
+
+    @Override
+    public Rengine importData4R(String pathToFile, boolean isForRDFOutput) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+
     
 }

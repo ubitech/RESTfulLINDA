@@ -145,6 +145,8 @@ public class GenerateRDFWithJena {
         return model;
 
     }
+    
+    
 
     public static void main(String[] args) throws FileNotFoundException {
 

@@ -5,9 +5,10 @@
  */
 package eu.linda.analytics.weka.classifiers;
 
+import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.controller.AnalyticProcess;
 import eu.linda.analytics.formats.InputFormat;
-import eu.linda.analytics.config.Configuration;
+import eu.linda.analytics.formats.OutputFormat;
 import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.weka.utils.HelpfulFunctions;
 import java.util.AbstractList;
@@ -59,13 +60,13 @@ public class M5PAnalyticProcess extends AnalyticProcess {
 
             // remove dataset metadata (first two columns)    
             if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
-                abstractListdata1 = input.importData(Configuration.docroot + analytics.getDocument(), true);
+                abstractListdata1 = input.importData4weka(Configuration.docroot + analytics.getDocument(), true);
                 data = (Instances) abstractListdata1;
                 HashMap<String, Instances> separatedData = helpfulFunctions.separateDataFromMetadataInfo(data);
                 data = separatedData.get("newData");
             } else {
 
-                abstractListdata1 = input.importData(Configuration.docroot + analytics.getDocument(), false);
+                abstractListdata1 = input.importData4weka(Configuration.docroot + analytics.getDocument(), false);
                 data = (Instances) abstractListdata1;
 
             }
@@ -94,7 +95,7 @@ public class M5PAnalyticProcess extends AnalyticProcess {
 
 //predictM5P
     @Override
-    public AbstractList eval(Analytics analytics) {
+    public void eval(Analytics analytics,OutputFormat out) {
         helpfulFunctions.nicePrintMessage("Eval M5P");
         HashMap<String, Instances> separatedData = null;
         AbstractList dataToReturn = null;
@@ -104,12 +105,12 @@ public class M5PAnalyticProcess extends AnalyticProcess {
             Instances data;
 
             if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
-                abstractList = input.importData(Configuration.docroot + analytics.getTestdocument(), true);
+                abstractList = input.importData4weka(Configuration.docroot + analytics.getTestdocument(), true);
                 data = (Instances) abstractList;
                 separatedData = helpfulFunctions.separateDataFromMetadataInfo(data);
                 data = separatedData.get("newData");
             } else {
-                abstractList = input.importData(Configuration.docroot + analytics.getTestdocument(), false);
+                abstractList = input.importData4weka(Configuration.docroot + analytics.getTestdocument(), false);
                 data = (Instances) abstractList;
             }
 
@@ -197,7 +198,9 @@ public class M5PAnalyticProcess extends AnalyticProcess {
         } catch (Exception ex) {
             Logger.getLogger(M5PAnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return dataToReturn;
+        
+        out.exportData(analytics, dataToReturn);
+      
 
     }
 

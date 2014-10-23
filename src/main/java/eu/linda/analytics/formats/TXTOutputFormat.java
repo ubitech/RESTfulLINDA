@@ -11,6 +11,8 @@ import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.weka.utils.HelpfulFunctions;
 import java.util.AbstractList;
 import org.json.JSONArray;
+import org.rosuda.JRI.Rengine;
+
 
 /**
  *
@@ -49,5 +51,11 @@ public class TXTOutputFormat extends OutputFormat {
             }
         }
     }
+
+    @Override
+    public void exportData(Analytics analytics, Rengine dataToExport) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 
 }

@@ -13,6 +13,7 @@ import eu.linda.analytics.formats.InputFormat;
 import eu.linda.analytics.formats.OutputFormat;
 import eu.linda.analytics.formats.RDFOutputFormat;
 import eu.linda.analytics.formats.TXTOutputFormat;
+import eu.linda.analytics.r.forecasting.ArimaAnalyticProcess;
 import eu.linda.analytics.weka.associations.AprioriAnalyticProcess;
 import eu.linda.analytics.weka.classifiers.J48AnalyticProcess;
 import eu.linda.analytics.weka.classifiers.M5PAnalyticProcess;
@@ -23,8 +24,7 @@ import eu.linda.analytics.weka.generic.LinearRegressionAnalyticProcess;
  * @author eleni
  */
 public class AnalyticsFactory {
-    
-    
+
     public AnalyticsInfo createAnalytics(String inputformat, String algorithm, String outputformat) {
 
         InputFormat inputFormat = null;
@@ -34,12 +34,10 @@ public class AnalyticsFactory {
         //Create Instances of InputFormat
         if (inputformat.equalsIgnoreCase("arff")) {
             inputFormat = new ArffInputFormat();
-        }else if (inputformat.equalsIgnoreCase("csv")) {
+        } else if (inputformat.equalsIgnoreCase("csv")) {
             inputFormat = new CSVInputFormat();
         }
-        
-        
-        
+
         //Create AnalyticProcesses
         if (algorithm.equalsIgnoreCase("J48")) {
             analyticProcess = new J48AnalyticProcess(inputFormat);
@@ -49,6 +47,8 @@ public class AnalyticsFactory {
             analyticProcess = new LinearRegressionAnalyticProcess(inputFormat);
         } else if (algorithm.equalsIgnoreCase("Apriori")) {
             analyticProcess = new AprioriAnalyticProcess(inputFormat);
+        } else if (algorithm.equalsIgnoreCase("Arima")) {
+            analyticProcess = new ArimaAnalyticProcess(inputFormat);
         }
 
         //Create Instances of OutputFormat
@@ -58,12 +58,10 @@ public class AnalyticsFactory {
             outputFormat = new ArffOutputFormat();
         } else if (outputformat.equalsIgnoreCase("txt")) {
             outputFormat = new TXTOutputFormat();
-        }else {
+        } else {
             // RDFXML , TTL , NTRIPLES
             outputFormat = new RDFOutputFormat();
         }
-        
-        
 
         AnalyticsInfo analyticsInfo = new AnalyticsInfo();
         analyticsInfo.setAnalyticProcess(analyticProcess);

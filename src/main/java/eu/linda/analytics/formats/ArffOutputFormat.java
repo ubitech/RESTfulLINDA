@@ -10,6 +10,8 @@ import eu.linda.analytics.db.DBSynchronizer;
 import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.weka.utils.HelpfulFunctions;
 import java.util.AbstractList;
+import org.rosuda.JRI.Rengine;
+
 
 /**
  *
@@ -49,5 +51,12 @@ public class ArffOutputFormat extends OutputFormat {
 
         }
     }
+
+    @Override
+    public void exportData(Analytics analytics, Rengine dataToExport) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+
 
 }

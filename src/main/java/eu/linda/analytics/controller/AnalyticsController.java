@@ -40,8 +40,11 @@ public class AnalyticsController {
         out = info.getOutputformat();
         
         ap.train(analytics);
-        AbstractList resultToExport = ap.eval(analytics);
-        out.exportData(analytics,resultToExport);
+//        AbstractList resultToExport = ap.eval(analytics);
+//        out.exportData(analytics,resultToExport);
+        
+        ap.eval(analytics,out);
+       
         
         return info;
         

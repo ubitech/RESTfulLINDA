@@ -18,9 +18,7 @@ import java.io.IOException;
 import java.util.AbstractList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
-
+import org.rosuda.JRI.Rengine;
 /**
  *
  * @author eleni
@@ -97,5 +95,11 @@ public class RDFOutputFormat extends OutputFormat {
         }
 
     }
+
+    @Override
+    public void exportData(Analytics analytics, Rengine dataToExport) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 
 }

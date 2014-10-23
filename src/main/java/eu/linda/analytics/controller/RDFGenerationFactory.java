@@ -6,19 +6,10 @@
 
 package eu.linda.analytics.controller;
 
-import eu.linda.analytics.formats.OutputFormat;
-import eu.linda.analytics.model.Analytics;
-
 /**
  *
  * @author eleni
  */
-
-abstract public class AnalyticProcess {
-
-
-    abstract public void train(Analytics a);
-
-    abstract public void eval(Analytics a,OutputFormat out);
+public class RDFGenerationFactory {
     
 }

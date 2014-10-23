@@ -5,9 +5,10 @@
  */
 package eu.linda.analytics.weka.generic;
 
+import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.controller.AnalyticProcess;
 import eu.linda.analytics.formats.InputFormat;
-import eu.linda.analytics.config.Configuration;
+import eu.linda.analytics.formats.OutputFormat;
 import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.weka.utils.HelpfulFunctions;
 import java.util.AbstractList;
@@ -47,13 +48,13 @@ public class LinearRegressionAnalyticProcess extends AnalyticProcess {
 
             // remove dataset metadata (first two columns)    
             if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
-                data1 = input.importData(Configuration.docroot + analytics.getDocument(), true);
+                data1 = input.importData4weka(Configuration.docroot + analytics.getDocument(), true);
                 data = (Instances) data1;
                 HashMap<String, Instances> separatedData = helpfulFunctions.separateDataFromMetadataInfo(data);
                 data = separatedData.get("newData");
 
             } else {
-                data1 = input.importData(Configuration.docroot + analytics.getDocument(), false);
+                data1 = input.importData4weka(Configuration.docroot + analytics.getDocument(), false);
                 data = (Instances) data1;
             }
 
@@ -78,7 +79,7 @@ public class LinearRegressionAnalyticProcess extends AnalyticProcess {
 
     //Get LinearRegression Results
     @Override
-    public AbstractList eval(Analytics analytics) {
+    public void eval(Analytics analytics,OutputFormat out) {
 
         helpfulFunctions.nicePrintMessage("Eval Linear Regresion");
 
@@ -90,13 +91,13 @@ public class LinearRegressionAnalyticProcess extends AnalyticProcess {
             Instances data;
 
             if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
-                abstractlistdata = input.importData(Configuration.docroot + analytics.getTestdocument(), true);
+                abstractlistdata = input.importData4weka(Configuration.docroot + analytics.getTestdocument(), true);
                 data = (Instances) abstractlistdata;
 
                 separatedData = helpfulFunctions.separateDataFromMetadataInfo(data);
                 data = separatedData.get("newData");
             } else {
-                abstractlistdata = input.importData(Configuration.docroot + analytics.getTestdocument(), false);
+                abstractlistdata = input.importData4weka(Configuration.docroot + analytics.getTestdocument(), false);
                 data = (Instances) abstractlistdata;
 
             }
@@ -131,8 +132,8 @@ public class LinearRegressionAnalyticProcess extends AnalyticProcess {
             Logger.getLogger(LinearRegressionAnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        //return resultjson.getString(1);
-        return dataToReturn;
+        out.exportData(analytics, dataToReturn);
+        
     }
 
 }

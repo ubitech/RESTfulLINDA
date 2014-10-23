@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.AbstractList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.rosuda.JRI.Rengine;
 import weka.core.Instances;
 import weka.core.converters.CSVLoader;
 
@@ -24,10 +25,11 @@ public class CSVInputFormat extends InputFormat {
 
     public CSVInputFormat() {
         helpfulFuncions = new HelpfulFunctions();
+
     }
 
     @Override
-    public AbstractList importData(String pathToFile, boolean isForRDFOutput) {
+    public AbstractList importData4weka(String pathToFile, boolean isForRDFOutput) {
 
         helpfulFuncions.nicePrintMessage("import CSV file ");
 
@@ -50,6 +52,24 @@ public class CSVInputFormat extends InputFormat {
         }
         return data;
 
+    }
+
+    @Override
+    public Rengine importData4R(String pathToFile, boolean isForRDFOutput) {
+
+        System.out.println(System.getProperty("java.library.path"));
+        System.out.println("R_HOME" + System.getenv().get("R_HOME"));
+
+        Rengine re = Rengine.getMainEngine();
+        if (re == null) {
+            re = new Rengine(new String[]{"--vanilla"}, false, null);
+        }
+
+        if (!re.waitForR()) {
+            System.out.println("Cannot load R");
+            System.out.println("is alive Rengine??" + re.isAlive());
+        }
+        return re;
     }
 
     public static void main(String[] args) throws Exception {

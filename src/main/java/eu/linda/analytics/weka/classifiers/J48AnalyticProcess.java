@@ -5,9 +5,10 @@
  */
 package eu.linda.analytics.weka.classifiers;
 
+import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.controller.AnalyticProcess;
 import eu.linda.analytics.formats.InputFormat;
-import eu.linda.analytics.config.Configuration;
+import eu.linda.analytics.formats.OutputFormat;
 import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.weka.utils.HelpfulFunctions;
 import java.util.AbstractList;
@@ -52,13 +53,13 @@ public class J48AnalyticProcess extends AnalyticProcess {
             //Classifier j48ClassifierModel = j48Output.getJ48TreeModel(Configuration.docroot + analytics.getDocument(),datasetContainsMetadataInfo);
             // remove dataset metadata (first two columns)    
             if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
-                abstractListdata = input.importData(Configuration.docroot + analytics.getDocument(), true);
+                abstractListdata = input.importData4weka(Configuration.docroot + analytics.getDocument(), true);
                 data = (Instances) abstractListdata;
                 HashMap<String, Instances> separatedData = helpfulFunctions.separateDataFromMetadataInfo(data);
                 data = separatedData.get("newData");
             } else {
 
-                abstractListdata = input.importData(Configuration.docroot + analytics.getDocument(), false);
+                abstractListdata = input.importData4weka(Configuration.docroot + analytics.getDocument(), false);
                 data = (Instances) abstractListdata;
 
             }
@@ -83,7 +84,7 @@ public class J48AnalyticProcess extends AnalyticProcess {
     }
 
     @Override
-    public AbstractList eval(Analytics analytics) {
+    public void eval(Analytics analytics,OutputFormat out) {
 
         AbstractList dataToReturn = null;
         HashMap<String, Instances> separatedTrainData = null;
@@ -102,21 +103,21 @@ public class J48AnalyticProcess extends AnalyticProcess {
             Instances testdata;
 
             if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
-                abstractListdata1 = input.importData(Configuration.docroot + analytics.getDocument(), true);
+                abstractListdata1 = input.importData4weka(Configuration.docroot + analytics.getDocument(), true);
                 traindata = (Instances) abstractListdata1;
                 separatedTrainData = helpfulFunctions.separateDataFromMetadataInfo(traindata);
                 traindata = separatedTrainData.get("newData");
 
-                abstractListdata2 = input.importData(Configuration.docroot + analytics.getTestdocument(), true);
+                abstractListdata2 = input.importData4weka(Configuration.docroot + analytics.getTestdocument(), true);
                 testdata = (Instances) abstractListdata2;
                 separatedEvalData = helpfulFunctions.separateDataFromMetadataInfo(testdata);
                 testdata = separatedEvalData.get("newData");
             } else {
 
-                abstractListdata1 = input.importData(Configuration.docroot + analytics.getDocument(), false);
+                abstractListdata1 = input.importData4weka(Configuration.docroot + analytics.getDocument(), false);
                 traindata = (Instances) abstractListdata1;
 
-                abstractListdata2 = input.importData(Configuration.docroot + analytics.getTestdocument(), false);
+                abstractListdata2 = input.importData4weka(Configuration.docroot + analytics.getTestdocument(), false);
                 testdata = (Instances) abstractListdata2;
 
             }
@@ -127,7 +128,7 @@ public class J48AnalyticProcess extends AnalyticProcess {
             if (traindata.numAttributes() != testdata.numAttributes()) {
                 helpfulFunctions.updateProcessMessageToAnalyticsTable("Train Dataset has not the same"
                         + " attributes with Evaluation dataset! Please create a new analytic process!", analytics.getId());
-                 return (AbstractList) new LinkedList();
+                 //return (AbstractList) new LinkedList();
             }
 
             //Classifier model  
@@ -172,10 +173,12 @@ public class J48AnalyticProcess extends AnalyticProcess {
         } catch (Exception ex) {
             Logger.getLogger(J48AnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);
             helpfulFunctions.updateProcessMessageToAnalyticsTable(ex.toString(), analytics.getId()); 
-            return (AbstractList) new LinkedList();
+            //return (AbstractList) new LinkedList();
 
         }
-        return dataToReturn;
+        
+        out.exportData(analytics, dataToReturn);
+        
 
     }
 
