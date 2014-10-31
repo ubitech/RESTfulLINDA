@@ -12,7 +12,7 @@ package eu.linda.analytics.formats;
 import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.db.DBSynchronizer;
 import eu.linda.analytics.model.Analytics;
-import eu.linda.analytics.weka.utils.HelpfulFunctions;
+import eu.linda.analytics.weka.utils.HelpfulFunctionsSingleton;
 import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -99,8 +99,8 @@ public class ManageOpenrdfLindaRepo {
 
     public static void main(String[] args) throws RDFParseException, IOException {
 
-        HelpfulFunctions helpfulFunctions = new HelpfulFunctions();
-
+        HelpfulFunctionsSingleton helpfulFunctions = HelpfulFunctionsSingleton.getInstance();
+        
         Analytics analytics = helpfulFunctions.connectToAnalyticsTable(Integer.parseInt("83"));
         ManageOpenrdfLindaRepo manageOpenrdfLindaRepo = new ManageOpenrdfLindaRepo();
 

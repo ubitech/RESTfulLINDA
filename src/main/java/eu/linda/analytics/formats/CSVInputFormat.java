@@ -5,10 +5,12 @@
  */
 package eu.linda.analytics.formats;
 
-import eu.linda.analytics.weka.utils.HelpfulFunctions;
+import eu.linda.analytics.weka.utils.HelpfulFunctionsSingleton;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.AbstractList;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.rosuda.JRI.Rengine;
@@ -21,11 +23,10 @@ import weka.core.converters.CSVLoader;
  */
 public class CSVInputFormat extends InputFormat {
 
-    HelpfulFunctions helpfulFuncions;
+    HelpfulFunctionsSingleton helpfulFuncions;
 
     public CSVInputFormat() {
-        helpfulFuncions = new HelpfulFunctions();
-
+        helpfulFuncions = HelpfulFunctionsSingleton.getInstance();
     }
 
     @Override
@@ -69,6 +70,8 @@ public class CSVInputFormat extends InputFormat {
             System.out.println("Cannot load R");
             System.out.println("is alive Rengine??" + re.isAlive());
         }
+        re.eval(" loaded_data <- read.csv(file='" + pathToFile + "', header=TRUE, sep=',', na.strings='---');");
+        
         return re;
     }
 

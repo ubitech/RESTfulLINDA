@@ -10,7 +10,7 @@ import eu.linda.analytics.controller.AnalyticProcess;
 import eu.linda.analytics.formats.InputFormat;
 import eu.linda.analytics.formats.OutputFormat;
 import eu.linda.analytics.model.Analytics;
-import eu.linda.analytics.weka.utils.HelpfulFunctions;
+import eu.linda.analytics.weka.utils.HelpfulFunctionsSingleton;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,11 +37,11 @@ import weka.core.SparseInstance;
 public class M5PAnalyticProcess extends AnalyticProcess {
 
     //M5POutput m5pOutput;
-    HelpfulFunctions helpfulFunctions;
+    HelpfulFunctionsSingleton helpfulFunctions;
     InputFormat input;
 
     public M5PAnalyticProcess(InputFormat input) {
-        helpfulFunctions = new HelpfulFunctions();
+        helpfulFunctions = HelpfulFunctionsSingleton.getInstance();
         helpfulFunctions.nicePrintMessage("Create analytic process for M5P");
         //m5pOutput = new M5POutput(in);
         this.input = input;
@@ -97,6 +97,10 @@ public class M5PAnalyticProcess extends AnalyticProcess {
     @Override
     public void eval(Analytics analytics,OutputFormat out) {
         helpfulFunctions.nicePrintMessage("Eval M5P");
+        
+        //clean previous eval info if exists
+        helpfulFunctions.cleanPreviousInfo(analytics);
+        
         HashMap<String, Instances> separatedData = null;
         AbstractList dataToReturn = null;
         try {

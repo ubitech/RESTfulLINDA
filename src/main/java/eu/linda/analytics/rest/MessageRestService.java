@@ -4,7 +4,7 @@ import eu.linda.analytics.controller.AnalyticsController;
 import eu.linda.analytics.controller.AnalyticsFactory;
 import eu.linda.analytics.formats.ManageOpenrdfLindaRepo;
 import eu.linda.analytics.model.Analytics;
-import eu.linda.analytics.weka.utils.HelpfulFunctions;
+import eu.linda.analytics.weka.utils.HelpfulFunctionsSingleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -32,7 +32,7 @@ public class MessageRestService {
     @Path("/loadtotriplestore/{id}")
     public Response loadToTriplestore(@PathParam("id") String analytics_id) throws Exception {
 
-        HelpfulFunctions helpfulFunctions = new HelpfulFunctions();
+        HelpfulFunctionsSingleton helpfulFunctions = HelpfulFunctionsSingleton.getInstance();
 
         Analytics analytics = helpfulFunctions.connectToAnalyticsTable(Integer.parseInt(analytics_id));
         ManageOpenrdfLindaRepo manageOpenrdfLindaRepo = new ManageOpenrdfLindaRepo();

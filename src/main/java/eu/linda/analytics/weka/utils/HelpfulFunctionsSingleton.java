@@ -8,7 +8,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
@@ -16,7 +15,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import weka.classifiers.Classifier;
 import weka.core.Attribute;
-import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.SerializationHelper;
 import weka.core.converters.ArffLoader;
@@ -28,16 +26,25 @@ import weka.filters.unsupervised.attribute.Remove;
  * Generates a little ARFF file with different attribute types.
  *
  */
-public class HelpfulFunctions {
-      DBSynchronizer dbsynchronizer;
+public class HelpfulFunctionsSingleton {
 
-    public HelpfulFunctions() {
-       dbsynchronizer= new DBSynchronizer();
+    DBSynchronizer dbsynchronizer;
 
+    private static HelpfulFunctionsSingleton instance = null;
+
+    protected HelpfulFunctionsSingleton() {
+        dbsynchronizer = new DBSynchronizer();
+    }
+
+    public static HelpfulFunctionsSingleton getInstance() {
+        if (instance == null) {
+            instance = new HelpfulFunctionsSingleton();
+        }
+        return instance;
     }
 
     public Analytics saveModel(Classifier model, Analytics analytics) throws Exception {
-        String[] splitedSourceFileName = analytics.getDocument().split(".arff");
+        String[] splitedSourceFileName = analytics.getDocument().split("\\.");
 
         String targetFileName = (splitedSourceFileName[0] + "_" + analytics.getAlgorithm_name() + "Model" + ".model").replace("datasets", "models");
 
@@ -49,7 +56,6 @@ public class HelpfulFunctions {
             // serialize && save model
             weka.core.SerializationHelper.write(Configuration.docroot + targetFileName, model);
 
-            
             dbsynchronizer.updateLindaAnalyticsModel(targetFileName, analytics.getId());
 
             analytics.setModel(targetFileName);
@@ -146,19 +152,19 @@ public class HelpfulFunctions {
         }
         return true;
     }
-/*
-    public Instances createArffFileFromArray(ArrayList<Attribute> atts, List<Instance> instances) {
+    /*
+     public Instances createArffFileFromArray(ArrayList<Attribute> atts, List<Instance> instances) {
 
-        Instances newDataset = new Instances("Dataset", atts, instances.size());
+     Instances newDataset = new Instances("Dataset", atts, instances.size());
 
-        for (Instance inst : instances) {
-            System.out.println("======inst" + inst);
-            newDataset.add(inst);
-        }
-        System.out.println("dataset arff" + newDataset.toString());
+     for (Instance inst : instances) {
+     System.out.println("======inst" + inst);
+     newDataset.add(inst);
+     }
+     System.out.println("dataset arff" + newDataset.toString());
 
-        return newDataset;
-    }*/
+     return newDataset;
+     }*/
 
     public Analytics saveModelasVector(Vector model, Analytics analytics) throws Exception {
         String[] splitedSourceFileName = analytics.getDocument().split(".arff");
@@ -224,7 +230,7 @@ public class HelpfulFunctions {
             metaData = Filter.useFilter(data, remove);
 
         } catch (Exception ex) {
-            Logger.getLogger(HelpfulFunctions.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(HelpfulFunctionsSingleton.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         HashMap resultMap = new HashMap<String, Instances>();
@@ -253,7 +259,7 @@ public class HelpfulFunctions {
             }
 
         } catch (Exception ex) {
-            Logger.getLogger(HelpfulFunctions.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(HelpfulFunctionsSingleton.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return mergedData;
@@ -280,22 +286,18 @@ public class HelpfulFunctions {
 
     }
 
-    public void deleteResultDocumentFromAnalytcsTable(int id) {
-        dbsynchronizer.emptyLindaAnalyticsResultDocument(id);
 
-    }
 
     public void cleanPreviousInfo(Analytics analytics) {
-        
+
+        this.nicePrintMessage("Clean Previous Analytic Info");
         //delete result document
         deleteFile(analytics.getResultdocument());
         deleteFile(analytics.getProcessinfo());
-        //empty the analytic result document
-        deleteResultDocumentFromAnalytcsTable(analytics.getId());
-                
+        //empty the analytic result document & processMessage
+        dbsynchronizer.emptyLindaAnalyticsResultInfo(analytics.getId());
+        
 
     }
-
-    
 
 }

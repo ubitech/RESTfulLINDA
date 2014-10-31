@@ -10,7 +10,7 @@ import eu.linda.analytics.controller.AnalyticProcess;
 import eu.linda.analytics.formats.InputFormat;
 import eu.linda.analytics.formats.OutputFormat;
 import eu.linda.analytics.model.Analytics;
-import eu.linda.analytics.weka.utils.HelpfulFunctions;
+import eu.linda.analytics.weka.utils.HelpfulFunctionsSingleton;
 import java.util.AbstractList;
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -24,14 +24,14 @@ import weka.core.Instances;
  * @author eleni
  */
 public class LinearRegressionAnalyticProcess extends AnalyticProcess {
-    HelpfulFunctions helpfulFunctions;
+
+    HelpfulFunctionsSingleton helpfulFunctions;
     InputFormat input;
 
     public LinearRegressionAnalyticProcess(InputFormat input) {
 
-        helpfulFunctions = new HelpfulFunctions();
+        helpfulFunctions = HelpfulFunctionsSingleton.getInstance();
         helpfulFunctions.nicePrintMessage("Create analytic process for LinearRegression");
-        //linearRegressionOutput = new LinearRegressionOutput(in);  
         this.input = input;
 
     }
@@ -79,9 +79,12 @@ public class LinearRegressionAnalyticProcess extends AnalyticProcess {
 
     //Get LinearRegression Results
     @Override
-    public void eval(Analytics analytics,OutputFormat out) {
+    public void eval(Analytics analytics, OutputFormat out) {
 
         helpfulFunctions.nicePrintMessage("Eval Linear Regresion");
+
+        //clean previous eval info if exists
+        helpfulFunctions.cleanPreviousInfo(analytics);
 
         AbstractList dataToReturn = null;
         HashMap<String, Instances> separatedData = null;
@@ -119,7 +122,7 @@ public class LinearRegressionAnalyticProcess extends AnalyticProcess {
                 labeled.instance(i).setClassValue(clsLabel);
             }
 
-           //<--in linear regression there is no process info text-->
+            //<--in linear regression there is no process info text-->
             if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
                 Instances mergedData = helpfulFunctions.mergeDataAndMetadataInfo(labeled, separatedData.get("metaData"));
                 dataToReturn = mergedData;
@@ -133,7 +136,7 @@ public class LinearRegressionAnalyticProcess extends AnalyticProcess {
         }
 
         out.exportData(analytics, dataToReturn);
-        
+
     }
 
 }

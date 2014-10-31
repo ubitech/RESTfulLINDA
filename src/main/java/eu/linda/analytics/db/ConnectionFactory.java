@@ -4,6 +4,8 @@ import eu.linda.analytics.config.Configuration;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -16,27 +18,30 @@ public class ConnectionFactory {
     }//EoC
     
     public static Connection getInstance() {
-        if (instance == null) {
-            synchronized (ConnectionFactory.class) {
-                if (instance == null) {
-                    try  
-                    {  
-                        Class.forName("com.mysql.jdbc.Driver");  
-                       instance = DriverManager.getConnection("jdbc:mysql://"+Configuration.dbip+":"+Configuration.dbport+"/"+Configuration.dbname,Configuration.username,Configuration.password);             
-                    }  
-                    catch(ClassNotFoundException ee)  
-                    {  
-                        System.out.println("Class Error");  
-                    }  
-                    catch(SQLException ee)  
-                    {  
-                        System.out.println("Connection Error");  
-                    } 
+        try {
+            if (instance == null || instance.isClosed()) {
+                synchronized (ConnectionFactory.class) {
+                    if (instance == null) {
+                        try
+                        {
+                            Class.forName("com.mysql.jdbc.Driver");
+                            instance = DriverManager.getConnection("jdbc:mysql://"+Configuration.dbip+":"+Configuration.dbport+"/"+Configuration.dbname,Configuration.username,Configuration.password);
+                        }
+                        catch(ClassNotFoundException ee)
+                        {
+                            System.out.println("Class Error");
+                        }
+                        catch(SQLException ee)
+                        {
+                            System.out.println("Connection Error"); 
+                        }
+                    }
                 }
             }
+        } catch (SQLException ex) {
+            Logger.getLogger(ConnectionFactory.class.getName()).log(Level.SEVERE, null, ex);
         }
         return instance;
-    }//EoM
-    
+    }    
     
 }//EoC

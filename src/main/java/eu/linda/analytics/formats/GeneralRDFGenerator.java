@@ -16,6 +16,7 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 import com.hp.hpl.jena.vocabulary.XSD;
 import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.model.Analytics;
+import eu.linda.analytics.weka.utils.HelpfulFunctionsSingleton;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -25,19 +26,25 @@ import java.util.AbstractList;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.rosuda.JRI.Rengine;
 import weka.core.Instances;
 
 /**
  *
  * @author eleni
  */
-public class GenerateRDFWithJena {
+public class GeneralRDFGenerator extends RDFGenerator {
 
-   
-    public GenerateRDFWithJena() {
+    HelpfulFunctionsSingleton helpfulFuncions;
+
+    public GeneralRDFGenerator() {
+        helpfulFuncions = HelpfulFunctionsSingleton.getInstance();
     }
 
+    @Override
     public Model generateRDFModel(Analytics analytics, AbstractList dataToExport) {
+
+        helpfulFuncions.nicePrintMessage("Generate General RDFModel for weka algorithms ");
 
         Object[] analytic_process_info = {"http://localhost:8080/openrdf-sesame/repositories/LinDAnalytics/analytics",
             6, "1.0.0", "08102014", "J48", "_20pci_l", "eleni"};
@@ -99,10 +106,9 @@ public class GenerateRDFWithJena {
         analytic_process_statement.addProperty(wasAssociatedWith, software_statement);
         analytic_process_statement.addProperty(RDFS.label, "linda analytic process");
 
-        
         linda_user_statement.addProperty(RDFS.subClassOf, agent);
         linda_user_statement.addProperty(RDFS.label, "linda user");
-        
+
         software_statement.addProperty(RDFS.subClassOf, agent);
         software_statement.addProperty(RDFS.label, "analytics software");
         software_statement.addProperty(actedOnBehalfOf, linda_user_statement);
@@ -136,60 +142,19 @@ public class GenerateRDFWithJena {
             //analytic_result_node_statement.addProperty(RDF.object, object);
         }
 
-        // Show the model in a few different formats.
-        /*
-         RDFDataMgr.write(System.out, model, Lang.TTL);
-         RDFDataMgr.write(System.out, model, Lang.RDFXML);
-         RDFDataMgr.write(System.out, model, Lang.NTRIPLES);
-         */
         return model;
 
     }
-    
-    
 
-    public static void main(String[] args) throws FileNotFoundException {
+    @Override
+    public Model generateRDFModel(Analytics analytics, Rengine re) {
 
-        Analytics analytics = new Analytics();
-
-        analytics.setExportFormat("TTL");
-
-        GenerateRDFWithJena generateRDFWithJena = new GenerateRDFWithJena();
-
-        //create rdf file & save
-        Model model = generateRDFWithJena.generateRDFModel(analytics, null);
-        String targetFileNameFullPath = "/home/eleni/IdeaProjects/LindaWorkbench/linda/analytics/documents/results/test";
-
-        try {
-
-            FileWriter outToSave = null;
-            if (analytics.getExportFormat().equalsIgnoreCase("RDFXML")) {
-                String fileName = targetFileNameFullPath + ".rdf";
-                outToSave = new FileWriter(fileName);
-                model.write(outToSave, "RDF/XML-ABBREV");
-
-            } else if (analytics.getExportFormat().equalsIgnoreCase("TTL")) {
-                String fileName = targetFileNameFullPath + ".ttl";
-                outToSave = new FileWriter(fileName);
-
-                model.write(outToSave, "TTL");
-            } else if (analytics.getExportFormat().equalsIgnoreCase("NTRIPLES")) {
-                String fileName = targetFileNameFullPath + ".nt";
-                outToSave = new FileWriter(fileName);
-                model.write(outToSave, "NTRIPLES");
-
-            }
-            outToSave.close();
-
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(GenerateRDFWithJena.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(GenerateRDFWithJena.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        // Show the model in a few different formats.
-        //RDFDataMgr.write(System.out, model, Lang.TTL);
-        //RDFDataMgr.write(System.out, model, Lang.RDFXML);
-        //RDFDataMgr.write(System.out, model, Lang.NTRIPLES);
+        helpfulFuncions.nicePrintMessage("Generate General RDFModel for R algorithms ");
+        
+        // Create the model and define some prefixes (for nice serialization in RDF/XML and TTL)
+        Model model = ModelFactory.createDefaultModel();
+        
+        return model;
     }
+
 }

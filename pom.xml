@@ -162,9 +162,21 @@
                         </includes>
                     </configuration>
                 </plugin>
+               <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>2.3</version>
+               </plugin>
                 
             </plugins>
         </pluginManagement>
+        
+        <resources>
+            <resource>
+            <directory>src/main/resources</directory>
+            <filtering>true</filtering>
+            </resource>
+        </resources>
     </build>
     
     
@@ -177,8 +189,9 @@
             <properties>
                 <!--db.driverClass>com.mysql.jdbc.Driver</db.driverClass>
                 <db.connectionURL>jdbc:mysql://127.0.0.1:3306/</db.connectionURL-->
+                <db.ip>127.0.0.1</db.ip>
                 <db.port>3306</db.port>
-                <db.name>analytics</db.name>
+                <db.name>linda</db.name>
                 <db.username>root</db.username>
                 <db.password>!uflow!</db.password>
                 <Lindaworkbench.docroot>/home/eleni/IdeaProjects/LindaWorkbench/linda/</Lindaworkbench.docroot>
@@ -190,11 +203,12 @@
             <properties>
                 <!--db.driverClass>com.mysql.jdbc.Driver</db.driverClass>
                 <db.connectionURL>jdbc:mysql://127.0.0.1:3306/</db.connectionURL-->
+                <db.ip>127.0.0.1</db.ip>
                 <db.port>3306</db.port>
-                <db.name>analytics</db.name>
+                <db.name>linda</db.name>
                 <db.username>root</db.username>
                 <db.password>!uflow!</db.password>
-                <Lindaworkbench.docroot>/home/eleni/IdeaProjects/LindaWorkbench/linda/</Lindaworkbench.docroot>
+                <Lindaworkbench.docroot>/root/Desktop/vocabularyrepo/linda/</Lindaworkbench.docroot>
                 <Lindaworkbench.URI>http://localhost:8000/</Lindaworkbench.URI>
             </properties>
        </profile>

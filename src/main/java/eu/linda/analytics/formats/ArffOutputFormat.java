@@ -8,7 +8,7 @@ package eu.linda.analytics.formats;
 import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.db.DBSynchronizer;
 import eu.linda.analytics.model.Analytics;
-import eu.linda.analytics.weka.utils.HelpfulFunctions;
+import eu.linda.analytics.weka.utils.HelpfulFunctionsSingleton;
 import java.util.AbstractList;
 import org.rosuda.JRI.Rengine;
 
@@ -20,11 +20,11 @@ import org.rosuda.JRI.Rengine;
 public class ArffOutputFormat extends OutputFormat {
 
     DBSynchronizer dbsynchronizer;
-    HelpfulFunctions helpfulFuncions;
+    HelpfulFunctionsSingleton helpfulFuncions;
 
     public ArffOutputFormat() {
         dbsynchronizer = new DBSynchronizer();
-        helpfulFuncions = new HelpfulFunctions();
+        helpfulFuncions = HelpfulFunctionsSingleton.getInstance();
     }
 
     @Override

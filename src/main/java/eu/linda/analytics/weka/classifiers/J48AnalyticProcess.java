@@ -10,7 +10,7 @@ import eu.linda.analytics.controller.AnalyticProcess;
 import eu.linda.analytics.formats.InputFormat;
 import eu.linda.analytics.formats.OutputFormat;
 import eu.linda.analytics.model.Analytics;
-import eu.linda.analytics.weka.utils.HelpfulFunctions;
+import eu.linda.analytics.weka.utils.HelpfulFunctionsSingleton;
 import java.util.AbstractList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -32,11 +32,11 @@ import weka.core.Instances;
  */
 public class J48AnalyticProcess extends AnalyticProcess {
 
-    HelpfulFunctions helpfulFunctions;
+    HelpfulFunctionsSingleton helpfulFunctions;
     InputFormat input;
 
     public J48AnalyticProcess(InputFormat input) {
-        helpfulFunctions = new HelpfulFunctions();
+        helpfulFunctions = HelpfulFunctionsSingleton.getInstance();
         helpfulFunctions.nicePrintMessage("Create analytic process for J48");
         this.input = input;
 
@@ -91,6 +91,10 @@ public class J48AnalyticProcess extends AnalyticProcess {
         HashMap<String, Instances> separatedEvalData = null;
 
         helpfulFunctions.nicePrintMessage("Eval J48");
+        
+        //clean previous eval info if exists
+        helpfulFunctions.cleanPreviousInfo(analytics);
+        
         try {
         //jsonresult = j48Output.getJ48TreeResultDataset(analytics);
 
@@ -128,7 +132,7 @@ public class J48AnalyticProcess extends AnalyticProcess {
             if (traindata.numAttributes() != testdata.numAttributes()) {
                 helpfulFunctions.updateProcessMessageToAnalyticsTable("Train Dataset has not the same"
                         + " attributes with Evaluation dataset! Please create a new analytic process!", analytics.getId());
-                 //return (AbstractList) new LinkedList();
+                return;
             }
 
             //Classifier model  
