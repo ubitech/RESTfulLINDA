@@ -45,9 +45,10 @@ public class ManageOpenrdfLindaRepo {
 
         String datasetContextToString = "analytics" + a.getId() + "V" + a.getVersion() + "Date" + today;
 
+
         File file = new File(Configuration.docroot + a.getResultdocument());
         String base = "http://localhost:8080/openrdf-sesame/repositories/" + repositoryID + "/statements?context=_:";
-        String baseURI = base + datasetContextToString + "/";
+        String baseURI = base + datasetContextToString + "#";
 
         try {
             repo.initialize();
@@ -106,33 +107,5 @@ public class ManageOpenrdfLindaRepo {
 
         manageOpenrdfLindaRepo.loadtotriplestore(analytics);
 
-        /*
-         String sesameServerURL = "http://localhost:8080/openrdf-sesame";
-         String repositoryID = "linda";
-         Repository repo = new HTTPRepository(sesameServerURL, repositoryID);
-
-         File file = new File("/home/eleni/Desktop/test.rdf");
-         String baseURI = "http://localhost:8080/openrdf-sesame/repositories/LinDAnalytics/analytics_6_1.0.0_08102014/";
-
-         try {
-         repo.initialize();
-
-         RepositoryConnection con = repo.getConnection();
-         try {
-         ValueFactory valueFactory = new MemValueFactory();
-         //URI context = valueFactory.createURI("http://localhost:8080/openrdf-sesame/repositories/LinDAnalytics/analytics_6_1.0.0_08102014/"); 
-         // Create a ValueFactory we can use to create resources and statements
-         ValueFactory vf = ValueFactoryImpl.getInstance();
-         Resource lala = vf.createBNode("analyticprocess");
-         con.add(file, baseURI, RDFFormat.RDFXML, lala);
-         //URL url = new URL("http://example.org/example/remote.rdf");
-         //con.add(url, url.toString(), RDFFormat.RDFXML);
-         } finally {
-         con.close();
-         }
-         } catch (OpenRDFException e) {
-         // handle exception
-         }
-         }*/
     }
 }

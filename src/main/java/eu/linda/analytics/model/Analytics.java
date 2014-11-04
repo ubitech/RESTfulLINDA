@@ -14,7 +14,7 @@ public class Analytics {
     public Analytics() {
     }
 
-    public Analytics(int id, int category_id, int algorithm_id, String document, String testdocument, String model,String modelReadable,String processinfo, String resultdocument, String exportFormat, int version, String description, boolean publishedToTriplestore,String loadedRDFContext) {
+    public Analytics(int id, int category_id, int algorithm_id, String document, String testdocument, String model,String modelReadable,String processinfo, String resultdocument, String exportFormat, int version, String description, boolean publishedToTriplestore,String loadedRDFContext,String parameters) {
         this.id = id;
         this.category_id = category_id;
         this.algorithm_id = algorithm_id;
@@ -29,6 +29,7 @@ public class Analytics {
         this.description= description;
         this.publishedToTriplestore = publishedToTriplestore;
         this.loadedRDFContext = loadedRDFContext;
+        this.parameters = parameters;
     }
     
     
@@ -65,8 +66,9 @@ public class Analytics {
     
     private String loadedRDFContext;
     
-    
-    
+    private String parameters;
+
+   
 
     public int getId() {
         return id;
@@ -191,6 +193,15 @@ public class Analytics {
     public void setLoadedRDFContext(String loadedRDFContext) {
         this.loadedRDFContext = loadedRDFContext;
     }
+     public String getParameters() {
+        return parameters;
+    }
+
+    public void setParameters(String parameters) {
+        this.parameters = parameters;
+    }
+    
+    
     
 
 

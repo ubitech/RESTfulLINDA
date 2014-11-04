@@ -12,28 +12,24 @@ import java.util.logging.Logger;
  * @author Panagiotis Gouvas
  */
 public class ConnectionFactory {
+
     private static volatile Connection instance = null;
-    
-    private ConnectionFactory() { 
+
+    private ConnectionFactory() {
     }//EoC
-    
+
     public static Connection getInstance() {
         try {
             if (instance == null || instance.isClosed()) {
                 synchronized (ConnectionFactory.class) {
-                    if (instance == null) {
-                        try
-                        {
+                    if (instance == null || instance.isClosed()) {
+                        try {
                             Class.forName("com.mysql.jdbc.Driver");
-                            instance = DriverManager.getConnection("jdbc:mysql://"+Configuration.dbip+":"+Configuration.dbport+"/"+Configuration.dbname,Configuration.username,Configuration.password);
-                        }
-                        catch(ClassNotFoundException ee)
-                        {
+                            instance = DriverManager.getConnection("jdbc:mysql://" + Configuration.dbip + ":" + Configuration.dbport + "/" + Configuration.dbname+"?autoReconnect=true", Configuration.username, Configuration.password);
+                        } catch (ClassNotFoundException ee) {
                             System.out.println("Class Error");
-                        }
-                        catch(SQLException ee)
-                        {
-                            System.out.println("Connection Error"); 
+                        } catch (SQLException ee) {
+                            System.out.println("Connection Error");
                         }
                     }
                 }
@@ -42,6 +38,6 @@ public class ConnectionFactory {
             Logger.getLogger(ConnectionFactory.class.getName()).log(Level.SEVERE, null, ex);
         }
         return instance;
-    }    
-    
+    }
+
 }//EoC

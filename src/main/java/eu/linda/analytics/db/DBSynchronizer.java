@@ -45,7 +45,8 @@ public class DBSynchronizer {
                         rs.getInt("version"),
                         rs.getString("description"),
                         rs.getBoolean("publishedToTriplestore"),
-                        rs.getString("loadedRDFContext")
+                        rs.getString("loadedRDFContext"),
+                        rs.getString("parameters")
                 );
                 analytics.setAlgorithm_name(rs.getString("name"));
                 break;

@@ -17,15 +17,10 @@ import com.hp.hpl.jena.vocabulary.XSD;
 import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.weka.utils.HelpfulFunctionsSingleton;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.AbstractList;
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.rosuda.JRI.Rengine;
 import weka.core.Instances;
 
@@ -46,24 +41,11 @@ public class GeneralRDFGenerator extends RDFGenerator {
 
         helpfulFuncions.nicePrintMessage("Generate General RDFModel for weka algorithms ");
 
-        Object[] analytic_process_info = {"http://localhost:8080/openrdf-sesame/repositories/LinDAnalytics/analytics",
-            6, "1.0.0", "08102014", "J48", "_20pci_l", "eleni"};
-
         Date date = new Date();
         DateFormat formatter = new SimpleDateFormat("ddMMyyyy");
         String today = formatter.format(date);
-        String base = "http://localhost:8080/openrdf-sesame/repositories/myRepository/statements?context=:_";
-        String datasetContextToString = "analytics" + analytics.getId() + "V" + analytics.getVersion() + "Date" + today;
-
-        // Define some triplets to convert.
-        Object[][] triplets1 = {
-            {0.57, "attributeValue", "jumped", "over the lazy dog.",
-                "http://health.data.ny.gov/resource/hbu9-xsrx/",
-                "http://health.data.ny.gov/resource/hbu9-xsrx/1",
-                111,
-                6},
-            {0.93, "The rail launchers", "are", "conceptually similar to the underslung SM-1.", "http://health.data.ny.gov/resource/hbu9-xsrx/", "http://health.data.ny.gov/resource/hbu9-xsrx/2", 222, 6}
-        };
+        String base = "http://localhost:8080/openrdf-sesame/repositories/linda/statements?context=:_";
+        String datasetContextToString = "analytics" + analytics.getId() + "V" + (analytics.getVersion() + 1) + "Date" + today;
 
         Instances triplets = (Instances) dataToExport;
         int tripletsAttibutesNum = triplets.numAttributes();
@@ -71,7 +53,7 @@ public class GeneralRDFGenerator extends RDFGenerator {
         // Create the model and define some prefixes (for nice serialization in RDF/XML and TTL)
         Model model = ModelFactory.createDefaultModel();
         //openrdf + analytic_process ID_version_date
-        String NS = base + datasetContextToString + "/" + analytics.getId() + "/";
+        String NS = base + datasetContextToString + "#";
 
         model.setNsPrefix("ds", NS);
         model.setNsPrefix("rdf", RDF.getURI());
@@ -97,14 +79,15 @@ public class GeneralRDFGenerator extends RDFGenerator {
         Resource onlineAccount = model.createResource(FOAF.OnlineAccount);
 
         Resource software_statement = model.createResource(NS + "RESTfulLIDA_analytics_software");
-        Resource linda_user_statement = model.createResource(NS + analytic_process_info[6]);
+        Resource linda_user_statement = model.createResource(NS + "eleni");
 
-        Resource analytic_process_statement = model.createResource(NS + (analytics.getVersion() + 1));
+        Resource analytic_process_statement = model.createResource(NS + "analytic_process");
         analytic_process_statement.addProperty(OWL.versionInfo, "1.0.0");
         analytic_process_statement.addLiteral(analyzedField, triplets.attribute(tripletsAttibutesNum - 1).name());
         analytic_process_statement.addProperty(RDFS.subClassOf, activity);
         analytic_process_statement.addProperty(wasAssociatedWith, software_statement);
         analytic_process_statement.addProperty(RDFS.label, "linda analytic process");
+        analytic_process_statement.addProperty(RDFS.comment, analytics.getDescription());
 
         linda_user_statement.addProperty(RDFS.subClassOf, agent);
         linda_user_statement.addProperty(RDFS.label, "linda user");
@@ -125,7 +108,7 @@ public class GeneralRDFGenerator extends RDFGenerator {
         for (int i = 1; i < triplets.size(); i++) {
             //for (Instance triplet : triplets) {
 
-            Resource analytic_result_node_statement = model.createResource(NS + (analytics.getVersion() + 1) + "/" + i);
+            Resource analytic_result_node_statement = model.createResource(NS + "/" + i);
             Resource analytic_input_node_statement = model.createResource(triplets.get(i).toString(1));
 
             //Resource subject = model.createResource().addProperty(RDFS.label, (String) triplet[1]);
@@ -150,10 +133,10 @@ public class GeneralRDFGenerator extends RDFGenerator {
     public Model generateRDFModel(Analytics analytics, Rengine re) {
 
         helpfulFuncions.nicePrintMessage("Generate General RDFModel for R algorithms ");
-        
+
         // Create the model and define some prefixes (for nice serialization in RDF/XML and TTL)
         Model model = ModelFactory.createDefaultModel();
-        
+
         return model;
     }
 

@@ -17,10 +17,6 @@ import java.io.IOException;
 import java.util.AbstractList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.rosuda.JRI.REXP;
-import org.rosuda.JRI.RFactor;
-import org.rosuda.JRI.RList;
-import org.rosuda.JRI.RVector;
 import org.rosuda.JRI.Rengine;
 
 /**

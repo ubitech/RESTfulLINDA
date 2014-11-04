@@ -45,7 +45,15 @@ public class J48AnalyticProcess extends AnalyticProcess {
     @Override
     public void train(Analytics analytics) {
 
-        helpfulFunctions.nicePrintMessage("Train J48");
+        String[] options = new String[1];
+        if (analytics.getParameters().equalsIgnoreCase("")) {
+            options[0] = "-C 1.0 –M 5"; // confidenceFactor = 1.0, minNumObject = 5
+
+        } else {
+            options[0] = analytics.getParameters();
+        }
+
+        helpfulFunctions.nicePrintMessage("Train J48 with options "+ options[0]);
         try {
             AbstractList<Instance> abstractListdata;
             Instances data;
@@ -67,9 +75,6 @@ public class J48AnalyticProcess extends AnalyticProcess {
             data.setClassIndex(data.numAttributes() - 1);
             J48 j48ClassifierModel = new J48(); // new instance of tree
 
-            String[] options = new String[1];
-            options[0] = "-C 1.0 –M 5"; // confidenceFactor = 1.0, minNumObject = 5
-
             j48ClassifierModel.setOptions(options);// set the options
             j48ClassifierModel.buildClassifier(data); // build classifier
 
@@ -84,17 +89,17 @@ public class J48AnalyticProcess extends AnalyticProcess {
     }
 
     @Override
-    public void eval(Analytics analytics,OutputFormat out) {
+    public void eval(Analytics analytics, OutputFormat out) {
 
         AbstractList dataToReturn = null;
         HashMap<String, Instances> separatedTrainData = null;
         HashMap<String, Instances> separatedEvalData = null;
 
         helpfulFunctions.nicePrintMessage("Eval J48");
-        
+
         //clean previous eval info if exists
         helpfulFunctions.cleanPreviousInfo(analytics);
-        
+
         try {
         //jsonresult = j48Output.getJ48TreeResultDataset(analytics);
 
@@ -162,9 +167,7 @@ public class J48AnalyticProcess extends AnalyticProcess {
                 labeled.instance(i).setClassValue(clsLabel);
             }
 
-           
-            
-             if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
+            if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
                 Instances mergedData = helpfulFunctions.mergeDataAndMetadataInfo(labeled, separatedEvalData.get("metaData"));
                 dataToReturn = mergedData;
 
@@ -176,13 +179,12 @@ public class J48AnalyticProcess extends AnalyticProcess {
 
         } catch (Exception ex) {
             Logger.getLogger(J48AnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);
-            helpfulFunctions.updateProcessMessageToAnalyticsTable(ex.toString(), analytics.getId()); 
+            helpfulFunctions.updateProcessMessageToAnalyticsTable(ex.toString(), analytics.getId());
             //return (AbstractList) new LinkedList();
 
         }
-        
+
         out.exportData(analytics, dataToReturn);
-        
 
     }
 
