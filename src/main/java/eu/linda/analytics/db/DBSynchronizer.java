@@ -1,13 +1,13 @@
 package eu.linda.analytics.db;
 
 import eu.linda.analytics.model.Analytics;
+import eu.linda.analytics.model.Query;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 
 public class DBSynchronizer {
 
@@ -37,6 +37,8 @@ public class DBSynchronizer {
                         rs.getInt("algorithm_id"),
                         rs.getString("document"),
                         rs.getString("testdocument"),
+                        rs.getInt("trainQuery_id"),
+                        rs.getInt("evaluationQuery_id"),
                         rs.getString("model"),
                         rs.getString("modelReadable"),
                         rs.getString("processinfo"),
@@ -63,8 +65,43 @@ public class DBSynchronizer {
             }
         }
         return analytics;
-    }//EoM   
+    }//EoM  
 
+    /*
+     * Fetch linda_app_query by id
+     */
+    public Query getQueryURI(int id) {
+        Query query = null;
+        PreparedStatement preparedStatement = null;
+        try {
+
+            String querytodb = "SELECT  * FROM linda_app_query  AS query WHERE query.id =? ";
+            preparedStatement = connection.prepareStatement(querytodb);
+
+            preparedStatement.setInt(1, id);
+            ResultSet rs = preparedStatement.executeQuery();
+            while (rs.next()) {
+                query = new Query(
+                        rs.getInt("id"),
+                        rs.getString("endpoint"),
+                        rs.getString("sparql"),
+                        rs.getString("description")
+                );
+                break;
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            if (preparedStatement != null) {
+                try {
+                    preparedStatement.close();
+                } catch (SQLException ex) {
+                    Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+        return query;
+    }//EoM  
 
     /*
      * Update LINDA Analytics with result file

@@ -7,9 +7,7 @@ package eu.linda.analytics.db;
 
 import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.formats.CSVOutputFormat;
-import eu.linda.analytics.logger.LoggerFactory;
 import eu.linda.analytics.model.Analytics;
-import eu.linda.analytics.weka.utils.HelpfulFunctionsSingleton;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -47,6 +45,7 @@ public class ConnectionController {
             Configuration.username = prop.getProperty("username").trim();
             Configuration.password = prop.getProperty("password").trim();
             Configuration.dbname = prop.getProperty("dbname").trim();
+            Configuration.rdf2anyServer = prop.getProperty("rdf2anyServer").trim();
             Configuration.docroot = prop.getProperty("docroot").trim();
             Configuration.lindaworkbenchURI = prop.getProperty("lindaworkbenchURI").trim();
         } finally {

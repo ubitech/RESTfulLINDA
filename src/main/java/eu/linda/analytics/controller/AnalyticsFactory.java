@@ -11,6 +11,7 @@ import eu.linda.analytics.formats.CSVInputFormat;
 import eu.linda.analytics.formats.CSVOutputFormat;
 import eu.linda.analytics.formats.InputFormat;
 import eu.linda.analytics.formats.OutputFormat;
+import eu.linda.analytics.formats.RDFInputFormat;
 import eu.linda.analytics.formats.RDFOutputFormat;
 import eu.linda.analytics.formats.TXTOutputFormat;
 import eu.linda.analytics.r.forecasting.ArimaAnalyticProcess;
@@ -32,10 +33,12 @@ public class AnalyticsFactory {
         OutputFormat outputFormat = null;
 
         //Create Instances of InputFormat
-        if (inputformat.equalsIgnoreCase("arff")) {
-            inputFormat = new ArffInputFormat();
+        if (inputformat.equalsIgnoreCase("rdf")) {
+            inputFormat = new RDFInputFormat();
         } else if (inputformat.equalsIgnoreCase("csv")) {
             inputFormat = new CSVInputFormat();
+        }else if (inputformat.equalsIgnoreCase("arff")) {
+            inputFormat = new ArffInputFormat();
         }
 
         //Create AnalyticProcesses

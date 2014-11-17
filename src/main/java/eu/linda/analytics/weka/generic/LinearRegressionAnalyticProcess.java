@@ -46,8 +46,15 @@ public class LinearRegressionAnalyticProcess extends AnalyticProcess {
             AbstractList<Instance> data1;
             Instances data;
 
-            // remove dataset metadata (first two columns)    
-            if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
+           if (helpfulFunctions.isRDFInputFormat(analytics.getTrainQuery_id()))
+            {
+                data1 = input.importData4weka(Integer.toString(analytics.getTrainQuery_id()), true);
+                data = (Instances) data1;
+                HashMap<String, Instances> separatedData = helpfulFunctions.separateDataFromMetadataInfo(data);
+                data = separatedData.get("newData");
+
+            } else if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
+                // remove dataset metadata (first two columns)   
                 data1 = input.importData4weka(Configuration.docroot + analytics.getDocument(), true);
                 data = (Instances) data1;
                 HashMap<String, Instances> separatedData = helpfulFunctions.separateDataFromMetadataInfo(data);
@@ -93,7 +100,15 @@ public class LinearRegressionAnalyticProcess extends AnalyticProcess {
             AbstractList<Instance> abstractlistdata;
             Instances data;
 
-            if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
+            if (helpfulFunctions.isRDFInputFormat(analytics.getEvaluationQuery_id()))
+            {
+                abstractlistdata = input.importData4weka(Integer.toString(analytics.getEvaluationQuery_id()), true);
+                data = (Instances) abstractlistdata;
+
+                separatedData = helpfulFunctions.separateDataFromMetadataInfo(data);
+                data = separatedData.get("newData");
+
+            } else if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
                 abstractlistdata = input.importData4weka(Configuration.docroot + analytics.getTestdocument(), true);
                 data = (Instances) abstractlistdata;
 

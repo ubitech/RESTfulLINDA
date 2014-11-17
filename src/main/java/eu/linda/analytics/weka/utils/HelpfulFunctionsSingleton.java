@@ -4,6 +4,7 @@ import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.db.ConnectionController;
 import eu.linda.analytics.db.DBSynchronizer;
 import eu.linda.analytics.model.Analytics;
+import eu.linda.analytics.model.Query;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -13,6 +14,8 @@ import java.util.List;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.httpclient.URIException;
+import org.apache.commons.httpclient.util.URIUtil;
 import weka.classifiers.Classifier;
 import weka.core.Attribute;
 import weka.core.Instances;
@@ -152,19 +155,6 @@ public class HelpfulFunctionsSingleton {
         }
         return true;
     }
-    /*
-     public Instances createArffFileFromArray(ArrayList<Attribute> atts, List<Instance> instances) {
-
-     Instances newDataset = new Instances("Dataset", atts, instances.size());
-
-     for (Instance inst : instances) {
-     System.out.println("======inst" + inst);
-     newDataset.add(inst);
-     }
-     System.out.println("dataset arff" + newDataset.toString());
-
-     return newDataset;
-     }*/
 
     public Analytics saveModelasVector(Vector model, Analytics analytics) throws Exception {
         String[] splitedSourceFileName = analytics.getDocument().split(".arff");
@@ -250,7 +240,7 @@ public class HelpfulFunctionsSingleton {
             // add new attributes
             mergedData.insertAttributeAt(new Attribute("basens", (List<String>) null), 0);
             //mergedData.insertAttributeAt(new Attribute("ID1", (List<String>) null), mergedData.numAttributes());
-            mergedData.insertAttributeAt(new Attribute("nodeID", (List<String>) null), 1);
+            mergedData.insertAttributeAt(new Attribute("uri", (List<String>) null), 1);
 
             for (int i = 0; i < mergedData.numInstances(); i++) {
                 // fill colums with data
@@ -274,6 +264,13 @@ public class HelpfulFunctionsSingleton {
         return false;
     }
 
+    public boolean isRDFInputFormat(int analytics_id) {
+        if (analytics_id > 0) {
+            return true;
+        }
+        return false;
+    }
+
     public Analytics connectToAnalyticsTable(int id) {
         ConnectionController connectionController = new ConnectionController();
         connectionController.readProperties();
@@ -286,8 +283,6 @@ public class HelpfulFunctionsSingleton {
 
     }
 
-
-
     public void cleanPreviousInfo(Analytics analytics) {
 
         this.nicePrintMessage("Clean Previous Analytic Info");
@@ -296,7 +291,28 @@ public class HelpfulFunctionsSingleton {
         deleteFile(analytics.getProcessinfo());
         //empty the analytic result document & processMessage
         dbsynchronizer.emptyLindaAnalyticsResultInfo(analytics.getId());
+
+    }
+
+    
+    public String getQueryURI(String query_id) {
+        String query_uri = null;
         
+       
+        
+        try {
+            Query linda_query = dbsynchronizer.getQueryURI(Integer.parseInt(query_id));
+
+            System.out.println("linda_query encoded"+URIUtil.encodeQuery(linda_query.getSparql()));
+
+            query_uri = Configuration.rdf2anyServer + "/rdf2any/v1.0/convert/csv-converter.csv?dataset=" + linda_query.getEndpoint() + "&query=" + URIUtil.encodeQuery(linda_query.getSparql());
+
+        } catch (URIException ex) {
+            Logger.getLogger(HelpfulFunctionsSingleton.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        System.out.println("query_uri"+query_uri);
+        return query_uri;
 
     }
 

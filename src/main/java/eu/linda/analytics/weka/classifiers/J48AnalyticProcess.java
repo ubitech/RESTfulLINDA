@@ -53,18 +53,26 @@ public class J48AnalyticProcess extends AnalyticProcess {
             options[0] = analytics.getParameters();
         }
 
-        helpfulFunctions.nicePrintMessage("Train J48 with options "+ options[0]);
+        helpfulFunctions.nicePrintMessage("Train J48 with options " + options[0]);
         try {
             AbstractList<Instance> abstractListdata;
             Instances data;
 
-            //Classifier j48ClassifierModel = j48Output.getJ48TreeModel(Configuration.docroot + analytics.getDocument(),datasetContainsMetadataInfo);
             // remove dataset metadata (first two columns)    
-            if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
+            if (helpfulFunctions.isRDFInputFormat(analytics.getTrainQuery_id())) {
+                
+                abstractListdata = input.importData4weka(Integer.toString(analytics.getTrainQuery_id()), true);
+                data = (Instances) abstractListdata;
+                HashMap<String, Instances> separatedData = helpfulFunctions.separateDataFromMetadataInfo(data);
+                data = separatedData.get("newData");
+
+            } else if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
+               
                 abstractListdata = input.importData4weka(Configuration.docroot + analytics.getDocument(), true);
                 data = (Instances) abstractListdata;
                 HashMap<String, Instances> separatedData = helpfulFunctions.separateDataFromMetadataInfo(data);
                 data = separatedData.get("newData");
+                
             } else {
 
                 abstractListdata = input.importData4weka(Configuration.docroot + analytics.getDocument(), false);
@@ -111,7 +119,20 @@ public class J48AnalyticProcess extends AnalyticProcess {
             AbstractList<Instance> abstractListdata2;
             Instances testdata;
 
-            if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
+            
+            if (helpfulFunctions.isRDFInputFormat(analytics.getEvaluationQuery_id()))
+            {                
+                abstractListdata1 = input.importData4weka(Integer.toString(analytics.getTrainQuery_id()), true);
+                traindata = (Instances) abstractListdata1;
+                separatedTrainData = helpfulFunctions.separateDataFromMetadataInfo(traindata);
+                traindata = separatedTrainData.get("newData");
+
+                abstractListdata2 = input.importData4weka(Integer.toString(analytics.getEvaluationQuery_id()), true);
+                testdata = (Instances) abstractListdata2;
+                separatedEvalData = helpfulFunctions.separateDataFromMetadataInfo(testdata);
+                testdata = separatedEvalData.get("newData"); 
+
+            } else if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
                 abstractListdata1 = input.importData4weka(Configuration.docroot + analytics.getDocument(), true);
                 traindata = (Instances) abstractListdata1;
                 separatedTrainData = helpfulFunctions.separateDataFromMetadataInfo(traindata);

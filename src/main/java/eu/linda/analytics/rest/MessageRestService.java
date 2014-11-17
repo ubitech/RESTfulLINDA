@@ -21,8 +21,16 @@ public class MessageRestService {
         AnalyticsFactory analyticsFactory = new AnalyticsFactory();
         AnalyticsController analyticsController = new AnalyticsController(analyticsFactory);
         Analytics analytics = analyticsController.connectToAnalyticsTable(Integer.parseInt(analytics_id));
-        String[] suffixes = analytics.getDocument().split("\\.");
-        String inputSuffix = suffixes[suffixes.length - 1];
+       
+        String inputSuffix;
+        if (analytics.getTrainQuery_id()>0){
+            inputSuffix="rdf";
+            System.out.println("inputSuffix"+inputSuffix);
+        }else{
+            String[] suffixes = analytics.getDocument().split("\\.");
+            inputSuffix = suffixes[suffixes.length - 1];
+        }
+
         analyticsController.runAnalytics(inputSuffix, analytics.getAlgorithm_name(), analytics.getExportFormat());
         return Response.status(200).entity("Analytic Process has runned").build();
 
