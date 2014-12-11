@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package eu.linda.analytics.formats;
 
+import eu.linda.analytics.db.ConnectionController;
 import eu.linda.analytics.weka.utils.HelpfulFunctionsSingleton;
 import java.io.File;
 import java.net.URL;
@@ -23,26 +23,28 @@ import weka.core.converters.CSVLoader;
  */
 public class RDFInputFormat extends InputFormat {
 
-      HelpfulFunctionsSingleton helpfulFuncions;
+    HelpfulFunctionsSingleton helpfulFuncions;
+    ConnectionController connectionController;
 
     public RDFInputFormat() {
         helpfulFuncions = HelpfulFunctionsSingleton.getInstance();
+        connectionController = ConnectionController.getInstance();
     }
 
     @Override
     public AbstractList importData4weka(String query_id, boolean isForRDFOutput) {
-    
-        String queryURI = helpfulFuncions.getQueryURI(query_id);
- 
-        helpfulFuncions.nicePrintMessage("import data from uri "+queryURI);
-        
+
+        String queryURI = connectionController.getQueryURI(query_id);
+
+        helpfulFuncions.nicePrintMessage("import data from uri " + queryURI);
+
         Instances data = null;
         try {
-            
+
             URL url = new URL(queryURI);
-            File tmpfile4lindaquery = File.createTempFile("tmpfile4lindaquery"+query_id, ".tmp"); 
-            FileUtils.copyURLToFile(url,tmpfile4lindaquery );
-            
+            File tmpfile4lindaquery = File.createTempFile("tmpfile4lindaquery" + query_id, ".tmp");
+            FileUtils.copyURLToFile(url, tmpfile4lindaquery);
+
             CSVLoader loader = new CSVLoader();
             loader.setSource(tmpfile4lindaquery);
             if (isForRDFOutput) {
@@ -57,14 +59,37 @@ public class RDFInputFormat extends InputFormat {
             Logger.getLogger(ArffInputFormat.class.getName()).log(Level.SEVERE, null, ex);
         }
         return data;
-    
-    
-    
+
     }
 
     @Override
-    public Rengine importData4R(String pathToFile, boolean isForRDFOutput) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Rengine importData4R(String query_id, boolean isForRDFOutput) {
+        System.out.println(System.getProperty("java.library.path"));
+        System.out.println("R_HOME" + System.getenv().get("R_HOME"));
+
+        Rengine re = Rengine.getMainEngine();
+        if (re == null) {
+            re = new Rengine(new String[]{"--vanilla"}, false, null);
+        }
+
+        if (!re.waitForR()) {
+            System.out.println("Cannot load R");
+            System.out.println("is alive Rengine??" + re.isAlive());
+        }
+
+        String queryURI = connectionController.getQueryURI(query_id);
+
+        helpfulFuncions.nicePrintMessage("import data from uri " + queryURI);
+        try {
+            URL url = new URL(queryURI);
+            File tmpfile4lindaquery = File.createTempFile("tmpfile4lindaquery" + query_id, ".tmp");
+            FileUtils.copyURLToFile(url, tmpfile4lindaquery);
+
+            re.eval(" loaded_data <- read.csv(file='" + tmpfile4lindaquery + "', header=TRUE, sep=',', na.strings='---');");
+        } catch (Exception ex) {
+            Logger.getLogger(ArffInputFormat.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return re;
     }
-    
+
 }

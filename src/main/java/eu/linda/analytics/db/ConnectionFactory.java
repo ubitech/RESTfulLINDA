@@ -19,17 +19,19 @@ public class ConnectionFactory {
     }//EoC
 
     public static Connection getInstance() {
+
         try {
             if (instance == null || instance.isClosed()) {
                 synchronized (ConnectionFactory.class) {
                     if (instance == null || instance.isClosed()) {
                         try {
                             Class.forName("com.mysql.jdbc.Driver");
-                            instance = DriverManager.getConnection("jdbc:mysql://" + Configuration.dbip + ":" + Configuration.dbport + "/" + Configuration.dbname+"?autoReconnect=true", Configuration.username, Configuration.password);
-                        } catch (ClassNotFoundException ee) {
-                            System.out.println("Class Error");
+                            instance = DriverManager.getConnection("jdbc:mysql://" + Configuration.dbip + ":" + Configuration.dbport + "/" + Configuration.dbname + "?autoReconnect=true&failOverReadOnly=false&maxReconnects=10", Configuration.username, Configuration.password);
+
                         } catch (SQLException ee) {
                             System.out.println("Connection Error");
+                        } catch (ClassNotFoundException ex) {
+                            Logger.getLogger(ConnectionFactory.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
                 }

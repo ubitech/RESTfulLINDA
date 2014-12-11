@@ -10,6 +10,7 @@ package eu.linda.analytics.formats;
  * @author eleni
  */
 import eu.linda.analytics.config.Configuration;
+import eu.linda.analytics.db.ConnectionController;
 import eu.linda.analytics.db.DBSynchronizer;
 import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.weka.utils.HelpfulFunctionsSingleton;
@@ -45,7 +46,6 @@ public class ManageOpenrdfLindaRepo {
 
         String datasetContextToString = "analytics" + a.getId() + "V" + a.getVersion() + "Date" + today;
 
-
         File file = new File(Configuration.docroot + a.getResultdocument());
         String base = "http://localhost:8080/openrdf-sesame/repositories/" + repositoryID + "/statements?context=_:";
         String baseURI = base + datasetContextToString + "#";
@@ -59,16 +59,14 @@ public class ManageOpenrdfLindaRepo {
                 Resource datasetContext = vf.createBNode(datasetContextToString);
 
                 if (a.getExportFormat().equalsIgnoreCase("RDFXML")) {
-                     con.add(file, baseURI, RDFFormat.RDFXML, datasetContext);
+                    con.add(file, baseURI, RDFFormat.RDFXML, datasetContext);
 
                 } else if (a.getExportFormat().equalsIgnoreCase("TTL")) {
-                     con.add(file, baseURI, RDFFormat.TURTLE, datasetContext);
+                    con.add(file, baseURI, RDFFormat.TURTLE, datasetContext);
 
                 } else if (a.getExportFormat().equalsIgnoreCase("NTRIPLES")) {
-                     con.add(file, baseURI, RDFFormat.N3, datasetContext);
+                    con.add(file, baseURI, RDFFormat.N3, datasetContext);
                 }
-               
-               
 
                 this.cleanLocalAnalyticsRepo(a, base + datasetContextToString);
 
@@ -93,19 +91,19 @@ public class ManageOpenrdfLindaRepo {
      */
     public void cleanLocalAnalyticsRepo(Analytics a, String rdfContextURL) {
 
-        DBSynchronizer dbSynchronizer = new DBSynchronizer();
-        dbSynchronizer.updateLindaAnalyticsRDFInfo(rdfContextURL, true, a.getId());
+        ConnectionController connectionController = ConnectionController.getInstance();
+        connectionController.updateLindaAnalyticsRDFInfo(rdfContextURL, true, a.getId());
 
     }
 
-    public static void main(String[] args) throws RDFParseException, IOException {
-
-        HelpfulFunctionsSingleton helpfulFunctions = HelpfulFunctionsSingleton.getInstance();
-        
-        Analytics analytics = helpfulFunctions.connectToAnalyticsTable(Integer.parseInt("83"));
-        ManageOpenrdfLindaRepo manageOpenrdfLindaRepo = new ManageOpenrdfLindaRepo();
-
-        manageOpenrdfLindaRepo.loadtotriplestore(analytics);
-
-    }
+//    public static void main(String[] args) throws RDFParseException, IOException {
+//
+//        HelpfulFunctionsSingleton helpfulFunctions = HelpfulFunctionsSingleton.getInstance();
+//        
+//        Analytics analytics = helpfulFunctions.connectToAnalyticsTable(Integer.parseInt("83"));
+//        ManageOpenrdfLindaRepo manageOpenrdfLindaRepo = new ManageOpenrdfLindaRepo();
+//
+//        manageOpenrdfLindaRepo.loadtotriplestore(analytics);
+//
+//    }
 }

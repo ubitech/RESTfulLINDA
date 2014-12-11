@@ -40,7 +40,7 @@ public class ArimaAnalyticProcess extends AnalyticProcess {
         //clean previous eval info if exists
         helpfulFunctions.cleanPreviousInfo(analytics);
 
-        Rengine re = input.importData4R(Configuration.docroot + analytics.getDocument(), true);
+        Rengine re = input.importData4R(Configuration.analyticsRepo + analytics.getDocument(), true);
 
         //re.eval(" loaded_data <- read.csv(file='" + Configuration.docroot + analytics.getDocument() + "', header=TRUE, sep=',');");
         String RScript = "loaded_data <- read.csv(file='" + Configuration.docroot + analytics.getDocument() + "', header=TRUE, sep=',');\n";

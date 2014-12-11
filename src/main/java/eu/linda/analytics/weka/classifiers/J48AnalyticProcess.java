@@ -7,14 +7,13 @@ package eu.linda.analytics.weka.classifiers;
 
 import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.controller.AnalyticProcess;
+import eu.linda.analytics.db.ConnectionController;
 import eu.linda.analytics.formats.InputFormat;
 import eu.linda.analytics.formats.OutputFormat;
 import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.weka.utils.HelpfulFunctionsSingleton;
 import java.util.AbstractList;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import weka.classifiers.Classifier;
@@ -34,9 +33,11 @@ public class J48AnalyticProcess extends AnalyticProcess {
 
     HelpfulFunctionsSingleton helpfulFunctions;
     InputFormat input;
+    ConnectionController connectionController;
 
     public J48AnalyticProcess(InputFormat input) {
         helpfulFunctions = HelpfulFunctionsSingleton.getInstance();
+        connectionController = ConnectionController.getInstance();
         helpfulFunctions.nicePrintMessage("Create analytic process for J48");
         this.input = input;
 
@@ -68,14 +69,14 @@ public class J48AnalyticProcess extends AnalyticProcess {
 
             } else if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
                
-                abstractListdata = input.importData4weka(Configuration.docroot + analytics.getDocument(), true);
+                abstractListdata = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(), true);
                 data = (Instances) abstractListdata;
                 HashMap<String, Instances> separatedData = helpfulFunctions.separateDataFromMetadataInfo(data);
                 data = separatedData.get("newData");
                 
             } else {
 
-                abstractListdata = input.importData4weka(Configuration.docroot + analytics.getDocument(), false);
+                abstractListdata = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(), false);
                 data = (Instances) abstractListdata;
 
             }
@@ -133,21 +134,21 @@ public class J48AnalyticProcess extends AnalyticProcess {
                 testdata = separatedEvalData.get("newData"); 
 
             } else if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
-                abstractListdata1 = input.importData4weka(Configuration.docroot + analytics.getDocument(), true);
+                abstractListdata1 = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(), true);
                 traindata = (Instances) abstractListdata1;
                 separatedTrainData = helpfulFunctions.separateDataFromMetadataInfo(traindata);
                 traindata = separatedTrainData.get("newData");
 
-                abstractListdata2 = input.importData4weka(Configuration.docroot + analytics.getTestdocument(), true);
+                abstractListdata2 = input.importData4weka(Configuration.analyticsRepo + analytics.getTestdocument(), true);
                 testdata = (Instances) abstractListdata2;
                 separatedEvalData = helpfulFunctions.separateDataFromMetadataInfo(testdata);
                 testdata = separatedEvalData.get("newData");
             } else {
 
-                abstractListdata1 = input.importData4weka(Configuration.docroot + analytics.getDocument(), false);
+                abstractListdata1 = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(), false);
                 traindata = (Instances) abstractListdata1;
 
-                abstractListdata2 = input.importData4weka(Configuration.docroot + analytics.getTestdocument(), false);
+                abstractListdata2 = input.importData4weka(Configuration.analyticsRepo + analytics.getTestdocument(), false);
                 testdata = (Instances) abstractListdata2;
 
             }
@@ -156,13 +157,13 @@ public class J48AnalyticProcess extends AnalyticProcess {
             testdata.setClassIndex(testdata.numAttributes() - 1);
 
             if (traindata.numAttributes() != testdata.numAttributes()) {
-                helpfulFunctions.updateProcessMessageToAnalyticsTable("Train Dataset has not the same"
+                connectionController.updateProcessMessageToAnalyticsTable("Train Dataset has not the same"
                         + " attributes with Evaluation dataset! Please create a new analytic process!", analytics.getId());
                 return;
             }
 
             //Classifier model  
-            Classifier model = (Classifier) weka.core.SerializationHelper.read(Configuration.docroot + analytics.getModel());
+            Classifier model = (Classifier) weka.core.SerializationHelper.read(Configuration.analyticsRepo + analytics.getModel());
 
             Evaluation eval = new Evaluation(traindata);
 
@@ -200,7 +201,7 @@ public class J48AnalyticProcess extends AnalyticProcess {
 
         } catch (Exception ex) {
             Logger.getLogger(J48AnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);
-            helpfulFunctions.updateProcessMessageToAnalyticsTable(ex.toString(), analytics.getId());
+            connectionController.updateProcessMessageToAnalyticsTable(ex.toString(), analytics.getId());
             //return (AbstractList) new LinkedList();
 
         }

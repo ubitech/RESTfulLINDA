@@ -6,7 +6,7 @@
 package eu.linda.analytics.formats;
 
 import eu.linda.analytics.config.Configuration;
-import eu.linda.analytics.db.DBSynchronizer;
+import eu.linda.analytics.db.ConnectionController;
 import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.weka.utils.HelpfulFunctionsSingleton;
 import java.util.AbstractList;
@@ -19,11 +19,11 @@ import org.rosuda.JRI.Rengine;
  */
 public class ArffOutputFormat extends OutputFormat {
 
-    DBSynchronizer dbsynchronizer;
+    ConnectionController connectionController;
     HelpfulFunctionsSingleton helpfulFuncions;
 
     public ArffOutputFormat() {
-        dbsynchronizer = new DBSynchronizer();
+        connectionController = ConnectionController.getInstance();
         helpfulFuncions = HelpfulFunctionsSingleton.getInstance();
     }
 
@@ -40,8 +40,8 @@ public class ArffOutputFormat extends OutputFormat {
             String targetFileNameFullPath = Configuration.docroot + targetFileName;
 
             helpfulFuncions.saveFile(targetFileNameFullPath, dataToExport.toString());
-            dbsynchronizer.updateLindaAnalytics(targetFileName, "resultdocument", analytics.getId());
-            dbsynchronizer.updateLindaAnalyticsVersion(analytics.getVersion(), analytics.getId());
+            connectionController.updateLindaAnalytics(targetFileName, "resultdocument", analytics.getId());
+            connectionController.updateLindaAnalyticsVersion(analytics.getVersion(), analytics.getId());
 
         } else {
             helpfulFuncions.nicePrintMessage("There are no data to be exported to Arff");

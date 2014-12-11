@@ -57,14 +57,20 @@ public class M5PAnalyticProcess extends AnalyticProcess {
             Instances data;
 
             // remove dataset metadata (first two columns)    
-            if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
-                abstractListdata1 = input.importData4weka(Configuration.docroot + analytics.getDocument(), true);
+            if (helpfulFunctions.isRDFInputFormat(analytics.getEvaluationQuery_id())) {
+                abstractListdata1 = input.importData4weka(Integer.toString(analytics.getEvaluationQuery_id()), true);
+                data = (Instances) abstractListdata1;
+                HashMap<String, Instances> separatedData = helpfulFunctions.separateDataFromMetadataInfo(data);
+                data = separatedData.get("newData");
+
+            } else if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
+                abstractListdata1 = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(), true);
                 data = (Instances) abstractListdata1;
                 HashMap<String, Instances> separatedData = helpfulFunctions.separateDataFromMetadataInfo(data);
                 data = separatedData.get("newData");
             } else {
 
-                abstractListdata1 = input.importData4weka(Configuration.docroot + analytics.getDocument(), false);
+                abstractListdata1 = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(), false);
                 data = (Instances) abstractListdata1;
 
             }
@@ -93,12 +99,12 @@ public class M5PAnalyticProcess extends AnalyticProcess {
 
 //predictM5P
     @Override
-    public void eval(Analytics analytics,OutputFormat out) {
+    public void eval(Analytics analytics, OutputFormat out) {
         helpfulFunctions.nicePrintMessage("Eval M5P");
-        
+
         //clean previous eval info if exists
         helpfulFunctions.cleanPreviousInfo(analytics);
-        
+
         HashMap<String, Instances> separatedData = null;
         AbstractList dataToReturn = null;
         try {
@@ -106,18 +112,25 @@ public class M5PAnalyticProcess extends AnalyticProcess {
             AbstractList<Instance> abstractList;
             Instances data;
 
-            if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
-                abstractList = input.importData4weka(Configuration.docroot + analytics.getTestdocument(), true);
+            if (helpfulFunctions.isRDFInputFormat(analytics.getEvaluationQuery_id())) {
+
+                abstractList = input.importData4weka(Integer.toString(analytics.getTrainQuery_id()), true);
+                data = (Instances) abstractList;
+                separatedData = helpfulFunctions.separateDataFromMetadataInfo(data);
+                data = separatedData.get("newData");
+
+            } else if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
+                abstractList = input.importData4weka(Configuration.analyticsRepo + analytics.getTestdocument(), true);
                 data = (Instances) abstractList;
                 separatedData = helpfulFunctions.separateDataFromMetadataInfo(data);
                 data = separatedData.get("newData");
             } else {
-                abstractList = input.importData4weka(Configuration.docroot + analytics.getTestdocument(), false);
+                abstractList = input.importData4weka(Configuration.analyticsRepo + analytics.getTestdocument(), false);
                 data = (Instances) abstractList;
             }
 
             data.setClassIndex(data.numAttributes() - 1);
-            Vector v = (Vector) SerializationHelper.read(Configuration.docroot + analytics.getModel());
+            Vector v = (Vector) SerializationHelper.read(Configuration.analyticsRepo + analytics.getModel());
 
             //model evaluation
             Evaluation eval = new Evaluation(data);
@@ -142,10 +155,10 @@ public class M5PAnalyticProcess extends AnalyticProcess {
 
             List<Instance> instances = new ArrayList<Instance>();
 
-           // System.out.println("inst# ,    actual, ->  predicted ,   error");
+            // System.out.println("inst# ,    actual, ->  predicted ,   error");
             String result = "inst# ,    actual,   predicted ,   error  \n";
             int dataLength = data.numAttributes();
-            
+
             for (int i = 0; i < data.numInstances(); i++) {
                 Instance curr = data.instance(i);
 
@@ -200,9 +213,8 @@ public class M5PAnalyticProcess extends AnalyticProcess {
         } catch (Exception ex) {
             Logger.getLogger(M5PAnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         out.exportData(analytics, dataToReturn);
-      
 
     }
 

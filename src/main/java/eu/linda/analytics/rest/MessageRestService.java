@@ -2,6 +2,8 @@ package eu.linda.analytics.rest;
 
 import eu.linda.analytics.controller.AnalyticsController;
 import eu.linda.analytics.controller.AnalyticsFactory;
+import eu.linda.analytics.db.ConnectionController;
+import eu.linda.analytics.db.DBSynchronizer;
 import eu.linda.analytics.formats.ManageOpenrdfLindaRepo;
 import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.weka.utils.HelpfulFunctionsSingleton;
@@ -20,18 +22,26 @@ public class MessageRestService {
 
         AnalyticsFactory analyticsFactory = new AnalyticsFactory();
         AnalyticsController analyticsController = new AnalyticsController(analyticsFactory);
-        Analytics analytics = analyticsController.connectToAnalyticsTable(Integer.parseInt(analytics_id));
-       
+        //Analytics analytics = analyticsController.connectToAnalyticsTable(Integer.parseInt(analytics_id));
+        
+        ConnectionController connectionController = ConnectionController.getInstance();
+        connectionController.readProperties();
+        Analytics analytics = connectionController.connectToAnalyticsTable(Integer.parseInt(analytics_id));
+        analyticsController.setAnalytics(analytics);
+        
+        
         String inputSuffix;
-        if (analytics.getTrainQuery_id()>0){
-            inputSuffix="rdf";
-            System.out.println("inputSuffix"+inputSuffix);
-        }else{
+        if (analytics.getTrainQuery_id() > 0) {
+            inputSuffix = "rdf";
+            System.out.println("inputSuffix" + inputSuffix);
+        } else {
             String[] suffixes = analytics.getDocument().split("\\.");
             inputSuffix = suffixes[suffixes.length - 1];
         }
 
         analyticsController.runAnalytics(inputSuffix, analytics.getAlgorithm_name(), analytics.getExportFormat());
+        
+        connectionController.closeConnection();
         return Response.status(200).entity("Analytic Process has runned").build();
 
     }
@@ -39,14 +49,13 @@ public class MessageRestService {
     @GET
     @Path("/loadtotriplestore/{id}")
     public Response loadToTriplestore(@PathParam("id") String analytics_id) throws Exception {
+        ConnectionController connectionController = ConnectionController.getInstance();
 
-        HelpfulFunctionsSingleton helpfulFunctions = HelpfulFunctionsSingleton.getInstance();
-
-        Analytics analytics = helpfulFunctions.connectToAnalyticsTable(Integer.parseInt(analytics_id));
+        Analytics analytics = connectionController.connectToAnalyticsTable(Integer.parseInt(analytics_id));
         ManageOpenrdfLindaRepo manageOpenrdfLindaRepo = new ManageOpenrdfLindaRepo();
-        
+
         manageOpenrdfLindaRepo.loadtotriplestore(analytics);
-        
+         connectionController.closeConnection();
         return Response.status(200).entity("RDF file has been succesfully published at Linda common server triplestore").build();
 
     }

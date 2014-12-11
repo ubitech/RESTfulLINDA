@@ -6,7 +6,7 @@
 package eu.linda.analytics.formats;
 
 import eu.linda.analytics.config.Configuration;
-import eu.linda.analytics.db.DBSynchronizer;
+import eu.linda.analytics.db.ConnectionController;
 import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.weka.utils.HelpfulFunctionsSingleton;
 import java.util.AbstractList;
@@ -18,11 +18,11 @@ import org.rosuda.JRI.Rengine;
  */
 public class CSVOutputFormat extends OutputFormat {
 
-    DBSynchronizer dbsynchronizer;
+    ConnectionController connectionController;
     HelpfulFunctionsSingleton helpfulFunctions;
 
     public CSVOutputFormat() {
-        dbsynchronizer = new DBSynchronizer();
+        connectionController = ConnectionController.getInstance();
         helpfulFunctions = HelpfulFunctionsSingleton.getInstance();
     }
 
@@ -42,8 +42,8 @@ public class CSVOutputFormat extends OutputFormat {
             String targetFileNameCSVFull = Configuration.docroot + targetFileNameCSV;
 
             helpfulFunctions.saveFileAsCSV(targetFileNameFullPath, targetFileNameCSVFull);
-            dbsynchronizer.updateLindaAnalytics(targetFileNameCSV, "resultdocument", analytics.getId());
-            dbsynchronizer.updateLindaAnalyticsVersion(analytics.getVersion(), analytics.getId());
+            connectionController.updateLindaAnalytics(targetFileNameCSV, "resultdocument", analytics.getId());
+            connectionController.updateLindaAnalyticsVersion(analytics.getVersion(), analytics.getId());
 
         } else {
             helpfulFunctions.nicePrintMessage("There are no data to be exported to CSV");
@@ -66,8 +66,8 @@ public class CSVOutputFormat extends OutputFormat {
         re.eval("write.table(df_to_export, file = '" + targetFileNameFullPath + "',row.names=FALSE,sep = ';', dec='.');");
         re.eval("rm(list=ls());");
 
-        dbsynchronizer.updateLindaAnalytics(targetFileName, "resultdocument", analytics.getId());
-        dbsynchronizer.updateLindaAnalyticsVersion(analytics.getVersion(), analytics.getId());
+        connectionController.updateLindaAnalytics(targetFileName, "resultdocument", analytics.getId());
+        connectionController.updateLindaAnalyticsVersion(analytics.getVersion(), analytics.getId());
 
     }
 

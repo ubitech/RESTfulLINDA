@@ -2,9 +2,7 @@ package eu.linda.analytics.weka.utils;
 
 import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.db.ConnectionController;
-import eu.linda.analytics.db.DBSynchronizer;
 import eu.linda.analytics.model.Analytics;
-import eu.linda.analytics.model.Query;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -14,8 +12,6 @@ import java.util.List;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.commons.httpclient.URIException;
-import org.apache.commons.httpclient.util.URIUtil;
 import weka.classifiers.Classifier;
 import weka.core.Attribute;
 import weka.core.Instances;
@@ -31,12 +27,12 @@ import weka.filters.unsupervised.attribute.Remove;
  */
 public class HelpfulFunctionsSingleton {
 
-    DBSynchronizer dbsynchronizer;
+    ConnectionController connectionController;
 
     private static HelpfulFunctionsSingleton instance = null;
 
     protected HelpfulFunctionsSingleton() {
-        dbsynchronizer = new DBSynchronizer();
+       connectionController = ConnectionController.getInstance();
     }
 
     public static HelpfulFunctionsSingleton getInstance() {
@@ -49,21 +45,27 @@ public class HelpfulFunctionsSingleton {
     public Analytics saveModel(Classifier model, Analytics analytics) throws Exception {
         String[] splitedSourceFileName = analytics.getDocument().split("\\.");
 
-        String targetFileName = (splitedSourceFileName[0] + "_" + analytics.getAlgorithm_name() + "Model" + ".model").replace("datasets", "models");
-
-        String targetFileNameTXT = (splitedSourceFileName[0] + "_" + analytics.getAlgorithm_name() + "ModelReadable" + ".txt").replace("datasets", "models");
-
+       // String targetFileName = (splitedSourceFileName[0] + "_" + analytics.getAlgorithm_name() + "Model" + ".model").replace("datasets", "models");
+       //String targetFileNameTXT = (splitedSourceFileName[0] + "_" + analytics.getAlgorithm_name() + "ModelReadable" + ".txt").replace("datasets", "models");
+       
+       String targetFileName = ("models/analyticsID" + analytics.getId() + "_" + analytics.getAlgorithm_name() + "Model" + ".model");
+       String targetFileNameTXT = ("models/analyticsID" + analytics.getId()  + "_" + analytics.getAlgorithm_name() + "ModelReadable" + ".txt");
+        
+       
         System.out.println("targetFileName: " + targetFileName);
         try {
 
             // serialize && save model
-            weka.core.SerializationHelper.write(Configuration.docroot + targetFileName, model);
+//            weka.core.SerializationHelper.write(Configuration.docroot + targetFileName, model);
 
-            dbsynchronizer.updateLindaAnalyticsModel(targetFileName, analytics.getId());
+           weka.core.SerializationHelper.write(Configuration.analyticsRepo + targetFileName, model);
+
+            connectionController.updateLindaAnalyticsModel(targetFileName, analytics.getId());
 
             analytics.setModel(targetFileName);
 
-            File file = new File(Configuration.docroot + targetFileNameTXT);
+//            File file = new File(Configuration.docroot + targetFileNameTXT);
+             File file = new File(Configuration.analyticsRepo +targetFileNameTXT);
 
             // if file doesnt exists, then create it
             if (!file.exists()) {
@@ -75,7 +77,7 @@ public class HelpfulFunctionsSingleton {
             bw.write(model.toString());
             bw.close();
 
-            dbsynchronizer.updateLindaAnalyticsModelReadable(targetFileNameTXT, analytics.getId());
+            connectionController.updateLindaAnalyticsModelReadable(targetFileNameTXT, analytics.getId());
             analytics.setModelReadable(targetFileNameTXT);
 
         } catch (IOException e) {
@@ -92,10 +94,11 @@ public class HelpfulFunctionsSingleton {
         String targetFileName = "";
 
         if (column.equalsIgnoreCase("processinfo")) {
-            targetFileName = (splitedSourceFileName[0] + "_" + analytics.getAlgorithm_id() + "_processinfo.txt").replace("datasets", "results");
-            String targetFileNameFullPath = Configuration.docroot + targetFileName;
+            //targetFileName = (splitedSourceFileName[0] + "_" + analytics.getAlgorithm_id() + "_processinfo.txt").replace("datasets", "results");
+            targetFileName = ( "results/analyticsID" + analytics.getId()+ "_" + analytics.getAlgorithm_id() + "_processinfo.txt").replace("datasets", "results");
+            String targetFileNameFullPath = Configuration.analyticsRepo + targetFileName;
             saveFile(targetFileNameFullPath, content);
-            dbsynchronizer.updateLindaAnalytics(targetFileName, column, analytics.getId());
+            connectionController.updateLindaAnalytics(targetFileName, column, analytics.getId());
 
         }
 
@@ -157,25 +160,23 @@ public class HelpfulFunctionsSingleton {
     }
 
     public Analytics saveModelasVector(Vector model, Analytics analytics) throws Exception {
-        String[] splitedSourceFileName = analytics.getDocument().split(".arff");
 
-        String targetFileName = (splitedSourceFileName[0] + "_" + analytics.getAlgorithm_name() + "Model" + ".model").replace("datasets", "models");
+        String targetFileName = "models/analyticsID" + analytics.getId() + "_" + analytics.getAlgorithm_name() + "Model" + ".model";
 
-        String targetFileNameTXT = (splitedSourceFileName[0] + "_" + analytics.getAlgorithm_name() + "ModelReadable" + ".txt").replace("datasets", "models");
+        String targetFileNameTXT = "models/analyticsID" + analytics.getId() + "_" + analytics.getAlgorithm_name() + "ModelReadable" + ".txt";
 
         System.out.println("targetFileName: " + targetFileName);
         try {
 
             // serialize && save model
-            SerializationHelper.write(Configuration.docroot + targetFileName, model);
-            weka.core.SerializationHelper.write(Configuration.docroot + targetFileName, model);
+            SerializationHelper.write(Configuration.analyticsRepo + targetFileName, model);
+            weka.core.SerializationHelper.write(Configuration.analyticsRepo + targetFileName, model);
 
-            DBSynchronizer dbsynchronizer = new DBSynchronizer();
-            dbsynchronizer.updateLindaAnalyticsModel(targetFileName, analytics.getId());
+            connectionController.updateLindaAnalyticsModel(targetFileName, analytics.getId());
 
             analytics.setModel(targetFileName);
 
-            File file = new File(Configuration.docroot + targetFileNameTXT);
+            File file = new File(Configuration.analyticsRepo + targetFileNameTXT);
 
             // if file doesnt exists, then create it
             if (!file.exists()) {
@@ -187,7 +188,7 @@ public class HelpfulFunctionsSingleton {
             bw.write(model.toString());
             bw.close();
 
-            dbsynchronizer.updateLindaAnalyticsModelReadable(targetFileNameTXT, analytics.getId());
+            connectionController.updateLindaAnalyticsModelReadable(targetFileNameTXT, analytics.getId());
             analytics.setModelReadable(targetFileNameTXT);
 
         } catch (IOException e) {
@@ -271,18 +272,6 @@ public class HelpfulFunctionsSingleton {
         return false;
     }
 
-    public Analytics connectToAnalyticsTable(int id) {
-        ConnectionController connectionController = new ConnectionController();
-        connectionController.readProperties();
-        Analytics analytics = dbsynchronizer.getlindaAnalytics_analytics(id);
-        return analytics;
-    }
-
-    public void updateProcessMessageToAnalyticsTable(String message, int id) {
-        dbsynchronizer.updateLindaAnalyticsProcessMessage(message, id);
-
-    }
-
     public void cleanPreviousInfo(Analytics analytics) {
 
         this.nicePrintMessage("Clean Previous Analytic Info");
@@ -290,29 +279,8 @@ public class HelpfulFunctionsSingleton {
         deleteFile(analytics.getResultdocument());
         deleteFile(analytics.getProcessinfo());
         //empty the analytic result document & processMessage
-        dbsynchronizer.emptyLindaAnalyticsResultInfo(analytics.getId());
-
-    }
-
-    
-    public String getQueryURI(String query_id) {
-        String query_uri = null;
-        
-       
-        
-        try {
-            Query linda_query = dbsynchronizer.getQueryURI(Integer.parseInt(query_id));
-
-            System.out.println("linda_query encoded"+URIUtil.encodeQuery(linda_query.getSparql()));
-
-            query_uri = Configuration.rdf2anyServer + "/rdf2any/v1.0/convert/csv-converter.csv?dataset=" + linda_query.getEndpoint() + "&query=" + URIUtil.encodeQuery(linda_query.getSparql());
-
-        } catch (URIException ex) {
-            Logger.getLogger(HelpfulFunctionsSingleton.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        System.out.println("query_uri"+query_uri);
-        return query_uri;
+        ConnectionController connectionController = ConnectionController.getInstance();
+        connectionController.emptyLindaAnalyticsResultInfo(analytics.getId());
 
     }
 

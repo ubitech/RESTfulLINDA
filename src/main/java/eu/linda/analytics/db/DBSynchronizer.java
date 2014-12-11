@@ -13,9 +13,26 @@ public class DBSynchronizer {
 
     Connection connection;
 
+   
     public DBSynchronizer() {
         connection = ConnectionFactory.getInstance();
     }//Constructor
+    
+      public void establishConnection() {
+        connection = ConnectionFactory.getInstance();
+    }
+
+    public void closeConnection() {
+        try {
+
+            if (connection != null && !connection.isClosed()) {
+                connection.close();
+            }
+            connection = null;
+        } catch (SQLException ex) {
+            Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 
     /*
      * Fetch analytics_analytics by id
@@ -51,18 +68,12 @@ public class DBSynchronizer {
                         rs.getString("parameters")
                 );
                 analytics.setAlgorithm_name(rs.getString("name"));
+                rs.close();
+                preparedStatement.close();
                 break;
             }
         } catch (SQLException ex) {
             Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            if (preparedStatement != null) {
-                try {
-                    preparedStatement.close();
-                } catch (SQLException ex) {
-                    Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
         }
         return analytics;
     }//EoM  
@@ -87,18 +98,12 @@ public class DBSynchronizer {
                         rs.getString("sparql"),
                         rs.getString("description")
                 );
+                rs.close();
+                preparedStatement.close();
                 break;
             }
         } catch (SQLException ex) {
             Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            if (preparedStatement != null) {
-                try {
-                    preparedStatement.close();
-                } catch (SQLException ex) {
-                    Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
         }
         return query;
     }//EoM  
@@ -115,17 +120,11 @@ public class DBSynchronizer {
             preparedStatement.setInt(2, analytics_id);
             preparedStatement.executeUpdate();
 
+            preparedStatement.close();
+
         } catch (SQLException ex) {
             Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("ERROR SEVERE" + ex);
-        } finally {
-            if (preparedStatement != null) {
-                try {
-                    preparedStatement.close();
-                } catch (SQLException ex) {
-                    Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
         }
     }//EoM updateLindaAnalytics   
 
@@ -141,17 +140,11 @@ public class DBSynchronizer {
             preparedStatement.setInt(2, analytics_id);
             preparedStatement.executeUpdate();
 
+            preparedStatement.close();
+
         } catch (SQLException ex) {
             Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("ERROR SEVERE" + ex);
-        } finally {
-            if (preparedStatement != null) {
-                try {
-                    preparedStatement.close();
-                } catch (SQLException ex) {
-                    Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
         }
     }//EoM updateLindaAnalyticsModel   
 
@@ -167,17 +160,11 @@ public class DBSynchronizer {
             preparedStatement.setInt(2, analytics_id);
             preparedStatement.executeUpdate();
 
+            preparedStatement.close();
+
         } catch (SQLException ex) {
             Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("ERROR SEVERE" + ex);
-        } finally {
-            if (preparedStatement != null) {
-                try {
-                    preparedStatement.close();
-                } catch (SQLException ex) {
-                    Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
         }
     }//EoM updateLindaAnalyticsModelReadable   
 
@@ -193,17 +180,11 @@ public class DBSynchronizer {
             preparedStatement.setInt(2, analytics_id);
             preparedStatement.executeUpdate();
 
+            preparedStatement.close();
+
         } catch (SQLException ex) {
             Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("ERROR SEVERE" + ex);
-        } finally {
-            if (preparedStatement != null) {
-                try {
-                    preparedStatement.close();
-                } catch (SQLException ex) {
-                    Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
         }
     }//EoM updateLindaAnalyticsVersion 
 
@@ -230,17 +211,11 @@ public class DBSynchronizer {
             preparedStatement.setInt(3, analytics_id);
             preparedStatement.executeUpdate();
 
+            preparedStatement.close();
+
         } catch (SQLException ex) {
             Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("ERROR SEVERE" + ex);
-        } finally {
-            if (preparedStatement != null) {
-                try {
-                    preparedStatement.close();
-                } catch (SQLException ex) {
-                    Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
         }
     }//EoM updateLindaAnalyticsRDFInfo 
 
@@ -257,17 +232,11 @@ public class DBSynchronizer {
             preparedStatement.setInt(2, analytics_id);
             preparedStatement.executeUpdate();
 
+            preparedStatement.close();
+
         } catch (SQLException ex) {
             Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("ERROR SEVERE" + ex);
-        } finally {
-            if (preparedStatement != null) {
-                try {
-                    preparedStatement.close();
-                } catch (SQLException ex) {
-                    Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
         }
     }//EoM updateLindaAnalyticsProcessMessage 
 
@@ -285,19 +254,15 @@ public class DBSynchronizer {
             preparedStatement.setString(3, "");
             preparedStatement.setInt(4, analytics_id);
             preparedStatement.executeUpdate();
+            preparedStatement.close();
 
         } catch (SQLException ex) {
             Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("ERROR SEVERE" + ex);
-        } finally {
-            if (preparedStatement != null) {
-                try {
-                    preparedStatement.close();
-                } catch (SQLException ex) {
-                    Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        }
+        } 
+        
     }//EoM emptyLindaAnalyticsResultDocument 
+    
+   
 
 }//EoC

@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package eu.linda.analytics.controller;
 
 import eu.linda.analytics.formats.InputFormat;
@@ -19,44 +18,49 @@ import java.util.AbstractList;
  */
 public class AnalyticsController {
 
-    
     AnalyticsFactory factory;
     Analytics analytics;
-    
+
     public AnalyticsController(AnalyticsFactory factory) {
         this.factory = factory;
     }
+
+    public void setAnalytics(Analytics analytics) {
+         this.analytics = analytics;
+    }
+
     
-    public AnalyticsInfo runAnalytics(String inputformat, String algorithm,String ouputformat){
-   
+    
+    public AnalyticsInfo runAnalytics(String inputformat, String algorithm, String ouputformat) {
+
         InputFormat in;
         AnalyticProcess ap;
         OutputFormat out;
-        
-        AnalyticsInfo info = factory.createAnalytics(inputformat,algorithm,ouputformat);
-        
+
+        AnalyticsInfo info = factory.createAnalytics(inputformat, algorithm, ouputformat);
+
         in = info.getInputformat();
         ap = info.getAnalyticProcess();
         out = info.getOutputformat();
-        
+
         ap.train(analytics);
 //        AbstractList resultToExport = ap.eval(analytics);
 //        out.exportData(analytics,resultToExport);
-        
-        ap.eval(analytics,out);
-       
-        
+
+        ap.eval(analytics, out);
+
         return info;
-        
+
     }
-    
-    public Analytics connectToAnalyticsTable(int id) {
-        ConnectionController connectionController = new ConnectionController();
-        connectionController.readProperties();
-        DBSynchronizer dbsynchronizer = new DBSynchronizer();
-        Analytics analytics = dbsynchronizer.getlindaAnalytics_analytics(id);
-        this.analytics = analytics;
-        return analytics;
-    }
-    
+
+//    public Analytics connectToAnalyticsTable(int id) {
+//        ConnectionController connectionController = ConnectionController.getInstance();
+//        connectionController.readProperties();
+//        DBSynchronizer dbsynchronizer = new DBSynchronizer();
+//        Analytics analytics = dbsynchronizer.getlindaAnalytics_analytics(id);
+//        this.analytics = analytics;
+//        dbsynchronizer.closeConnection();
+//        return analytics;
+//    }
+
 }

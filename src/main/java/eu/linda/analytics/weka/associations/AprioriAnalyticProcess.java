@@ -7,18 +7,15 @@ package eu.linda.analytics.weka.associations;
 
 import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.controller.AnalyticProcess;
+import eu.linda.analytics.db.ConnectionController;
 import eu.linda.analytics.formats.InputFormat;
 import eu.linda.analytics.formats.OutputFormat;
 import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.weka.utils.HelpfulFunctionsSingleton;
 import java.util.AbstractList;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.json.JSONArray;
 import weka.associations.Apriori;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -59,16 +56,23 @@ public class AprioriAnalyticProcess extends AnalyticProcess {
             AbstractList<Instance> abstractListdata;
             Instances data;
 
-            // remove dataset metadata (first two columns)    
-            if (analytics.getExportFormat().equalsIgnoreCase("rdf")) {
+            // remove dataset metadata (first two columns) 
+             if (helpfulFunctions.isRDFInputFormat(analytics.getEvaluationQuery_id()))
+            {
+                abstractListdata = input.importData4weka(Integer.toString(analytics.getEvaluationQuery_id()), true);
+                data = (Instances) abstractListdata;
+                HashMap<String, Instances> separatedData = helpfulFunctions.separateDataFromMetadataInfo(data);
+                data = separatedData.get("newData");
 
-                abstractListdata = input.importData4weka(Configuration.docroot + analytics.getDocument(), true);
+            } else if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
+
+                abstractListdata = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(), true);
                 data = (Instances) abstractListdata;
                 HashMap<String, Instances> separatedData = helpfulFunctions.separateDataFromMetadataInfo(data);
                 data = separatedData.get("newData");
             } else {
 
-                abstractListdata = input.importData4weka(Configuration.docroot + analytics.getDocument(), false);
+                abstractListdata = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(), false);
                 data = (Instances) abstractListdata;
 
             }
@@ -94,14 +98,10 @@ public class AprioriAnalyticProcess extends AnalyticProcess {
 
         } catch (Exception ex) {
             Logger.getLogger(AprioriAnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);
-            helpfulFunctions.updateProcessMessageToAnalyticsTable(ex.toString(), analytics.getId());
+            ConnectionController.getInstance().updateProcessMessageToAnalyticsTable(ex.toString(), analytics.getId());
+//            helpfulFunctions.updateProcessMessageToAnalyticsTable(ex.toString(), analytics.getId());
         }
 
-        //Apriori returns an empty list
-        // List list = new LinkedList();
-        // return (AbstractList) list;
-//helpfulFuncions.writeToFile(jsonresult.getString(1), "resultdocument", analytics);
-        //result = jsonresult.toString();
     }
 
 }

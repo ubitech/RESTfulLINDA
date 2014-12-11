@@ -45,25 +45,25 @@ public class TestAssociationAlgorithms {
     // @Test
     // public void hello() {}
  
-     @Test
-    public void testApriori() {
-
-        int[] analyticsToTest = {50, 51, 53, 55};
-
-        AnalyticsFactory analyticsFactory = new AnalyticsFactory();
-        AnalyticsController analyticsController = new AnalyticsController(analyticsFactory);
-
-        for (int analytic_id : analyticsToTest) {
-            
-            Analytics analytics = analyticsController.connectToAnalyticsTable(analytic_id);
-            System.out.println("Analytic Process "+analytics.getExportFormat()+" 2 "+analytics.getExportFormat()+" for Apriori");
-            String[] suffixes = analytics.getDocument().split("\\.");
-            String inputSuffix = suffixes[suffixes.length - 1];
-            analyticsController.runAnalytics(inputSuffix, analytics.getAlgorithm_name(), analytics.getExportFormat());
-        }
-
-        String expResult = "";
-        assertEquals(expResult, expResult);
-
-    }
+//     @Test
+//    public void testApriori() {
+//
+//        int[] analyticsToTest = {50, 51, 53, 55};
+//
+//        AnalyticsFactory analyticsFactory = new AnalyticsFactory();
+//        AnalyticsController analyticsController = new AnalyticsController(analyticsFactory);
+//
+//        for (int analytic_id : analyticsToTest) {
+//            
+//            Analytics analytics = analyticsController.connectToAnalyticsTable(analytic_id);
+//            System.out.println("Analytic Process "+analytics.getExportFormat()+" 2 "+analytics.getExportFormat()+" for Apriori");
+//            String[] suffixes = analytics.getDocument().split("\\.");
+//            String inputSuffix = suffixes[suffixes.length - 1];
+//            analyticsController.runAnalytics(inputSuffix, analytics.getAlgorithm_name(), analytics.getExportFormat());
+//        }
+//
+//        String expResult = "";
+//        assertEquals(expResult, expResult);
+//
+//    }
 }

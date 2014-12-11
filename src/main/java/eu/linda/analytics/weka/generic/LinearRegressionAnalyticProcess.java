@@ -55,13 +55,13 @@ public class LinearRegressionAnalyticProcess extends AnalyticProcess {
 
             } else if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
                 // remove dataset metadata (first two columns)   
-                data1 = input.importData4weka(Configuration.docroot + analytics.getDocument(), true);
+                data1 = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(), true);
                 data = (Instances) data1;
                 HashMap<String, Instances> separatedData = helpfulFunctions.separateDataFromMetadataInfo(data);
                 data = separatedData.get("newData");
 
             } else {
-                data1 = input.importData4weka(Configuration.docroot + analytics.getDocument(), false);
+                data1 = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(), false);
                 data = (Instances) data1;
             }
 
@@ -109,19 +109,19 @@ public class LinearRegressionAnalyticProcess extends AnalyticProcess {
                 data = separatedData.get("newData");
 
             } else if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
-                abstractlistdata = input.importData4weka(Configuration.docroot + analytics.getTestdocument(), true);
+                abstractlistdata = input.importData4weka(Configuration.analyticsRepo + analytics.getTestdocument(), true);
                 data = (Instances) abstractlistdata;
 
                 separatedData = helpfulFunctions.separateDataFromMetadataInfo(data);
                 data = separatedData.get("newData");
             } else {
-                abstractlistdata = input.importData4weka(Configuration.docroot + analytics.getTestdocument(), false);
+                abstractlistdata = input.importData4weka(Configuration.analyticsRepo + analytics.getTestdocument(), false);
                 data = (Instances) abstractlistdata;
 
             }
 
             //load model
-            LinearRegression model = (LinearRegression) weka.core.SerializationHelper.read(Configuration.docroot + analytics.getModel());
+            LinearRegression model = (LinearRegression) weka.core.SerializationHelper.read(Configuration.analyticsRepo + analytics.getModel());
 
             Instances unlabeled = data;
 

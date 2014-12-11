@@ -42,48 +42,48 @@ public class TestClassificationAlgorithms {
     // The methods must be annotated with annotation @Test. For example:
     //
     
-    @Test
-    public void testJ48() {
-
-        int[] analyticsToTest = {56, 57, 63};
-
-        AnalyticsFactory analyticsFactory = new AnalyticsFactory();
-        AnalyticsController analyticsController = new AnalyticsController(analyticsFactory);
-
-        for (int analytic_id : analyticsToTest) {
-
-            Analytics analytics = analyticsController.connectToAnalyticsTable(analytic_id);
-            System.out.println("Analytic Process " + analytics.getExportFormat() + " 2 " + analytics.getExportFormat() + " for Linear Regresion");
-            String[] suffixes = analytics.getDocument().split("\\.");
-            String inputSuffix = suffixes[suffixes.length - 1];
-            analyticsController.runAnalytics(inputSuffix, analytics.getAlgorithm_name(), analytics.getExportFormat());
-        }
-
-        String expResult = "";
-        assertEquals(expResult, expResult);
-
-    }
-    
-        @Test
-    public void testM5P() {
-
-        int[] analyticsToTest = {64, 70, 71};
-
-        AnalyticsFactory analyticsFactory = new AnalyticsFactory();
-        AnalyticsController analyticsController = new AnalyticsController(analyticsFactory);
-
-        for (int analytic_id : analyticsToTest) {
-
-            Analytics analytics = analyticsController.connectToAnalyticsTable(analytic_id);
-            System.out.println("Analytic Process " + analytics.getExportFormat() + " 2 " + analytics.getExportFormat() + " for Linear Regresion");
-            String[] suffixes = analytics.getDocument().split("\\.");
-            String inputSuffix = suffixes[suffixes.length - 1];
-            analyticsController.runAnalytics(inputSuffix, analytics.getAlgorithm_name(), analytics.getExportFormat());
-        }
-
-        String expResult = "";
-        assertEquals(expResult, expResult);
-
-    }
-
+//    @Test
+//    public void testJ48() {
+//
+//        int[] analyticsToTest = {56, 57, 63};
+//
+//        AnalyticsFactory analyticsFactory = new AnalyticsFactory();
+//        AnalyticsController analyticsController = new AnalyticsController(analyticsFactory);
+//
+//        for (int analytic_id : analyticsToTest) {
+//
+//            Analytics analytics = analyticsController.connectToAnalyticsTable(analytic_id);
+//            System.out.println("Analytic Process " + analytics.getExportFormat() + " 2 " + analytics.getExportFormat() + " for Linear Regresion");
+//            String[] suffixes = analytics.getDocument().split("\\.");
+//            String inputSuffix = suffixes[suffixes.length - 1];
+//            analyticsController.runAnalytics(inputSuffix, analytics.getAlgorithm_name(), analytics.getExportFormat());
+//        }
+//
+//        String expResult = "";
+//        assertEquals(expResult, expResult);
+//
+//    }
+//    
+//        @Test
+//    public void testM5P() {
+//
+//        int[] analyticsToTest = {64, 70, 71};
+//
+//        AnalyticsFactory analyticsFactory = new AnalyticsFactory();
+//        AnalyticsController analyticsController = new AnalyticsController(analyticsFactory);
+//
+//        for (int analytic_id : analyticsToTest) {
+//
+//            Analytics analytics = analyticsController.connectToAnalyticsTable(analytic_id);
+//            System.out.println("Analytic Process " + analytics.getExportFormat() + " 2 " + analytics.getExportFormat() + " for Linear Regresion");
+//            String[] suffixes = analytics.getDocument().split("\\.");
+//            String inputSuffix = suffixes[suffixes.length - 1];
+//            analyticsController.runAnalytics(inputSuffix, analytics.getAlgorithm_name(), analytics.getExportFormat());
+//        }
+//
+//        String expResult = "";
+//        assertEquals(expResult, expResult);
+//
+//    }
+//
 }

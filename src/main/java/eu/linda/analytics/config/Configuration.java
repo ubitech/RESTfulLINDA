@@ -9,5 +9,7 @@ public class Configuration {
     public static String dbname;
     public static String rdf2anyServer;
     public static String docroot;  
-    public static String lindaworkbenchURI;  
+    public static String lindaworkbenchURI; 
+    public static String analyticsRepo; 
+    
 }//EoC

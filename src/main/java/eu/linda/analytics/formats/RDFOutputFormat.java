@@ -8,6 +8,7 @@ package eu.linda.analytics.formats;
 import com.hp.hpl.jena.rdf.model.Model;
 import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.controller.RDFGenerationFactory;
+import eu.linda.analytics.db.ConnectionController;
 import eu.linda.analytics.db.DBSynchronizer;
 import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.weka.utils.HelpfulFunctionsSingleton;
@@ -25,14 +26,16 @@ import org.rosuda.JRI.Rengine;
  */
 public class RDFOutputFormat extends OutputFormat {
 
-    DBSynchronizer dbsynchronizer;
     HelpfulFunctionsSingleton helpfulFuncions;
     RDFGenerationFactory rdfGenerationFactory;
     RDFGenerator rdfGenerator;
+     ConnectionController connectionController ;
+   
 
     public RDFOutputFormat() {
-        dbsynchronizer = new DBSynchronizer();
+        super();
         helpfulFuncions = HelpfulFunctionsSingleton.getInstance();
+        connectionController= ConnectionController.getInstance();
         rdfGenerationFactory = new RDFGenerationFactory();
     }
 
@@ -43,12 +46,15 @@ public class RDFOutputFormat extends OutputFormat {
             helpfulFuncions.nicePrintMessage("Export to RDF");
 
             //save rdf file
-            String[] splitedSourceFileName = analytics.getDocument().split("\\.");
+//            String[] splitedSourceFileName = analytics.getDocument().split("\\.");
+//
+//            String targetFileName = (splitedSourceFileName[0] + "_" + analytics.getAlgorithm_name() + "_resultdocument").replace("datasets", "results");
+//            String targetFileNameFullPath = Configuration.docroot + targetFileName;
 
-            String targetFileName = (splitedSourceFileName[0] + "_" + analytics.getAlgorithm_name() + "_resultdocument").replace("datasets", "results");
-            String targetFileNameFullPath = Configuration.docroot + targetFileName;
+            String targetFileName = ("results/analyticsID" + analytics.getId() + "_" + analytics.getAlgorithm_name() + "_resultdocument").replace("datasets", "results");
+            String targetFileNameFullPath = Configuration.analyticsRepo + targetFileName;
+
             //create rdf file & save
-
             rdfGenerator = rdfGenerationFactory.createRDF(analytics.getCategory_id());
 
             Model model = rdfGenerator.generateRDFModel(analytics, dataToExport);
@@ -87,9 +93,9 @@ public class RDFOutputFormat extends OutputFormat {
                 Logger.getLogger(GeneralRDFGenerator.class.getName()).log(Level.SEVERE, null, ex);
             }
 
-            dbsynchronizer.updateLindaAnalytics(targetFileName, "resultdocument", analytics.getId());
-            dbsynchronizer.updateLindaAnalyticsVersion(analytics.getVersion(), analytics.getId());
-            dbsynchronizer.updateLindaAnalyticsRDFInfo("", false, analytics.getId());
+            connectionController.updateLindaAnalytics(targetFileName, "resultdocument", analytics.getId());
+            connectionController.updateLindaAnalyticsVersion(analytics.getVersion(), analytics.getId());
+            connectionController.updateLindaAnalyticsRDFInfo("", false, analytics.getId());
 
         } else {
             helpfulFuncions.nicePrintMessage("There are no data to be exported to RDF");
@@ -110,7 +116,7 @@ public class RDFOutputFormat extends OutputFormat {
         String[] splitedSourceFileName = analytics.getDocument().split("\\.");
 
         String targetFileName = (splitedSourceFileName[0] + "_" + analytics.getAlgorithm_name() + "_resultdocument").replace("datasets", "results");
-        String targetFileNameFullPath = Configuration.docroot + targetFileName;
+        String targetFileNameFullPath = Configuration.analyticsRepo + targetFileName;
         //create rdf file & save
 
         rdfGenerator = rdfGenerationFactory.createRDF(analytics.getCategory_id());
@@ -152,9 +158,9 @@ public class RDFOutputFormat extends OutputFormat {
             Logger.getLogger(GeneralRDFGenerator.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        dbsynchronizer.updateLindaAnalytics(targetFileName, "resultdocument", analytics.getId());
-        dbsynchronizer.updateLindaAnalyticsVersion(analytics.getVersion(), analytics.getId());
-        dbsynchronizer.updateLindaAnalyticsRDFInfo("", false, analytics.getId());
+        connectionController.updateLindaAnalytics(targetFileName, "resultdocument", analytics.getId());
+        connectionController.updateLindaAnalyticsVersion(analytics.getVersion(), analytics.getId());
+        connectionController.updateLindaAnalyticsRDFInfo("", false, analytics.getId());
 
         //   }
 //    else {

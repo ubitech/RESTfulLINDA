@@ -202,6 +202,7 @@
                 <db.username>root</db.username>
                 <db.password>!uflow!</db.password>
                 <rdf2any.server>http://localhost:8081</rdf2any.server>
+                <analytics.repo>/var/www/LindaAnalytics/</analytics.repo>
                 <Lindaworkbench.docroot>/home/eleni/IdeaProjects/LindaWorkbench/linda/</Lindaworkbench.docroot>
                 <Lindaworkbench.URI>http://localhost:8000/</Lindaworkbench.URI>
             </properties>
@@ -217,6 +218,7 @@
                 <db.username>root</db.username>
                 <db.password>!uflow!</db.password>
                 <rdf2any.server>http://107.170.70.175:8081</rdf2any.server>
+                <analytics.repo>/var/www/LindaAnalytics/</analytics.repo>
                 <Lindaworkbench.docroot>/root/Desktop/vocabularyrepo/linda/</Lindaworkbench.docroot>
                 <Lindaworkbench.URI>http://localhost:8000/</Lindaworkbench.URI>
             </properties>
