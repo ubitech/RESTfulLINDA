@@ -32,7 +32,7 @@ public class HelpfulFunctionsSingleton {
     private static HelpfulFunctionsSingleton instance = null;
 
     protected HelpfulFunctionsSingleton() {
-       connectionController = ConnectionController.getInstance();
+        connectionController = ConnectionController.getInstance();
     }
 
     public static HelpfulFunctionsSingleton getInstance() {
@@ -45,27 +45,24 @@ public class HelpfulFunctionsSingleton {
     public Analytics saveModel(Classifier model, Analytics analytics) throws Exception {
         String[] splitedSourceFileName = analytics.getDocument().split("\\.");
 
-       // String targetFileName = (splitedSourceFileName[0] + "_" + analytics.getAlgorithm_name() + "Model" + ".model").replace("datasets", "models");
-       //String targetFileNameTXT = (splitedSourceFileName[0] + "_" + analytics.getAlgorithm_name() + "ModelReadable" + ".txt").replace("datasets", "models");
-       
-       String targetFileName = ("models/analyticsID" + analytics.getId() + "_" + analytics.getAlgorithm_name() + "Model" + ".model");
-       String targetFileNameTXT = ("models/analyticsID" + analytics.getId()  + "_" + analytics.getAlgorithm_name() + "ModelReadable" + ".txt");
-        
-       
+        // String targetFileName = (splitedSourceFileName[0] + "_" + analytics.getAlgorithm_name() + "Model" + ".model").replace("datasets", "models");
+        //String targetFileNameTXT = (splitedSourceFileName[0] + "_" + analytics.getAlgorithm_name() + "ModelReadable" + ".txt").replace("datasets", "models");
+        String targetFileName = ("models/analyticsID" + analytics.getId() + "_" + analytics.getAlgorithm_name() + "Model" + ".model");
+        String targetFileNameTXT = ("models/analyticsID" + analytics.getId() + "_" + analytics.getAlgorithm_name() + "ModelReadable" + ".txt");
+
         System.out.println("targetFileName: " + targetFileName);
         try {
 
             // serialize && save model
 //            weka.core.SerializationHelper.write(Configuration.docroot + targetFileName, model);
-
-           weka.core.SerializationHelper.write(Configuration.analyticsRepo + targetFileName, model);
+            weka.core.SerializationHelper.write(Configuration.analyticsRepo + targetFileName, model);
 
             connectionController.updateLindaAnalyticsModel(targetFileName, analytics.getId());
 
             analytics.setModel(targetFileName);
 
 //            File file = new File(Configuration.docroot + targetFileNameTXT);
-             File file = new File(Configuration.analyticsRepo +targetFileNameTXT);
+            File file = new File(Configuration.analyticsRepo + targetFileNameTXT);
 
             // if file doesnt exists, then create it
             if (!file.exists()) {
@@ -95,7 +92,7 @@ public class HelpfulFunctionsSingleton {
 
         if (column.equalsIgnoreCase("processinfo")) {
             //targetFileName = (splitedSourceFileName[0] + "_" + analytics.getAlgorithm_id() + "_processinfo.txt").replace("datasets", "results");
-            targetFileName = ( "results/analyticsID" + analytics.getId()+ "_" + analytics.getAlgorithm_id() + "_processinfo.txt").replace("datasets", "results");
+            targetFileName = ("results/analyticsID" + analytics.getId() + "_" + analytics.getAlgorithm_id() + "_processinfo.txt").replace("datasets", "results");
             String targetFileNameFullPath = Configuration.analyticsRepo + targetFileName;
             saveFile(targetFileNameFullPath, content);
             connectionController.updateLindaAnalytics(targetFileName, column, analytics.getId());
@@ -204,6 +201,22 @@ public class HelpfulFunctionsSingleton {
     }
 
     public HashMap separateDataFromMetadataInfo(Instances data) {
+        //until to correct rdf2any converter
+        String[] options1 = new String[2];
+        options1[0] = "-R";    // "range"
+        options1[1] = "1";
+        Instances newData1 = null;
+        try {
+            Remove remove1 = new Remove();             // new instance of filter
+            remove1.setOptions(options1);               // set options
+            remove1.setInputFormat(data);              // inform filter about dataset **AFTER** setting options
+            newData1 = Filter.useFilter(data, remove1); // apply filter                
+        } catch (Exception ex) {
+            Logger.getLogger(HelpfulFunctionsSingleton.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        data = newData1;
+
         String[] options = new String[2];
         options[0] = "-R";    // "range"
         options[1] = "1,2";
@@ -282,6 +295,23 @@ public class HelpfulFunctionsSingleton {
         ConnectionController connectionController = ConnectionController.getInstance();
         connectionController.emptyLindaAnalyticsResultInfo(analytics.getId());
 
+    }
+
+    public long manageNewPlot(Analytics analytics, String description, String filepath, String plot) {
+        String oldPlotFileName;
+        if (plot.equalsIgnoreCase("plot1_id")) {
+            oldPlotFileName = Configuration.analyticsRepo + "plots/plotid" + analytics.getPlot1_id() + ".png";
+            
+        } else {
+            oldPlotFileName = Configuration.analyticsRepo + "plots/plotid" + analytics.getPlot2_id()+ ".png";
+        }
+        
+        //TODO the plots are not deleted - permision issue
+        deleteFile(oldPlotFileName);
+
+        //add plot to db
+        long plot_id = connectionController.manageNewPlot(analytics.getId(), description, filepath, plot);
+        return plot_id;
     }
 
 }

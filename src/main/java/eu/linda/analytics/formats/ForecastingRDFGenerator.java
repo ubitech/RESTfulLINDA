@@ -149,6 +149,10 @@ public class ForecastingRDFGenerator extends RDFGenerator {
 
         helpfulFunctions.nicePrintMessage("Generate Forecasting RDFModel for R algorithms ");
 
+        //create input bag
+        
+        re.eval("data_matrix[,c('uri')]");
+        
         REXP basens = re.eval("data_matrix[1,1]");
         System.out.println("basens" + basens.asString());
 

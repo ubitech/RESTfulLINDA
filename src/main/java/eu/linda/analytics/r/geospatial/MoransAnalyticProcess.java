@@ -14,6 +14,7 @@ import eu.linda.analytics.weka.utils.HelpfulFunctionsSingleton;
 import java.util.HashMap;
 import org.rosuda.JRI.RBool;
 import org.rosuda.JRI.REXP;
+import org.rosuda.JRI.RVector;
 import org.rosuda.JRI.Rengine;
 import weka.core.Instances;
 
@@ -73,6 +74,14 @@ public class MoransAnalyticProcess extends AnalyticProcess {
 
         RScript += "----------------MORAN's RESULT-------------\n";
 
+      
+        
+        
+          //double  pvalue= re.eval("morans_result$p.value").asDouble();
+
+            //System.out.println("pvalue:" + pvalue);
+      
+        
 //        RBool lala = re.eval("morans_result$p.value>0.4").asBool();
 
         RScript += "if Moran's I $p.value is greater than 0.4 \n then there is a significant spatial autocorrelation in your data \n and you should take into account in next analytic processes";
@@ -80,7 +89,6 @@ public class MoransAnalyticProcess extends AnalyticProcess {
 //        if (lala.isTRUE()) {
 //            RScript +="TRRRRRRRRRRRRRRRRUUUUUUUUUUUUUUUEEEEEEEEEEEEEEee";
 //        }
-
         helpfulFunctions.writeToFile(RScript, "processinfo", analytics);
 
 //        re.eval("write.csv(df_to_export, file = '/home/eleni/Desktop/mydatasets/airline2.csv',row.names=FALSE);");

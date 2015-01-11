@@ -15,6 +15,7 @@ import eu.linda.analytics.formats.RDFInputFormat;
 import eu.linda.analytics.formats.RDFOutputFormat;
 import eu.linda.analytics.formats.TXTOutputFormat;
 import eu.linda.analytics.r.forecasting.ArimaAnalyticProcess;
+import eu.linda.analytics.r.geospatial.KrigingAnalyticProcess;
 import eu.linda.analytics.r.geospatial.MoransAnalyticProcess;
 import eu.linda.analytics.weka.associations.AprioriAnalyticProcess;
 import eu.linda.analytics.weka.classifiers.J48AnalyticProcess;
@@ -55,6 +56,8 @@ public class AnalyticsFactory {
             analyticProcess = new ArimaAnalyticProcess(inputFormat);
         } else if (algorithm.equalsIgnoreCase("Morans I")) {
             analyticProcess = new MoransAnalyticProcess(inputFormat);
+        } else if (algorithm.equalsIgnoreCase("Kriging")) {
+            analyticProcess = new KrigingAnalyticProcess(inputFormat);
         }
 
         //Create Instances of OutputFormat

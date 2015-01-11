@@ -69,7 +69,10 @@ public class RDFInputFormat extends InputFormat {
 
         Rengine re = Rengine.getMainEngine();
         if (re == null) {
-            re = new Rengine(new String[]{"--vanilla"}, false, null);
+//            re = new Rengine(new String[]{"--vanilla"}, false, null);
+            String newargs[] = {"--no-save"};
+             re = new Rengine(newargs, false, null);
+           
         }
 
         if (!re.waitForR()) {
@@ -84,8 +87,11 @@ public class RDFInputFormat extends InputFormat {
             URL url = new URL(queryURI);
             File tmpfile4lindaquery = File.createTempFile("tmpfile4lindaquery" + query_id, ".tmp");
             FileUtils.copyURLToFile(url, tmpfile4lindaquery);
+            
+            //TODO:open with java the temp file and clean the ^^http://www.w3.org/2001/XMLSchema#decimal metadata
 
             re.eval(" loaded_data <- read.csv(file='" + tmpfile4lindaquery + "', header=TRUE, sep=',', na.strings='---');");
+            System.out.println(" loaded_data <- read.csv(file='" + tmpfile4lindaquery + "', header=TRUE, sep=',', na.strings='---');");
         } catch (Exception ex) {
             Logger.getLogger(ArffInputFormat.class.getName()).log(Level.SEVERE, null, ex);
         }

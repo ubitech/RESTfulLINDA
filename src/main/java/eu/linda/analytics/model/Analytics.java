@@ -11,7 +11,7 @@ public class Analytics {
     public Analytics() {
     }
 
-    public Analytics(int id, int category_id, int algorithm_id, String document, String testdocument,int trainQuery_id, int evaluationQuery_id ,String model, String modelReadable, String processinfo, String resultdocument, String exportFormat, int version, String description, boolean publishedToTriplestore, String loadedRDFContext, String parameters) {
+    public Analytics(int id, int category_id, int algorithm_id, String document, String testdocument, int trainQuery_id, int evaluationQuery_id, String model, String modelReadable, String processinfo, String resultdocument, String exportFormat, int version, String description, boolean publishedToTriplestore, String loadedRDFContext, String parameters, int plot1_id, int plot2_id) {
         this.id = id;
         this.category_id = category_id;
         this.algorithm_id = algorithm_id;
@@ -29,6 +29,8 @@ public class Analytics {
         this.publishedToTriplestore = publishedToTriplestore;
         this.loadedRDFContext = loadedRDFContext;
         this.parameters = parameters;
+        this.plot1_id = plot1_id;
+        this.plot2_id = plot2_id;
     }
 
     private int id;
@@ -66,6 +68,10 @@ public class Analytics {
     private String loadedRDFContext;
 
     private String parameters;
+
+    private int plot1_id;
+
+    private int plot2_id;
 
     public int getId() {
         return id;
@@ -209,6 +215,22 @@ public class Analytics {
 
     public void setParameters(String parameters) {
         this.parameters = parameters;
+    }
+
+    public int getPlot1_id() {
+        return plot1_id;
+    }
+
+    public void setPlot1_id(int plot1_id) {
+        this.plot1_id = plot1_id;
+    }
+
+    public int getPlot2_id() {
+        return plot2_id;
+    }
+
+    public void setPlot2_id(int plot2_id) {
+        this.plot2_id = plot2_id;
     }
 
 }

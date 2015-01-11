@@ -13,12 +13,11 @@ public class DBSynchronizer {
 
     Connection connection;
 
-   
     public DBSynchronizer() {
         connection = ConnectionFactory.getInstance();
     }//Constructor
-    
-      public void establishConnection() {
+
+    public void establishConnection() {
         connection = ConnectionFactory.getInstance();
     }
 
@@ -65,7 +64,9 @@ public class DBSynchronizer {
                         rs.getString("description"),
                         rs.getBoolean("publishedToTriplestore"),
                         rs.getString("loadedRDFContext"),
-                        rs.getString("parameters")
+                        rs.getString("parameters"),
+                        rs.getInt("plot1_id"),
+                        rs.getInt("plot2_id")
                 );
                 analytics.setAlgorithm_name(rs.getString("name"));
                 rs.close();
@@ -259,10 +260,57 @@ public class DBSynchronizer {
         } catch (SQLException ex) {
             Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("ERROR SEVERE" + ex);
-        } 
-        
+        }
+
     }//EoM emptyLindaAnalyticsResultDocument 
+
+    /*
+     * Add LindaAnalyticsPlot 
+     */
+    public long addPlot(String description, String image) {
+        PreparedStatement preparedStatement = null;
+        long plot_id = 0;
+        try {
+            String query = "INSERT INTO analytics_plot (description, image) VALUES (?, ?)";
+            preparedStatement = connection.prepareStatement(query,PreparedStatement.RETURN_GENERATED_KEYS);
+            preparedStatement.setString(1,  description );
+            preparedStatement.setString(2,  image );
+            preparedStatement.executeUpdate();
+            ResultSet rs = preparedStatement.getGeneratedKeys();
+            if (rs != null && rs.next()) {
+                plot_id = rs.getLong(1);
+            }
+           
+
+            preparedStatement.close();
+
+        } catch (SQLException ex) {
+            Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("ERROR SEVERE" + ex);
+        }
+
+        return plot_id;
+    }//EoM Add LindaAnalyticsPlot
     
-   
+        /*
+     * Updates updateLindaAnalyticsPlot
+     */
+    public void updateLindaAnalyticsPlot(int analytics_id,long plot_id, String plot) {
+        PreparedStatement preparedStatement = null;
+        try {
+
+            String query = "update analytics_analytics set "+plot+"=?  where id=?";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, (int) plot_id);
+            preparedStatement.setInt(2, analytics_id);
+            preparedStatement.executeUpdate();
+            preparedStatement.close();
+
+        } catch (SQLException ex) {
+            Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("ERROR SEVERE" + ex);
+        }
+
+    }//EoM updateLindaAnalyticsPlot 
 
 }//EoC
