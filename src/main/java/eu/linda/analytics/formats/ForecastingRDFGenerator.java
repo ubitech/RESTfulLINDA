@@ -149,20 +149,19 @@ public class ForecastingRDFGenerator extends RDFGenerator {
 
         helpfulFunctions.nicePrintMessage("Generate Forecasting RDFModel for R algorithms ");
 
-        //create input bag
-        
-        re.eval("data_matrix[,c('uri')]");
-        
-        REXP basens = re.eval("data_matrix[1,1]");
-        System.out.println("basens" + basens.asString());
-
         RVector dataToExportasVector = re.eval("df_to_export").asVector();
         Vector colnames = dataToExportasVector.getNames();
-
         String[] colnamesArray = new String[colnames.size()];
         colnames.copyInto(colnamesArray);
 
-        String analyzedFieldValue = colnamesArray[0];
+        String analyzedFieldValue = colnamesArray[colnames.size() - 1];
+
+        //create input bag
+        //re.eval("data_matrix[,c('uri')]");
+        REXP basenamespace = re.eval("basens<-data_matrix[1,1]");
+        String basens = basenamespace.asString();
+        System.out.println("basens" + basens);
+
         REXP datesAsCharacter = re.eval("as.character(df_to_export$" + colnamesArray[0] + ")");
 
         String[] datesAsStringArray = datesAsCharacter.asStringArray();
@@ -252,7 +251,7 @@ public class ForecastingRDFGenerator extends RDFGenerator {
         // predicate, and object, and then add the triples to the model.
         for (int i = 0; i < predictedValuesAsDoubleArray.length - 1; i++) {
 
-            Resource analytic_input_node_statement = model.createResource(basens.asString());
+            Resource analytic_input_node_statement = model.createResource(basens);
             analytic_input_node_statement.addProperty(RDF.type, analytic_input_node);
 
             Resource analytic_result_node_statement = model.createResource(ds + "/" + i);

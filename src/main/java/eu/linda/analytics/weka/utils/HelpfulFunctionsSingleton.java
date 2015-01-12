@@ -298,19 +298,24 @@ public class HelpfulFunctionsSingleton {
     }
 
     public long manageNewPlot(Analytics analytics, String description, String filepath, String plot) {
-        String oldPlotFileName;
-        if (plot.equalsIgnoreCase("plot1_id")) {
-            oldPlotFileName = Configuration.analyticsRepo + "plots/plotid" + analytics.getPlot1_id() + ".png";
-            
-        } else {
-            oldPlotFileName = Configuration.analyticsRepo + "plots/plotid" + analytics.getPlot2_id()+ ".png";
-        }
-        
-        //TODO the plots are not deleted - permision issue
-        deleteFile(oldPlotFileName);
 
         //add plot to db
-        long plot_id = connectionController.manageNewPlot(analytics.getId(), description, filepath, plot);
+        long plot_id = connectionController.manageNewPlot(analytics, description, filepath, plot);
+
+        String oldPlotFileName;
+        int oldPlotID;
+        if (plot.equalsIgnoreCase("plot1_id")) {
+            oldPlotFileName = Configuration.analyticsRepo + "plots/plotid" + analytics.getPlot1_id() + ".png";
+            oldPlotID = analytics.getPlot1_id();
+        } else {
+            oldPlotFileName = Configuration.analyticsRepo + "plots/plotid" + analytics.getPlot2_id() + ".png";
+            oldPlotID = analytics.getPlot2_id();
+        }
+
+        //TODO the plots are not deleted - permision issue
+        deleteFile(oldPlotFileName);
+        connectionController.deletePlot(oldPlotID);
+
         return plot_id;
     }
 

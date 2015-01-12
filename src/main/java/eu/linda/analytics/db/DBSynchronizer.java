@@ -312,5 +312,25 @@ public class DBSynchronizer {
         }
 
     }//EoM updateLindaAnalyticsPlot 
+     
+    /*
+     * delete old plot Plot
+     */
+    public void deletePlot(int plot_id) {
+        PreparedStatement preparedStatement = null;
+        try {
+
+            String query = "delete from analytics_plot  where id=?";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, (int) plot_id);
+            preparedStatement.executeUpdate();
+            preparedStatement.close();
+
+        } catch (SQLException ex) {
+            Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("ERROR SEVERE" + ex);
+        }
+
+    }//EoM delete plot
 
 }//EoC

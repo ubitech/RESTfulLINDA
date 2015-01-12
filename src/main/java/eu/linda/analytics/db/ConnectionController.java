@@ -132,14 +132,20 @@ public final class ConnectionController {
             }
         }
     }//EoM readproperties  
-    
-    
-     public long manageNewPlot(int analytics_id,String description,String filepath,String plot) {
-       long plot_id = dbsynchronizer.addPlot(description, filepath);
-       dbsynchronizer.updateLindaAnalyticsPlot(analytics_id,plot_id,plot);
-       
-       return plot_id;
-     }//EoM addPlot 
+
+    public long manageNewPlot(Analytics analytics, String description, String filepath, String plot) {
+
+        long plot_id = dbsynchronizer.addPlot(description, filepath);
+        dbsynchronizer.updateLindaAnalyticsPlot(analytics.getId(), plot_id, plot);
+
+        return plot_id;
+    }//EoM addPlot 
+
+    public void deletePlot(int plot_id) {
+
+        dbsynchronizer.deletePlot(plot_id);
+
+    }//EoM addPlot 
 
 }//EoC
 

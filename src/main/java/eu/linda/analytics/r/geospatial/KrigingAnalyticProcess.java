@@ -171,7 +171,7 @@ public class KrigingAnalyticProcess extends AnalyticProcess {
         re.eval("df_to_export[[column_to_predict]] <- df$sim1");
         RScript += "df_to_export[[column_to_predict]] <- df$sim1 \n";
 
-         long plot2_id = helpfulFunctions.manageNewPlot(analytics,"Spatial data spplot map for analyzed field :"+analyzedFieldValue, "plots/plotid"+analytics.getPlot1_id()+".png","plot2_id");
+        long plot2_id = helpfulFunctions.manageNewPlot(analytics,"Spatial data spplot map for analyzed field :"+analyzedFieldValue, "plots/plotid"+analytics.getPlot2_id()+".png","plot2_id");
         
         
         re.eval("tmp <- spplot(df)");
