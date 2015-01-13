@@ -292,7 +292,6 @@ public class HelpfulFunctionsSingleton {
         deleteFile(analytics.getResultdocument());
         deleteFile(analytics.getProcessinfo());
         //empty the analytic result document & processMessage
-        ConnectionController connectionController = ConnectionController.getInstance();
         connectionController.emptyLindaAnalyticsResultInfo(analytics.getId());
 
     }
@@ -317,6 +316,11 @@ public class HelpfulFunctionsSingleton {
         connectionController.deletePlot(oldPlotID);
 
         return plot_id;
+    }
+    
+    public void updateProcessMessageToAnalyticsTable(String message, int id) {
+        connectionController.updateProcessMessageToAnalyticsTable(message, id);
+
     }
 
 }
