@@ -300,6 +300,7 @@ public class HelpfulFunctionsSingleton {
 
         //add plot to db
         long plot_id = connectionController.manageNewPlot(analytics, description, filepath, plot);
+        connectionController.updatePlot((int) plot_id, "plots/plotid"+plot_id+".png");
 
         String oldPlotFileName;
         int oldPlotID;

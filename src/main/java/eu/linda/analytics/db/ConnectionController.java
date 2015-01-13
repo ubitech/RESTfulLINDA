@@ -68,7 +68,6 @@ public final class ConnectionController {
             Query linda_query = dbsynchronizer.getQueryURI(Integer.parseInt(query_id));
 
             //System.out.println("linda_query encoded" + URIUtil.encodeQuery(linda_query.getSparql()));
-
             query_uri = Configuration.rdf2anyServer + "/rdf2any/v1.0/convert/csv-converter.csv?dataset=" + linda_query.getEndpoint() + "&query=" + URIUtil.encodeQuery(linda_query.getSparql());
 
         } catch (URIException ex) {
@@ -140,6 +139,12 @@ public final class ConnectionController {
 
         return plot_id;
     }//EoM addPlot 
+
+    public void updatePlot(int plot_id, String image) {
+
+        dbsynchronizer.updatePlot(plot_id, image);
+
+    }//EoM updatePlot 
 
     public void deletePlot(int plot_id) {
 

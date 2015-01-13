@@ -11,10 +11,7 @@ import eu.linda.analytics.formats.InputFormat;
 import eu.linda.analytics.formats.OutputFormat;
 import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.weka.utils.HelpfulFunctionsSingleton;
-import java.io.IOException;
 import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.rosuda.JRI.RVector;
 import org.rosuda.JRI.Rengine;
 
@@ -153,7 +150,7 @@ public class KrigingAnalyticProcess extends AnalyticProcess {
         RScript += "m <- fit.variogram(v, vgm(1, 'Sph', 300, 1))\n";
 
         long plot1_id = helpfulFunctions.manageNewPlot(analytics,"Variogram Plot : Visualization of the spatial autocorrelation of the analyzed field: "+analyzedFieldValue, "plots/plotid"+analytics.getPlot1_id()+".png","plot1_id");
-
+        
         
         re.eval("variogramplot<-plot(v, model = m)");
         re.eval("png(file='"+Configuration.analyticsRepo+"plots/plotid"+plot1_id+".png',width=600)");
