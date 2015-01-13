@@ -134,11 +134,9 @@ public class MoransAnalyticProcess extends AnalyticProcess {
         double moranObservedValue = re.eval("morans_result$observed").asDouble();
         System.out.println("moranObservedValue:" + moranObservedValue);
 
-        System.out.println("gamo to kerat omou:" + re.eval("morans_result$p").asDouble() + "  " + moranObservedValue
-                + "  " + re.eval("morans_result$expected").asDouble() + "  " + re.eval("morans_result$sd").asDouble());
 
         String processMessage = "Moran's I Result for analyzed Field: " + analyzedFieldValue + ". \n";
-        processMessage += "$p.value  : " + re.eval("morans_result$p").asDouble() + ".\n";
+       //processMessage += "$p.value  : " + re.eval("morans_result$p").asDouble() + ".\n";
         processMessage += "$observed.value  : " + moranObservedValue + ".\n";
         processMessage += "$expected.value  : " + re.eval("morans_result$expected").asDouble() + ".\n";
         processMessage += "$expected.sd  : " + re.eval("morans_result$sd").asDouble() + ".\n";

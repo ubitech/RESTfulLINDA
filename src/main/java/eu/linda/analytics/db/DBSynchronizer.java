@@ -41,7 +41,7 @@ public class DBSynchronizer {
         PreparedStatement preparedStatement = null;
         try {
 
-            String query = "SELECT  * FROM analytics_analytics  AS analytics, analytics_algorithm AS alg WHERE analytics.id =? AND analytics.algorithm_id = alg.id";
+            String query = "SELECT  analytics.*,alg.*,user.username FROM analytics_analytics  AS analytics, analytics_algorithm AS alg, auth_user as user WHERE analytics.id =? AND analytics.algorithm_id = alg.id AND user.id =analytics.user_id";
             preparedStatement = connection.prepareStatement(query);
 
             preparedStatement.setInt(1, id);
@@ -66,8 +66,10 @@ public class DBSynchronizer {
                         rs.getString("loadedRDFContext"),
                         rs.getString("parameters"),
                         rs.getInt("plot1_id"),
-                        rs.getInt("plot2_id")
+                        rs.getInt("plot2_id"),
+                        rs.getString("username")        
                 );
+                System.out.println("usernameeeeeeeeeeeeeeee "+rs.getString("username")    );
                 analytics.setAlgorithm_name(rs.getString("name"));
                 rs.close();
                 preparedStatement.close();

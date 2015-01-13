@@ -13,6 +13,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.Seq;
 import com.hp.hpl.jena.sparql.vocabulary.FOAF;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
@@ -104,7 +105,7 @@ public class ForecastingRDFGenerator extends RDFGenerator {
         analytic_process_statement.addProperty(RDFS.label, "linda analytic process");
         analytic_process_statement.addProperty(RDFS.comment, analytics.getDescription());
 
-        Resource linda_user_statement = model.createResource(analytics_NS + "User/eleni");
+        Resource linda_user_statement = model.createResource(analytics_NS + "User/"+analytics.getUser_name());
         linda_user_statement.addProperty(RDF.type, linda_user);
         linda_user_statement.addProperty(RDFS.subClassOf, agent);
         linda_user_statement.addProperty(RDFS.label, "linda user");
@@ -118,7 +119,7 @@ public class ForecastingRDFGenerator extends RDFGenerator {
 
         linda_user_statement.addProperty(FOAF.holdsAccount, onlineAccount);
 
-        linda_user_statement.addProperty(FOAF.accountName, "eleni");
+        linda_user_statement.addProperty(FOAF.accountName, analytics.getUser_name());
         onlineAccount.addProperty(FOAF.homepage, Configuration.lindaworkbenchURI);
 
         Resource analytic_result_node = model.createResource(analytics_NS + "analytics_result_node");
@@ -158,30 +159,33 @@ public class ForecastingRDFGenerator extends RDFGenerator {
 
         //create input bag
         //re.eval("data_matrix[,c('uri')]");
-        REXP basenamespace = re.eval("basens<-data_matrix[1,1]");
-        String basens = basenamespace.asString();
-        System.out.println("basens" + basens);
-
         REXP datesAsCharacter = re.eval("as.character(df_to_export$" + colnamesArray[0] + ")");
 
         String[] datesAsStringArray = datesAsCharacter.asStringArray();
-        for (String string : datesAsStringArray) {
-            System.out.println("datesAsStringArray" + string);
-        }
+//        for (String string : datesAsStringArray) {
+//            System.out.println("datesAsStringArray" + string);
+//        }
 
         System.out.println("colname of predicted value" + colnamesArray[colnames.size() - 1]);
         REXP predictedValues = re.eval("df_to_export$" + colnamesArray[colnames.size() - 1]);
 
         double[] predictedValuesAsDoubleArray = predictedValues.asDoubleArray();
 
-        for (double d : predictedValuesAsDoubleArray) {
-            System.out.println("predictedValues:" + d);
-        }
+//        for (double d : predictedValuesAsDoubleArray) {
+//            System.out.println("predictedValues:" + d);
+//        }
+
+        REXP uriAsCharacter = re.eval("as.character(loaded_data$uri)");
+        String[] urisAsStringArray = uriAsCharacter.asStringArray();
+
+//        for (String string : urisAsStringArray) {
+//            System.out.println("urisAsStringArray" + string);
+//        }
 
         Date date = new Date();
         DateFormat formatter = new SimpleDateFormat("ddMMyyyy");
         String today = formatter.format(date);
-        String base = "http://localhost:8080/openrdf-sesame/repositories/linda/statements?context=:_";
+        String base = Configuration.lindaworkbenchURI + "openrdf-sesame/repositories/linda/statements?context=:_";
         String datasetContextToString = "analytics" + analytics.getId() + "V" + (analytics.getVersion() + 1) + "Date" + today;
 
         // Create the model and define some prefixes (for nice serialization in RDF/XML and TTL)
@@ -189,7 +193,7 @@ public class ForecastingRDFGenerator extends RDFGenerator {
         //openrdf + analytic_process ID_version_date
         String ds = base + datasetContextToString + "#";
 
-        String analytics_base = "http://localhost:8080/openrdf-sesame/repositories/linda/rdf-graphs/analyticsontology";
+        String analytics_base = Configuration.lindaworkbenchURI + "openrdf-sesame/repositories/linda/rdf-graphs/analyticsontology";
         String analytics_NS = analytics_base + "#";
 
         model.setNsPrefix("ds", ds);
@@ -199,7 +203,7 @@ public class ForecastingRDFGenerator extends RDFGenerator {
         model.setNsPrefix("rdfs", RDFS.getURI());
         model.setNsPrefix("prov", "http://www.w3.org/ns/prov#");
         model.setNsPrefix("sio", "http://semanticscience.org/ontology/sio#");
-        model.setNsPrefix("an", "http://localhost:8080/openrdf-sesame/repositories/linda/rdf-graphs/analyticsontology#");
+        model.setNsPrefix("an", Configuration.lindaworkbenchURI + "openrdf-sesame/repositories/linda/rdf-graphs/analyticsontology#");
 
         // Define local properties
         Property analyzedField = model.createProperty(ds + "analyzedField");
@@ -209,6 +213,7 @@ public class ForecastingRDFGenerator extends RDFGenerator {
         Property wasGeneratedBy = model.createProperty("http://www.w3.org/ns/prov#wasGeneratedBy");
         Property actedOnBehalfOf = model.createProperty("http://www.w3.org/ns/prov#actedOnBehalfOf");
         Property wasAssociatedWith = model.createProperty("http://www.w3.org/ns/prov#wasAssociatedWith");
+        
 
         Resource entity = model.createResource("http://www.w3.org/ns/prov#Entity");
         Resource activity = model.createResource("http://www.w3.org/ns/prov#Activity");
@@ -229,7 +234,7 @@ public class ForecastingRDFGenerator extends RDFGenerator {
         analytic_process_statement.addProperty(RDFS.label, "linda analytic process");
         analytic_process_statement.addProperty(RDFS.comment, analytics.getDescription());
 
-        Resource linda_user_statement = model.createResource(analytics_NS + "User/eleni");
+        Resource linda_user_statement = model.createResource(analytics_NS + "User/"+analytics.getUser_name());
         linda_user_statement.addProperty(RDF.type, linda_user);
         linda_user_statement.addProperty(RDFS.subClassOf, agent);
         linda_user_statement.addProperty(RDFS.label, "linda user");
@@ -241,23 +246,29 @@ public class ForecastingRDFGenerator extends RDFGenerator {
 
         linda_user_statement.addProperty(OWL.equivalentClass, FOAF.Person);
         linda_user_statement.addProperty(FOAF.holdsAccount, onlineAccount);
-        linda_user_statement.addProperty(FOAF.accountName, "eleni");
+        linda_user_statement.addProperty(FOAF.accountName, analytics.getUser_name());
         onlineAccount.addProperty(FOAF.homepage, Configuration.lindaworkbenchURI);
 
         Resource analytic_result_node = model.createResource(analytics_NS + "analytics_result_node");
         Resource analytic_input_node = model.createResource(analytics_NS + "analytic_input_node");
 
+        Seq analytic_input_nodes = model.createSeq(analytics_NS + "analytic_input_collection/" + analytics.getId() + "/" + analytics.getVersion());
+
+        // fill analytic input collection
+        for (int i = 0; i < predictedValuesAsDoubleArray.length - 1; i++) {
+
+            Resource analytic_input_node_statement = model.createResource(urisAsStringArray[i]);
+            analytic_input_node_statement.addProperty(RDF.type, analytic_input_node);
+            analytic_input_nodes.add(analytic_input_node_statement);
+        }
+
         // For each triplet, create a resource representing the sentence, as well as the subject, 
         // predicate, and object, and then add the triples to the model.
         for (int i = 0; i < predictedValuesAsDoubleArray.length - 1; i++) {
-
-            Resource analytic_input_node_statement = model.createResource(basens);
-            analytic_input_node_statement.addProperty(RDF.type, analytic_input_node);
-
             Resource analytic_result_node_statement = model.createResource(ds + "/" + i);
             analytic_result_node_statement.addProperty(RDF.type, analytic_result_node);
             analytic_result_node_statement.addProperty(RDFS.subClassOf, entity);
-            analytic_result_node_statement.addProperty(wasDerivedFrom, analytic_input_node_statement);
+            analytic_result_node_statement.addProperty(wasDerivedFrom, analytic_input_nodes);
             analytic_result_node_statement.addProperty(wasGeneratedBy, analytic_process_statement);
             analytic_result_node_statement.addProperty(forecastingDate, datesAsStringArray[i]);
             analytic_result_node_statement.addProperty(predictedValue, String.valueOf(predictedValuesAsDoubleArray[i]));

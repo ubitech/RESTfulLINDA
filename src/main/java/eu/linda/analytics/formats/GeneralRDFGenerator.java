@@ -17,20 +17,15 @@ import com.hp.hpl.jena.vocabulary.XSD;
 import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.weka.utils.HelpfulFunctionsSingleton;
-import java.io.File;
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.AbstractList;
 import java.util.Date;
 import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.rosuda.JRI.REXP;
 import org.rosuda.JRI.RVector;
 import org.rosuda.JRI.Rengine;
 import weka.core.Instances;
-import weka.core.converters.CSVLoader;
 
 /**
  *
@@ -52,7 +47,7 @@ public class GeneralRDFGenerator extends RDFGenerator {
         Date date = new Date();
         DateFormat formatter = new SimpleDateFormat("ddMMyyyy");
         String today = formatter.format(date);
-        String base = "http://localhost:8080/openrdf-sesame/repositories/linda/statements?context=:_";
+        String base = Configuration.lindaworkbenchURI + "openrdf-sesame/repositories/linda/statements?context=:_";
         String datasetContextToString = "analytics" + analytics.getId() + "V" + (analytics.getVersion() + 1) + "Date" + today;
 
         Instances triplets = (Instances) dataToExport;
@@ -63,7 +58,7 @@ public class GeneralRDFGenerator extends RDFGenerator {
         //openrdf + analytic_process ID_version_date
         String NS = base + datasetContextToString + "#";
 
-        String analytics_base = "http://localhost:8080/openrdf-sesame/repositories/linda/rdf-graphs/analyticsontology";
+        String analytics_base = Configuration.lindaworkbenchURI + "openrdf-sesame/repositories/linda/rdf-graphs/analyticsontology";
         String analytics_NS = analytics_base + "#";
 
         model.setNsPrefix("ds", NS);
@@ -73,7 +68,7 @@ public class GeneralRDFGenerator extends RDFGenerator {
         model.setNsPrefix("rdfs", RDFS.getURI());
         model.setNsPrefix("prov", "http://www.w3.org/ns/prov#");
         model.setNsPrefix("sio", "http://semanticscience.org/ontology/sio#");
-        model.setNsPrefix("an", "http://localhost:8080/openrdf-sesame/repositories/linda/rdf-graphs/analyticsontology#");
+        model.setNsPrefix("an", Configuration.lindaworkbenchURI + "openrdf-sesame/repositories/linda/rdf-graphs/analyticsontology#");
 
         // Define local properties
         Property analyzedField = model.createProperty(NS + "analyzedField");
@@ -104,7 +99,7 @@ public class GeneralRDFGenerator extends RDFGenerator {
         analytic_process_statement.addProperty(RDFS.label, "linda analytic process");
         analytic_process_statement.addProperty(RDFS.comment, analytics.getDescription());
 
-        Resource linda_user_statement = model.createResource(analytics_NS + "User/eleni");
+        Resource linda_user_statement = model.createResource(analytics_NS + "User/" + analytics.getUser_name());
         linda_user_statement.addProperty(RDF.type, linda_user);
         linda_user_statement.addProperty(RDFS.subClassOf, agent);
         linda_user_statement.addProperty(RDFS.label, "linda user");
@@ -118,7 +113,7 @@ public class GeneralRDFGenerator extends RDFGenerator {
 
         linda_user_statement.addProperty(FOAF.holdsAccount, onlineAccount);
 
-        linda_user_statement.addProperty(FOAF.accountName, "eleni");
+        linda_user_statement.addProperty(FOAF.accountName, analytics.getUser_name());
         onlineAccount.addProperty(FOAF.homepage, Configuration.lindaworkbenchURI);
 
         Resource analytic_result_node = model.createResource(analytics_NS + "analytics_result_node");
@@ -139,10 +134,6 @@ public class GeneralRDFGenerator extends RDFGenerator {
             analytic_result_node_statement.addProperty(wasGeneratedBy, analytic_process_statement);
             analytic_result_node_statement.addProperty(predictedValue, triplets.get(i).toString(tripletsAttibutesNum - 1));
 
-            //analytic_result_node_statement.addLiteral(confidence, triplet[0]);
-            //analytic_result_node_statement.addProperty(RDF.subject, subject);
-            //analytic_result_node_statement.addProperty(RDF.predicate, predicate);
-            //analytic_result_node_statement.addProperty(RDF.object, object);
         }
 
         return model;
@@ -154,14 +145,9 @@ public class GeneralRDFGenerator extends RDFGenerator {
 
         helpfulFuncions.nicePrintMessage("Generate General RDFModel for R algorithms ");
 
-        
-        //create input bag
-        
        // re.eval("uri<-data_matrix[,c('uri')]");
-        
 //        REXP basens = re.eval("data_matrix[1,1]");
 //        System.out.println("basens" + basens.asString());
-
         RVector dataToExportasVector = re.eval("df_to_export").asVector();
         Vector colnames = dataToExportasVector.getNames();
 
@@ -169,35 +155,33 @@ public class GeneralRDFGenerator extends RDFGenerator {
         colnames.copyInto(colnamesArray);
 
         String analyzedFieldValue = colnamesArray[colnames.size() - 1];
-        
-        System.out.println("analyzedFieldValue: "+analyzedFieldValue);     
+
+        System.out.println("analyzedFieldValue: " + analyzedFieldValue);
         REXP uriAsCharacter = re.eval("as.character(df_to_export$uri)");
 
         String[] urisAsStringArray = uriAsCharacter.asStringArray();
 //        for (String string : urisAsStringArray) {
 //            System.out.println("urisAsStringArray" + string);
 //        }
-        
+
         REXP predictedValues = re.eval("as.character(df_to_export[[column_to_predict]]);");
         String[] predictedValuesAsDoubleArray = predictedValues.asStringArray();
 //        for (String d : predictedValuesAsDoubleArray) {
 //            System.out.println("predictedValues:" + d);
 //        }
-          
+
         Date date = new Date();
         DateFormat formatter = new SimpleDateFormat("ddMMyyyy");
         String today = formatter.format(date);
-        String base = "http://localhost:8080/openrdf-sesame/repositories/linda/statements?context=:_";
+        String base = Configuration.lindaworkbenchURI + "openrdf-sesame/repositories/linda/statements?context=:_";
         String datasetContextToString = "analytics" + analytics.getId() + "V" + (analytics.getVersion() + 1) + "Date" + today;
 
-       
-       // Create the model and define some prefixes (for nice serialization in RDF/XML and TTL)
+        // Create the model and define some prefixes (for nice serialization in RDF/XML and TTL)
         Model model = ModelFactory.createDefaultModel();
         //openrdf + analytic_process ID_version_date
         String ds = base + datasetContextToString + "#";
 
-        
-        String analytics_base = "http://localhost:8080/openrdf-sesame/repositories/linda/rdf-graphs/analyticsontology";
+        String analytics_base = Configuration.lindaworkbenchURI + "openrdf-sesame/repositories/linda/rdf-graphs/analyticsontology";
         String analytics_NS = analytics_base + "#";
 
         model.setNsPrefix("ds", ds);
@@ -207,7 +191,7 @@ public class GeneralRDFGenerator extends RDFGenerator {
         model.setNsPrefix("rdfs", RDFS.getURI());
         model.setNsPrefix("prov", "http://www.w3.org/ns/prov#");
         model.setNsPrefix("sio", "http://semanticscience.org/ontology/sio#");
-        model.setNsPrefix("an", "http://localhost:8080/openrdf-sesame/repositories/linda/rdf-graphs/analyticsontology#");
+        model.setNsPrefix("an", Configuration.lindaworkbenchURI + "openrdf-sesame/repositories/linda/rdf-graphs/analyticsontology#");
 
         // Define local properties
         Property analyzedField = model.createProperty(ds + "analyzedField");
@@ -238,7 +222,7 @@ public class GeneralRDFGenerator extends RDFGenerator {
         analytic_process_statement.addProperty(RDFS.label, "linda analytic process");
         analytic_process_statement.addProperty(RDFS.comment, analytics.getDescription());
 
-        Resource linda_user_statement = model.createResource(analytics_NS + "User/eleni");
+        Resource linda_user_statement = model.createResource(analytics_NS + "User/" + analytics.getUser_name());
         linda_user_statement.addProperty(RDF.type, linda_user);
         linda_user_statement.addProperty(RDFS.subClassOf, agent);
         linda_user_statement.addProperty(RDFS.label, "linda user");
@@ -252,13 +236,13 @@ public class GeneralRDFGenerator extends RDFGenerator {
 
         linda_user_statement.addProperty(FOAF.holdsAccount, onlineAccount);
 
-        linda_user_statement.addProperty(FOAF.accountName, "eleni");
+        linda_user_statement.addProperty(FOAF.accountName, analytics.getUser_name());
         onlineAccount.addProperty(FOAF.homepage, Configuration.lindaworkbenchURI);
 
         Resource analytic_result_node = model.createResource(analytics_NS + "analytics_result_node");
         Resource analytic_input_node = model.createResource(analytics_NS + "analytic_input_node");
-        
-         // For each triplet, create a resource representing the sentence, as well as the subject, 
+
+        // For each triplet, create a resource representing the sentence, as well as the subject, 
         // predicate, and object, and then add the triples to the model.
         for (int i = 0; i < predictedValuesAsDoubleArray.length - 1; i++) {
 
@@ -274,7 +258,7 @@ public class GeneralRDFGenerator extends RDFGenerator {
 
         }
 
-         re.eval("rm(list=ls());");
+        re.eval("rm(list=ls());");
 
         return model;
     }

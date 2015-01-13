@@ -29,13 +29,12 @@ public class RDFOutputFormat extends OutputFormat {
     HelpfulFunctionsSingleton helpfulFuncions;
     RDFGenerationFactory rdfGenerationFactory;
     RDFGenerator rdfGenerator;
-     ConnectionController connectionController ;
-   
+    ConnectionController connectionController;
 
     public RDFOutputFormat() {
         super();
         helpfulFuncions = HelpfulFunctionsSingleton.getInstance();
-        connectionController= ConnectionController.getInstance();
+        connectionController = ConnectionController.getInstance();
         rdfGenerationFactory = new RDFGenerationFactory();
     }
 
@@ -50,7 +49,6 @@ public class RDFOutputFormat extends OutputFormat {
 //
 //            String targetFileName = (splitedSourceFileName[0] + "_" + analytics.getAlgorithm_name() + "_resultdocument").replace("datasets", "results");
 //            String targetFileNameFullPath = Configuration.docroot + targetFileName;
-
             String targetFileName = ("results/analyticsID" + analytics.getId() + "_" + analytics.getAlgorithm_name() + "_resultdocument").replace("datasets", "results");
             String targetFileNameFullPath = Configuration.analyticsRepo + targetFileName;
 
@@ -108,17 +106,16 @@ public class RDFOutputFormat extends OutputFormat {
 
     @Override
     public void exportData(Analytics analytics, Rengine re) {
-//    if (dataToExport.size() != 0) {
 
         helpfulFuncions.nicePrintMessage("Export to RDF");
-
         //save rdf file
-        String[] splitedSourceFileName = analytics.getDocument().split("\\.");
 
-        String targetFileName = (splitedSourceFileName[0] + "_" + analytics.getAlgorithm_name() + "_resultdocument").replace("datasets", "results");
+//        String[] splitedSourceFileName = analytics.getDocument().split("\\.");
+//        String targetFileName = (splitedSourceFileName[0] + "_" + analytics.getAlgorithm_name() + "_resultdocument").replace("datasets", "results");
+        String targetFileName = "results/analyticsID" + analytics.getId() + "_"+"version"+analytics.getVersion()+"_" + analytics.getAlgorithm_name() + "_resultdocument";
         String targetFileNameFullPath = Configuration.analyticsRepo + targetFileName;
-        //create rdf file & save
 
+        //create rdf file & save
         rdfGenerator = rdfGenerationFactory.createRDF(analytics.getCategory_id());
 
         Model model = rdfGenerator.generateRDFModel(analytics, re);

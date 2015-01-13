@@ -11,7 +11,7 @@ public class Analytics {
     public Analytics() {
     }
 
-    public Analytics(int id, int category_id, int algorithm_id, String document, String testdocument, int trainQuery_id, int evaluationQuery_id, String model, String modelReadable, String processinfo, String resultdocument, String exportFormat, int version, String description, boolean publishedToTriplestore, String loadedRDFContext, String parameters, int plot1_id, int plot2_id) {
+    public Analytics(int id, int category_id, int algorithm_id, String document, String testdocument, int trainQuery_id, int evaluationQuery_id, String model, String modelReadable, String processinfo, String resultdocument, String exportFormat, int version, String description, boolean publishedToTriplestore, String loadedRDFContext, String parameters, int plot1_id, int plot2_id,String user_name) {
         this.id = id;
         this.category_id = category_id;
         this.algorithm_id = algorithm_id;
@@ -31,47 +31,31 @@ public class Analytics {
         this.parameters = parameters;
         this.plot1_id = plot1_id;
         this.plot2_id = plot2_id;
+        this.user_name = user_name;
+        
     }
 
     private int id;
-
     private int category_id;
-
     private int algorithm_id;
-
     private String algorithm_name;
-
     private int trainQuery_id;
-
     private int evaluationQuery_id;
-
     private String document;
-
     private String testdocument;
-
     private String model;
-
     private String modelReadable;
-
     private String processinfo;
-
     private String resultdocument;
-
     private String exportFormat;
-
     private int version;
-
     private String description;
-
     private boolean publishedToTriplestore;
-
     private String loadedRDFContext;
-
     private String parameters;
-
     private int plot1_id;
-
     private int plot2_id;
+    private String user_name;
 
     public int getId() {
         return id;
@@ -232,5 +216,14 @@ public class Analytics {
     public void setPlot2_id(int plot2_id) {
         this.plot2_id = plot2_id;
     }
+
+    public String getUser_name() {
+        return user_name;
+    }
+
+    public void setUser_name(String user_name) {
+        this.user_name = user_name;
+    }
+
 
 }

@@ -67,7 +67,7 @@ public final class ConnectionController {
         try {
             Query linda_query = dbsynchronizer.getQueryURI(Integer.parseInt(query_id));
 
-            System.out.println("linda_query encoded" + URIUtil.encodeQuery(linda_query.getSparql()));
+            //System.out.println("linda_query encoded" + URIUtil.encodeQuery(linda_query.getSparql()));
 
             query_uri = Configuration.rdf2anyServer + "/rdf2any/v1.0/convert/csv-converter.csv?dataset=" + linda_query.getEndpoint() + "&query=" + URIUtil.encodeQuery(linda_query.getSparql());
 
@@ -75,7 +75,7 @@ public final class ConnectionController {
             Logger.getLogger(HelpfulFunctionsSingleton.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        System.out.println("query_uri" + query_uri);
+        //System.out.println("query_uri" + query_uri);
         return query_uri;
 
     }
