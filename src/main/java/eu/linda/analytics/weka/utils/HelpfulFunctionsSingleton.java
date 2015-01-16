@@ -7,6 +7,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
@@ -252,14 +254,13 @@ public class HelpfulFunctionsSingleton {
         try {
             mergedData = new Instances(data);
             // add new attributes
-            mergedData.insertAttributeAt(new Attribute("basens", (List<String>) null), 0);
-            //mergedData.insertAttributeAt(new Attribute("ID1", (List<String>) null), mergedData.numAttributes());
-            mergedData.insertAttributeAt(new Attribute("uri", (List<String>) null), 1);
+            //mergedData.insertAttributeAt(new Attribute("basens", (List<String>) null), 0);
+            mergedData.insertAttributeAt(new Attribute("uri", (List<String>) null), 0);
 
             for (int i = 0; i < mergedData.numInstances(); i++) {
                 // fill colums with data
                 mergedData.instance(i).setValue(0, metadata.get(i).stringValue(0));
-                mergedData.instance(i).setValue(1, metadata.get(i).stringValue(1));
+                //mergedData.instance(i).setValue(1, metadata.get(i).stringValue(1));
             }
 
         } catch (Exception ex) {
@@ -300,7 +301,7 @@ public class HelpfulFunctionsSingleton {
 
         //add plot to db
         long plot_id = connectionController.manageNewPlot(analytics, description, filepath, plot);
-        connectionController.updatePlot((int) plot_id, "plots/plotid"+plot_id+".png");
+        connectionController.updatePlot((int) plot_id, "plots/plotid" + plot_id + ".png");
 
         String oldPlotFileName;
         int oldPlotID;
@@ -318,9 +319,27 @@ public class HelpfulFunctionsSingleton {
 
         return plot_id;
     }
-    
+
     public void updateProcessMessageToAnalyticsTable(String message, int id) {
         connectionController.updateProcessMessageToAnalyticsTable(message, id);
+
+    }
+
+    public boolean isURLResponsive(URL url) {
+        try {
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("HEAD");
+            connection.setConnectTimeout(10000);
+            int responseCode = connection.getResponseCode();
+            if (responseCode != 200) {
+                this.nicePrintMessage("url http url connection failed");
+                return false;
+            }
+            this.nicePrintMessage("url http url connection succesfull");
+        } catch (IOException ex) {
+            Logger.getLogger(HelpfulFunctionsSingleton.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return true;
 
     }
 

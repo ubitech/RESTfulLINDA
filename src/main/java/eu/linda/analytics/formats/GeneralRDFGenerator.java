@@ -73,8 +73,8 @@ public class GeneralRDFGenerator extends RDFGenerator {
         // Define local properties
         Property analyzedField = model.createProperty(NS + "analyzedField");
         Property predictedValue = model.createProperty(NS + "predictedValue");
-        Property confidence = model.createProperty(NS + "confidence");
-        Property denotes = model.createProperty("http://semanticscience.org/ontology/sio#denotes");
+//        Property confidence = model.createProperty(NS + "confidence");
+//        Property denotes = model.createProperty("http://semanticscience.org/ontology/sio#denotes");
         Property wasDerivedFrom = model.createProperty("http://www.w3.org/ns/prov#wasDerivedFrom");
         Property wasGeneratedBy = model.createProperty("http://www.w3.org/ns/prov#wasGeneratedBy");
         Property actedOnBehalfOf = model.createProperty("http://www.w3.org/ns/prov#actedOnBehalfOf");
@@ -123,8 +123,7 @@ public class GeneralRDFGenerator extends RDFGenerator {
         // predicate, and object, and then add the triples to the model.
         for (int i = 1; i < triplets.size(); i++) {
             //for (Instance triplet : triplets) {
-
-            Resource analytic_input_node_statement = model.createResource(triplets.get(i).toString(1));
+            Resource analytic_input_node_statement = model.createResource(triplets.get(i).toString(0));
             analytic_input_node_statement.addProperty(RDF.type, analytic_input_node);
 
             Resource analytic_result_node_statement = model.createResource(NS + "/" + i);

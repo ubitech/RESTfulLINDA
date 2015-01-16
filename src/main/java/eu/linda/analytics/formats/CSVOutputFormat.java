@@ -35,11 +35,11 @@ public class CSVOutputFormat extends OutputFormat {
 
             String targetFileName = (splitedSourceFileName[0] + "_" + analytics.getAlgorithm_name() + "_resultdocument.arff").replace("datasets", "results");
 
-            String targetFileNameFullPath = Configuration.docroot + targetFileName;
+            String targetFileNameFullPath = Configuration.analyticsRepo + targetFileName;
             helpfulFunctions.saveFile(targetFileNameFullPath, dataToExport.toString());
 
             String targetFileNameCSV = (splitedSourceFileName[0] + "_" + analytics.getAlgorithm_name() + "_resultdocument." + analytics.getExportFormat()).replace("datasets", "results");
-            String targetFileNameCSVFull = Configuration.docroot + targetFileNameCSV;
+            String targetFileNameCSVFull = Configuration.analyticsRepo + targetFileNameCSV;
 
             helpfulFunctions.saveFileAsCSV(targetFileNameFullPath, targetFileNameCSVFull);
             connectionController.updateLindaAnalytics(targetFileNameCSV, "resultdocument", analytics.getId());
@@ -61,7 +61,7 @@ public class CSVOutputFormat extends OutputFormat {
 
         String targetFileName = (splitedSourceFileName[0] + "_" + analytics.getAlgorithm_name() + "_resultdocument.csv").replace("datasets", "results");
 
-        String targetFileNameFullPath = Configuration.docroot + targetFileName;
+        String targetFileNameFullPath = Configuration.analyticsRepo + targetFileName;
         System.out.println("targetFileNameFullPath" + targetFileNameFullPath);
         re.eval("write.table(df_to_export, file = '" + targetFileNameFullPath + "',row.names=FALSE,sep = ';', dec='.');");
         re.eval("rm(list=ls());");

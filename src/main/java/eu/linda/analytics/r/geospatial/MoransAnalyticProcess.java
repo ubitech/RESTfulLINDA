@@ -55,103 +55,125 @@ public class MoransAnalyticProcess extends AnalyticProcess {
 
         }
 
-        // ---- get analyzedFieldValue ----
-        RVector dataToExportasVector = re.eval("loaded_data").asVector();
-        Vector colnames = dataToExportasVector.getNames();
+        RBool is_query_responsive = re.eval("is_query_responsive").asBool();
+        System.out.println("is_query_responsive:" + is_query_responsive.isTRUE());
 
-        String[] colnamesArray = new String[colnames.size()];
-        colnames.copyInto(colnamesArray);
-
-        String analyzedFieldValue = colnamesArray[colnames.size() - 1];
-        //
-
-        re.eval("library(ape)");
-        RScript += "library(ape)\n";
-
-        re.eval("loaded_data <- na.omit(loaded_data);");
-        RScript += "loaded_data <- na.omit(loaded_data);\n";
-
-        re.eval("myvars <- names(loaded_data) %in% c('rowID','basens','uri');");
-        RScript += "myvars <- names(loaded_data) %in% c('rowID','basens','uri');\n";
-
-        re.eval("loaded_data <- loaded_data[!myvars];");
-        RScript += "loaded_data <- loaded_data[!myvars];\n";
-
-        re.eval("column_number<-ncol(loaded_data);");
-        RScript += "column_number<-ncol(loaded_data);\n";
-
-        re.eval("rows_number<-nrow(loaded_data);");
-        RScript += "rows_number<-nrow(loaded_data);\n";
-
-        re.eval("column_to_predict <-colnames(loaded_data[column_number]); ");
-        RScript += "column_to_predict <-colnames(loaded_data[column_number]);\n ";
-
-        re.eval("trimmedValues<- data.frame();");
-        RScript += "trimmedValues<- data.frame();\n ";
-
-        re.eval("valuesToClean<-loaded_data[column_to_predict]; ");
-        RScript += "valuesToClean<-loaded_data[column_to_predict]; \n";
-
-        re.eval("valuesToCleanNum<-rows_number;");
-        RScript += "valuesToCleanNum<-rows_number; \n";
-
-        re.eval("for(i in 1:valuesToCleanNum){ valueToTrim <- as.character(valuesToClean[i,1]);  if(grepl(\"#\", valueToTrim)) {  position<-which(strsplit(valueToTrim, \"\")[[1]]==\"^\");  trimmedValues[i,1]<-substr(valueToTrim, 1, position[1]-1); }else{ trimmedValues[i,1]<-valueToTrim;}  }");
-        RScript += "for(i in 1:valuesToCleanNum){ valueToTrim <- as.character(valuesToClean[i,1]);  if(grepl(\"#\", valueToTrim)) {  position<-which(strsplit(valueToTrim, \"\")[[1]]==\"^\");  trimmedValues[i,1]<-substr(valueToTrim, 1, position[1]-1); }else{ trimmedValues[i,1]<-valueToTrim;}  }\n";
-
-        re.eval("result_column_number<-ncol(loaded_data); ");
-        RScript += "result_column_number<-ncol(loaded_data); \n";
-
-        re.eval("colnames(trimmedValues)[1]<- column_to_predict;");
-        RScript += "colnames(trimmedValues)[1]<- column_to_predict;\n";
-
-        re.eval("trimmedValues$" + analyzedFieldValue + "<-as.numeric(trimmedValues$" + analyzedFieldValue + ");");
-        RScript += "trimmedValues$" + analyzedFieldValue + "<-as.numeric(trimmedValues$" + analyzedFieldValue + "); \n";
-
-        re.eval("loaded_data[[column_to_predict]] <- trimmedValues;");
-        RScript += "loaded_data[[column_to_predict]] <- trimmedValues;\n";
-
-        re.eval("loaded_data.dists <- as.matrix(dist(cbind(loaded_data$x, loaded_data$y)));");
-        RScript += "loaded_data.dists <- as.matrix(dist(cbind(loaded_data$x, loaded_data$y)));\n";
-
-        re.eval("loaded_data.dists.inv <- 1/loaded_data.dists; ");
-        RScript += "loaded_data.dists.inv <- 1/loaded_data.dists; \n";
-
-        re.eval(" loaded_data.dists.inv[is.infinite(loaded_data.dists.inv)] <- 0");
-        RScript += "loaded_data.dists.inv[is.infinite(loaded_data.dists.inv)] <- 0 \n";
-
-        re.eval("diag(loaded_data.dists.inv) <- 0");
-        RScript += "diag(loaded_data.dists.inv) <- 0\n";
-
-        re.eval("morans_result<-Moran.I(loaded_data$" + analyzedFieldValue + "[1:rows_number,], loaded_data.dists.inv[1:rows_number, 1:rows_number]);");
-        RScript += "morans_result<-Moran.I(loaded_data$" + analyzedFieldValue + "[1:rows_number,], loaded_data.dists.inv[1:rows_number, 1:rows_number]);\n";
-
-        re.eval("if (exists('morans_result'))   {  result <-  morans_result$p;   } else {  result <- 0.0;}");
-        RScript += "if (exists('morans_result'))   {  result <-  morans_result$p;   } else {  result <- 0.0;}\n";
-
-        double pvalue = re.eval("result").asDouble();
-        System.out.println("pvalue:" + pvalue);
-
-        double moranObservedValue = re.eval("morans_result$observed").asDouble();
-        System.out.println("moranObservedValue:" + moranObservedValue);
-
-
-        String processMessage = "Moran's I Result for analyzed Field: " + analyzedFieldValue + ". \n";
-       //processMessage += "$p.value  : " + re.eval("morans_result$p").asDouble() + ".\n";
-        processMessage += "$observed.value  : " + moranObservedValue + ".\n";
-        processMessage += "$expected.value  : " + re.eval("morans_result$expected").asDouble() + ".\n";
-        processMessage += "$expected.sd  : " + re.eval("morans_result$sd").asDouble() + ".\n";
-
-        if (moranObservedValue > 0) {
-            processMessage += "\n There is a significant spatial autocorrelation in your data \n and you should take into account in next analytic processes \n. You could double check this result with NCF Correlogram Algorithm";
+        if (is_query_responsive.isFALSE()) {
+            helpfulFunctions.updateProcessMessageToAnalyticsTable("There is a connectivity issue. Could not reach data for predefined query.\n"
+                    + " Please check your connectivity and the responsiveness of the selected sparql endpoint.\n "
+                    + "Then click on re-Evaluate button to try to run again the analytic process.", analytics.getId());
+            re.eval("rm(list=ls());");
         } else {
-            processMessage += "\n Moran's I did not detect a significant spatial autocorrelation in your data. \n You could double check this result with NCF Correlogram Algorithm";
 
+            //check if x y coordinates exist at the query
+            re.eval("if('x' %in% colnames(loaded_data) && 'y' %in% colnames(loaded_data) ) {  exists_geo_info <-TRUE }else{   exists_geo_info <-FALSE }");
+            RBool exists_geo_info = re.eval("exists_geo_info").asBool();
+            System.out.println("exists_geo_info:" + exists_geo_info.isTRUE());
+
+            if (exists_geo_info.isFALSE()) {
+                helpfulFunctions.updateProcessMessageToAnalyticsTable("The data you provided has no geospatial information.\n Please enter a dataset or query with a x & y information or provide the adecuate parameters.", analytics.getId());
+                re.eval("rm(list=ls());");
+            } else {
+
+                // ---- get analyzedFieldValue ----
+                RVector dataToExportasVector = re.eval("loaded_data").asVector();
+                Vector colnames = dataToExportasVector.getNames();
+
+                String[] colnamesArray = new String[colnames.size()];
+                colnames.copyInto(colnamesArray);
+
+                String analyzedFieldValue = colnamesArray[colnames.size() - 1];
+                //
+
+                re.eval("library(ape)");
+                RScript += "library(ape)\n";
+
+                re.eval("loaded_data <- na.omit(loaded_data);");
+                RScript += "loaded_data <- na.omit(loaded_data);\n";
+
+                re.eval("myvars <- names(loaded_data) %in% c('rowID','basens','uri');");
+                RScript += "myvars <- names(loaded_data) %in% c('rowID','basens','uri');\n";
+
+                re.eval("loaded_data <- loaded_data[!myvars];");
+                RScript += "loaded_data <- loaded_data[!myvars];\n";
+
+                re.eval("column_number<-ncol(loaded_data);");
+                RScript += "column_number<-ncol(loaded_data);\n";
+
+                re.eval("rows_number<-nrow(loaded_data);");
+                RScript += "rows_number<-nrow(loaded_data);\n";
+
+                re.eval("column_to_predict <-colnames(loaded_data[column_number]); ");
+                RScript += "column_to_predict <-colnames(loaded_data[column_number]);\n ";
+
+                re.eval("trimmedValues<- data.frame();");
+                RScript += "trimmedValues<- data.frame();\n ";
+
+                re.eval("valuesToClean<-loaded_data[column_to_predict]; ");
+                RScript += "valuesToClean<-loaded_data[column_to_predict]; \n";
+
+                re.eval("valuesToCleanNum<-rows_number;");
+                RScript += "valuesToCleanNum<-rows_number; \n";
+
+                re.eval("for(i in 1:valuesToCleanNum){ valueToTrim <- as.character(valuesToClean[i,1]);  if(grepl(\"#\", valueToTrim)) {  position<-which(strsplit(valueToTrim, \"\")[[1]]==\"^\");  trimmedValues[i,1]<-substr(valueToTrim, 1, position[1]-1); }else{ trimmedValues[i,1]<-valueToTrim;}  }");
+                RScript += "for(i in 1:valuesToCleanNum){ valueToTrim <- as.character(valuesToClean[i,1]);  if(grepl(\"#\", valueToTrim)) {  position<-which(strsplit(valueToTrim, \"\")[[1]]==\"^\");  trimmedValues[i,1]<-substr(valueToTrim, 1, position[1]-1); }else{ trimmedValues[i,1]<-valueToTrim;}  }\n";
+
+                re.eval("result_column_number<-ncol(loaded_data); ");
+                RScript += "result_column_number<-ncol(loaded_data); \n";
+
+                re.eval("colnames(trimmedValues)[1]<- column_to_predict;");
+                RScript += "colnames(trimmedValues)[1]<- column_to_predict;\n";
+
+                re.eval("trimmedValues$" + analyzedFieldValue + "<-as.numeric(trimmedValues$" + analyzedFieldValue + ");");
+                RScript += "trimmedValues$" + analyzedFieldValue + "<-as.numeric(trimmedValues$" + analyzedFieldValue + "); \n";
+
+                re.eval("loaded_data[[column_to_predict]] <- trimmedValues;");
+                RScript += "loaded_data[[column_to_predict]] <- trimmedValues;\n";
+
+                re.eval("loaded_data.dists <- as.matrix(dist(cbind(loaded_data$x, loaded_data$y)));");
+                RScript += "loaded_data.dists <- as.matrix(dist(cbind(loaded_data$x, loaded_data$y)));\n";
+
+                re.eval("loaded_data.dists.inv <- 1/loaded_data.dists; ");
+                RScript += "loaded_data.dists.inv <- 1/loaded_data.dists; \n";
+
+                re.eval(" loaded_data.dists.inv[is.infinite(loaded_data.dists.inv)] <- 0");
+                RScript += "loaded_data.dists.inv[is.infinite(loaded_data.dists.inv)] <- 0 \n";
+
+                re.eval("diag(loaded_data.dists.inv) <- 0");
+                RScript += "diag(loaded_data.dists.inv) <- 0\n";
+
+                re.eval("morans_result<-Moran.I(loaded_data$" + analyzedFieldValue + "[1:rows_number,], loaded_data.dists.inv[1:rows_number, 1:rows_number]);");
+                RScript += "morans_result<-Moran.I(loaded_data$" + analyzedFieldValue + "[1:rows_number,], loaded_data.dists.inv[1:rows_number, 1:rows_number]);\n";
+
+                re.eval("if (exists('morans_result'))   {  result <-  morans_result$p;   } else {  result <- 0.0;}");
+                RScript += "if (exists('morans_result'))   {  result <-  morans_result$p;   } else {  result <- 0.0;}\n";
+
+                double pvalue = re.eval("result").asDouble();
+                System.out.println("pvalue:" + pvalue);
+
+                double moranObservedValue = re.eval("morans_result$observed").asDouble();
+                System.out.println("moranObservedValue:" + moranObservedValue);
+
+                String processMessage = "Moran's I Result for analyzed Field: " + analyzedFieldValue + ". \n";
+                //processMessage += "$p.value  : " + re.eval("morans_result$p").asDouble() + ".\n";
+                processMessage += "$observed.value  : " + moranObservedValue + ".\n";
+                processMessage += "$expected.value  : " + re.eval("morans_result$expected").asDouble() + ".\n";
+                processMessage += "$expected.sd  : " + re.eval("morans_result$sd").asDouble() + ".\n";
+
+                if (moranObservedValue > 0) {
+                    processMessage += "\n There is a significant spatial autocorrelation in your data \n and you should take into account in next analytic processes \n. You could double check this result with NCF Correlogram Algorithm";
+                } else {
+                    processMessage += "\n Moran's I did not detect a significant spatial autocorrelation in your data. \n You could double check this result with NCF Correlogram Algorithm";
+
+                }
+                helpfulFunctions.updateProcessMessageToAnalyticsTable(processMessage, analytics.getId());
+
+                helpfulFunctions.writeToFile(RScript, "processinfo", analytics);
+
+                re.eval("rm(list=ls());");
+            }
         }
-        helpfulFunctions.updateProcessMessageToAnalyticsTable(processMessage, analytics.getId());
 
-        helpfulFunctions.writeToFile(RScript, "processinfo", analytics);
-
-        re.eval("rm(list=ls());");
     }
 
 }

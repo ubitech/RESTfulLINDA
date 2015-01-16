@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import static java.sql.Types.NULL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -249,7 +250,7 @@ public class DBSynchronizer {
         PreparedStatement preparedStatement = null;
         try {
 
-            String query = "update analytics_analytics set processinfo=? , resultdocument=? , processMessage=? where id=?";
+            String query = "update analytics_analytics set processinfo=? , resultdocument=? , processMessage=?, plot1_id=null , plot2_id=null where id=?";
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, "");
             preparedStatement.setString(2, "");

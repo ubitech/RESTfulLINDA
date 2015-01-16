@@ -23,11 +23,11 @@ import weka.core.converters.CSVLoader;
  */
 public class RDFInputFormat extends InputFormat {
 
-    HelpfulFunctionsSingleton helpfulFuncions;
+    HelpfulFunctionsSingleton helpfulFunctions;
     ConnectionController connectionController;
 
     public RDFInputFormat() {
-        helpfulFuncions = HelpfulFunctionsSingleton.getInstance();
+        helpfulFunctions = HelpfulFunctionsSingleton.getInstance();
         connectionController = ConnectionController.getInstance();
     }
 
@@ -36,14 +36,19 @@ public class RDFInputFormat extends InputFormat {
 
         String queryURI = connectionController.getQueryURI(query_id);
 
-        helpfulFuncions.nicePrintMessage("import data from uri " + queryURI);
+        helpfulFunctions.nicePrintMessage("import data from uri " + queryURI);
 
         Instances data = null;
         try {
 
             URL url = new URL(queryURI);
+            if (!helpfulFunctions.isURLResponsive(url)) {
+                return null;
+            }
             File tmpfile4lindaquery = File.createTempFile("tmpfile4lindaquery" + query_id, ".tmp");
             FileUtils.copyURLToFile(url, tmpfile4lindaquery);
+             
+            System.out.println("Downloaded File Query: "+ tmpfile4lindaquery);
 
             CSVLoader loader = new CSVLoader();
             loader.setSource(tmpfile4lindaquery);
@@ -71,8 +76,8 @@ public class RDFInputFormat extends InputFormat {
         if (re == null) {
 //            re = new Rengine(new String[]{"--vanilla"}, false, null);
             String newargs[] = {"--no-save"};
-             re = new Rengine(newargs, false, null);
-           
+            re = new Rengine(newargs, false, null);
+
         }
 
         if (!re.waitForR()) {
@@ -82,16 +87,26 @@ public class RDFInputFormat extends InputFormat {
 
         String queryURI = connectionController.getQueryURI(query_id);
 
-        helpfulFuncions.nicePrintMessage("import data from uri " + queryURI);
+        helpfulFunctions.nicePrintMessage("import data from uri " + queryURI);
         try {
             URL url = new URL(queryURI);
-            File tmpfile4lindaquery = File.createTempFile("tmpfile4lindaquery" + query_id, ".tmp");
-            FileUtils.copyURLToFile(url, tmpfile4lindaquery);
-            
-            //TODO:open with java the temp file and clean the ^^http://www.w3.org/2001/XMLSchema#decimal metadata
 
-            re.eval(" loaded_data <- read.csv(file='" + tmpfile4lindaquery + "', header=TRUE, sep=',', na.strings='---');");
-            System.out.println(" loaded_data <- read.csv(file='" + tmpfile4lindaquery + "', header=TRUE, sep=',', na.strings='---');");
+            if (!helpfulFunctions.isURLResponsive(url)) {
+                re.eval(" is_query_responsive <-FALSE ");
+                System.out.println("is_query_responsive <-FALSE ");
+                
+            } else {
+                re.eval("is_query_responsive <-TRUE  ");
+                System.out.println("is_query_responsive <-TRUE ");
+
+
+                File tmpfile4lindaquery = File.createTempFile("tmpfile4lindaquery" + query_id, ".tmp");
+                FileUtils.copyURLToFile(url, tmpfile4lindaquery);
+
+                re.eval(" loaded_data <- read.csv(file='" + tmpfile4lindaquery + "', header=TRUE, sep=',', na.strings='---');");
+                System.out.println(" loaded_data <- read.csv(file='" + tmpfile4lindaquery + "', header=TRUE, sep=',', na.strings='---');");
+            }
+
         } catch (Exception ex) {
             Logger.getLogger(ArffInputFormat.class.getName()).log(Level.SEVERE, null, ex);
         }
