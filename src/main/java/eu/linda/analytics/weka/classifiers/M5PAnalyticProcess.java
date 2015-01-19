@@ -49,6 +49,8 @@ public class M5PAnalyticProcess extends AnalyticProcess {
 //trainModelM5P
     @Override
     public void train(Analytics analytics) {
+         float timeToRun_analytics = 0;
+        long startTimeToRun_analytics = System.currentTimeMillis();
         helpfulFunctions.nicePrintMessage("Train  M5P");
         Vector M5Pmodel;
         try {
@@ -58,19 +60,19 @@ public class M5PAnalyticProcess extends AnalyticProcess {
 
             // remove dataset metadata (first two columns)    
             if (helpfulFunctions.isRDFInputFormat(analytics.getEvaluationQuery_id())) {
-                abstractListdata1 = input.importData4weka(Integer.toString(analytics.getEvaluationQuery_id()), true);
+                abstractListdata1 = input.importData4weka(Integer.toString(analytics.getEvaluationQuery_id()), true, analytics);
                 data = (Instances) abstractListdata1;
                 HashMap<String, Instances> separatedData = helpfulFunctions.separateDataFromMetadataInfo(data);
                 data = separatedData.get("newData");
 
             } else if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
-                abstractListdata1 = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(), true);
+                abstractListdata1 = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(), true, analytics);
                 data = (Instances) abstractListdata1;
                 HashMap<String, Instances> separatedData = helpfulFunctions.separateDataFromMetadataInfo(data);
                 data = separatedData.get("newData");
             } else {
 
-                abstractListdata1 = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(), false);
+                abstractListdata1 = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(), false, analytics);
                 data = (Instances) abstractListdata1;
 
             }
@@ -95,11 +97,17 @@ public class M5PAnalyticProcess extends AnalyticProcess {
         } catch (Exception ex) {
             Logger.getLogger(M5PAnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);
         }
+         long elapsedTimeToRunAnalyticsMillis = System.currentTimeMillis() - startTimeToRun_analytics;
+            // Get elapsed time in seconds
+            timeToRun_analytics = elapsedTimeToRunAnalyticsMillis / 1000F;
+            analytics.setTimeToRun_analytics(timeToRun_analytics);
     }
 
 //predictM5P
     @Override
     public void eval(Analytics analytics, OutputFormat out) {
+        float timeToRun_analytics = 0;
+        long startTimeToRun_analytics = System.currentTimeMillis();
         helpfulFunctions.nicePrintMessage("Eval M5P");
 
         //clean previous eval info if exists
@@ -114,18 +122,18 @@ public class M5PAnalyticProcess extends AnalyticProcess {
 
             if (helpfulFunctions.isRDFInputFormat(analytics.getEvaluationQuery_id())) {
 
-                abstractList = input.importData4weka(Integer.toString(analytics.getTrainQuery_id()), true);
+                abstractList = input.importData4weka(Integer.toString(analytics.getTrainQuery_id()), true, analytics);
                 data = (Instances) abstractList;
                 separatedData = helpfulFunctions.separateDataFromMetadataInfo(data);
                 data = separatedData.get("newData");
 
             } else if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
-                abstractList = input.importData4weka(Configuration.analyticsRepo + analytics.getTestdocument(), true);
+                abstractList = input.importData4weka(Configuration.analyticsRepo + analytics.getTestdocument(), true, analytics);
                 data = (Instances) abstractList;
                 separatedData = helpfulFunctions.separateDataFromMetadataInfo(data);
                 data = separatedData.get("newData");
             } else {
-                abstractList = input.importData4weka(Configuration.analyticsRepo + analytics.getTestdocument(), false);
+                abstractList = input.importData4weka(Configuration.analyticsRepo + analytics.getTestdocument(), false, analytics);
                 data = (Instances) abstractList;
             }
 
@@ -214,6 +222,12 @@ public class M5PAnalyticProcess extends AnalyticProcess {
             Logger.getLogger(M5PAnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+         long elapsedTimeToRunAnalyticsMillis = System.currentTimeMillis() - startTimeToRun_analytics;
+        // Get elapsed time in seconds
+        timeToRun_analytics = elapsedTimeToRunAnalyticsMillis / 1000F;
+        analytics.setTimeToRun_analytics(analytics.getTimeToRun_analytics()+timeToRun_analytics);
+        out.exportData(analytics, dataToReturn);
+        
         out.exportData(analytics, dataToReturn);
 
     }

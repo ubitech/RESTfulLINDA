@@ -11,7 +11,8 @@ public class Analytics {
     public Analytics() {
     }
 
-    public Analytics(int id, int category_id, int algorithm_id, String document, String testdocument, int trainQuery_id, int evaluationQuery_id, String model, String modelReadable, String processinfo, String resultdocument, String exportFormat, int version, String description, boolean publishedToTriplestore, String loadedRDFContext, String parameters, int plot1_id, int plot2_id,String user_name) {
+    public Analytics(int id, int category_id, int algorithm_id, String document, String testdocument, int trainQuery_id, int evaluationQuery_id, String model, String modelReadable, String processinfo, String resultdocument, String exportFormat, int version, String description, boolean publishedToTriplestore, String loadedRDFContext, String parameters, int plot1_id, int plot2_id,String user_name,    float timeToGet_data, float data_size, float timeToRun_analytics, float timeToCreate_RDF
+) {
         this.id = id;
         this.category_id = category_id;
         this.algorithm_id = algorithm_id;
@@ -32,6 +33,11 @@ public class Analytics {
         this.plot1_id = plot1_id;
         this.plot2_id = plot2_id;
         this.user_name = user_name;
+        this.timeToGet_data = timeToGet_data;
+        this.data_size = data_size;
+        this.timeToRun_analytics = timeToRun_analytics;
+        this.timeToCreate_RDF = timeToCreate_RDF;
+
         
     }
 
@@ -56,6 +62,12 @@ public class Analytics {
     private int plot1_id;
     private int plot2_id;
     private String user_name;
+    private float timeToGet_data;
+    private float data_size;
+    private float timeToRun_analytics;
+    private float timeToCreate_RDF;
+    
+    
 
     public int getId() {
         return id;
@@ -224,6 +236,41 @@ public class Analytics {
     public void setUser_name(String user_name) {
         this.user_name = user_name;
     }
+
+    public float getTimeToGet_data() {
+        return timeToGet_data;
+    }
+
+    public void setTimeToGet_data(float timeToGet_data) {
+        this.timeToGet_data = timeToGet_data;
+    }
+
+    public float getData_size() {
+        return data_size;
+    }
+
+    public void setData_size(float data_size) {
+        this.data_size = data_size;
+    }
+
+    public float getTimeToRun_analytics() {
+        return timeToRun_analytics;
+    }
+
+    public void setTimeToRun_analytics(float timeToRun_analytics) {
+        this.timeToRun_analytics = timeToRun_analytics;
+    }
+
+    public float getTimeToCreate_RDF() {
+        return timeToCreate_RDF;
+    }
+
+    public void setTimeToCreate_RDF(float timeToCreate_RDF) {
+        this.timeToCreate_RDF = timeToCreate_RDF;
+    }
+    
+    
+    
 
 
 }

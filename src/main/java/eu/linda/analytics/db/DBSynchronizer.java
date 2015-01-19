@@ -68,7 +68,11 @@ public class DBSynchronizer {
                         rs.getString("parameters"),
                         rs.getInt("plot1_id"),
                         rs.getInt("plot2_id"),
-                        rs.getString("username")
+                        rs.getString("username"),
+                        rs.getFloat("timeToGet_data"),
+                        rs.getFloat("data_size"),
+                        rs.getFloat("timeToRun_analytics"),
+                        rs.getFloat("timeToCreate_RDF")
                 );
                 analytics.setAlgorithm_name(rs.getString("name"));
                 rs.close();
@@ -265,6 +269,51 @@ public class DBSynchronizer {
         }
 
     }//EoM emptyLindaAnalyticsResultDocument 
+
+    /*
+     * Updates updateLindaAnalyticsPerformanceTime
+     */
+    public void updateLindaAnalyticsProcessPerformanceTime(Analytics analytics) {
+        PreparedStatement preparedStatement = null;
+        try {
+
+            String query = "update analytics_analytics set  timeToRun_analytics=? , timeToCreate_RDF=? where id=?";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setFloat(1, analytics.getTimeToRun_analytics());
+            preparedStatement.setFloat(2, analytics.getTimeToCreate_RDF());
+            preparedStatement.setInt(3, analytics.getId());
+            preparedStatement.executeUpdate();
+            preparedStatement.close();
+
+        } catch (SQLException ex) {
+            Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("ERROR SEVERE" + ex);
+        }
+
+    }//EoM updateLindaAnalyticsPerformanceTime 
+    
+    
+    /*
+     * Updates updateLindaAnalyticsPerformanceTime
+     */
+    public void updateLindaAnalyticsInputDataPerformanceTime(Analytics analytics) {
+        PreparedStatement preparedStatement = null;
+        try {
+
+            String query = "update analytics_analytics set timeToGet_data=? , data_size=?  where id=?";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setFloat(1, analytics.getTimeToGet_data());
+            preparedStatement.setFloat(2, analytics.getData_size());
+            preparedStatement.setInt(3, analytics.getId());
+            preparedStatement.executeUpdate();
+            preparedStatement.close();
+
+        } catch (SQLException ex) {
+            Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("ERROR SEVERE" + ex);
+        }
+
+    }//EoM updateLindaAnalyticsPerformanceTime 
 
     /*
      * Add LindaAnalyticsPlot 

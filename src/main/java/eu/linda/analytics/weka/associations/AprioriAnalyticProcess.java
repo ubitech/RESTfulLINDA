@@ -59,20 +59,20 @@ public class AprioriAnalyticProcess extends AnalyticProcess {
             // remove dataset metadata (first two columns) 
              if (helpfulFunctions.isRDFInputFormat(analytics.getEvaluationQuery_id()))
             {
-                abstractListdata = input.importData4weka(Integer.toString(analytics.getEvaluationQuery_id()), true);
+                abstractListdata = input.importData4weka(Integer.toString(analytics.getEvaluationQuery_id()), true, analytics);
                 data = (Instances) abstractListdata;
                 HashMap<String, Instances> separatedData = helpfulFunctions.separateDataFromMetadataInfo(data);
                 data = separatedData.get("newData");
 
             } else if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
 
-                abstractListdata = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(), true);
+                abstractListdata = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(), true, analytics);
                 data = (Instances) abstractListdata;
                 HashMap<String, Instances> separatedData = helpfulFunctions.separateDataFromMetadataInfo(data);
                 data = separatedData.get("newData");
             } else {
 
-                abstractListdata = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(), false);
+                abstractListdata = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(), false, analytics);
                 data = (Instances) abstractListdata;
 
             }

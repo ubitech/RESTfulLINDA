@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.validator.UrlValidator;
 import weka.classifiers.Classifier;
 import weka.core.Attribute;
 import weka.core.Instances;
@@ -340,6 +341,18 @@ public class HelpfulFunctionsSingleton {
             Logger.getLogger(HelpfulFunctionsSingleton.class.getName()).log(Level.SEVERE, null, ex);
         }
         return true;
+
+    }
+
+    public boolean isURLValid(String url) {
+
+        UrlValidator urlValidator = new UrlValidator();
+        //valid URL
+        if (urlValidator.isValid(url)) {
+            return true;
+        } else {
+            return false;
+        }
 
     }
 

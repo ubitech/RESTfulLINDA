@@ -6,6 +6,7 @@
 
 package eu.linda.analytics.formats;
 
+import eu.linda.analytics.model.Analytics;
 import java.util.AbstractList;
 import org.rosuda.JRI.Rengine;
 
@@ -17,9 +18,9 @@ import org.rosuda.JRI.Rengine;
 
 abstract public class InputFormat { 
 
-    abstract public AbstractList importData4weka(String pathToFile,boolean isForRDFOutput);
+    abstract public AbstractList importData4weka(String pathToFile,boolean isForRDFOutput,Analytics analytics);
     
-    abstract public Rengine importData4R(String pathToFile,boolean isForRDFOutput);
+    abstract public Rengine importData4R(String pathToFile,boolean isForRDFOutput,Analytics analytics);
 
 }
 

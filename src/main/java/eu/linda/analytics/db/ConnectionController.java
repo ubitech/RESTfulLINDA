@@ -98,6 +98,16 @@ public final class ConnectionController {
     public void updateLindaAnalyticsVersion(int version, int analytics_id) {
         dbsynchronizer.updateLindaAnalyticsVersion(version, analytics_id);
     }//EoM updateLindaAnalyticsVersion 
+    
+    public void    updateLindaAnalyticsProcessPerformanceTime(Analytics analytics) {
+        dbsynchronizer.updateLindaAnalyticsProcessPerformanceTime(analytics);
+    }//EoM updateLindaAnalyticsProcessPerformanceTime 
+    
+    
+     public void    updateLindaAnalyticsInputDataPerformanceTime(Analytics analytics) {
+        dbsynchronizer.updateLindaAnalyticsInputDataPerformanceTime(analytics);
+    }//EoM updateLindaAnalyticsInputDataPerformanceTime 
+ 
 
     public void readProperties() {
         try {

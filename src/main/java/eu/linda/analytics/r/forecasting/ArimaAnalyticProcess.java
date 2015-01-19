@@ -39,12 +39,14 @@ public class ArimaAnalyticProcess extends AnalyticProcess {
 
     @Override
     public void eval(Analytics analytics, OutputFormat out) {
+        float timeToRun_analytics = 0;
+        long startTimeToRun_analytics = System.currentTimeMillis();
         String startDate = "";
         String endDate = "";
-        String timeGranularity="months";
-        String frequency="12";
-        String timePredicion="1";
-        
+        String timeGranularity = "months";
+        String frequency = "12";
+        String timePredicion = "1";
+
         //get parameters
         String parameters = analytics.getParameters();
 
@@ -65,10 +67,10 @@ public class ArimaAnalyticProcess extends AnalyticProcess {
             if (parameter.contains("U")) {
                 String[] timeGranularityP = parameter.split("U");
                 timeGranularity = timeGranularityP[1].trim();
-                if (timeGranularity.equalsIgnoreCase("months")){
-                frequency="12";
-                }else if (timeGranularity.equalsIgnoreCase("years")){
-                frequency="1";
+                if (timeGranularity.equalsIgnoreCase("months")) {
+                    frequency = "12";
+                } else if (timeGranularity.equalsIgnoreCase("years")) {
+                    frequency = "1";
                 }
                 System.out.println("timeGranularity" + timeGranularity);
             }
@@ -83,9 +85,9 @@ public class ArimaAnalyticProcess extends AnalyticProcess {
         helpfulFunctions.cleanPreviousInfo(analytics);
         Rengine re;
         if (helpfulFunctions.isRDFInputFormat(analytics.getTrainQuery_id())) {
-            re = input.importData4R(Integer.toString(analytics.getTrainQuery_id()), true);
+            re = input.importData4R(Integer.toString(analytics.getTrainQuery_id()), true, analytics);
         } else {
-            re = input.importData4R(Configuration.analyticsRepo + analytics.getDocument(), true);
+            re = input.importData4R(Configuration.analyticsRepo + analytics.getDocument(), true, analytics);
         }
         RBool is_query_responsive = re.eval("is_query_responsive").asBool();
         System.out.println("is_query_responsive:" + is_query_responsive.isTRUE());
@@ -192,20 +194,20 @@ public class ArimaAnalyticProcess extends AnalyticProcess {
                 RScript += "for(i in 1:valuesToCleanNum){ valueToTrim <- as.character(valuesToClean[i,1]);  if(grepl(\"#\", valueToTrim)) {  position<-which(strsplit(valueToTrim, \"\")[[1]]==\"^\"); trimmedValues[i,1]<-substr(valueToTrim, 1, position[1]-1);  }else{ trimmedValues[i,1]<-valueToTrim; }  }\n";
 
                 //re.eval(" datats <- ts(loaded_data[column_number], frequency=12, start=c(year_to_start,month_to_start)); ");
-                re.eval(" datats <- ts(trimmedValues, frequency="+frequency+", start=c(year_to_start,month_to_start)); ");
-                RScript += "datats <- ts(trimmedValues, frequency="+frequency+", start=c(year_to_start,month_to_start));\n";
+                re.eval(" datats <- ts(trimmedValues, frequency=" + frequency + ", start=c(year_to_start,month_to_start)); ");
+                RScript += "datats <- ts(trimmedValues, frequency=" + frequency + ", start=c(year_to_start,month_to_start));\n";
 
-                re.eval(" add."+timeGranularity+"= function(date,n) seq(date, by = paste (n, '"+timeGranularity+"'), length = 2)[2];");
-                RScript += "add."+timeGranularity+"= function(date,n) seq(date, by = paste (n, '"+timeGranularity+"'), length = 2)[2];\n";
+                re.eval(" add." + timeGranularity + "= function(date,n) seq(date, by = paste (n, '" + timeGranularity + "'), length = 2)[2];");
+                RScript += "add." + timeGranularity + "= function(date,n) seq(date, by = paste (n, '" + timeGranularity + "'), length = 2)[2];\n";
 
                 re.eval(" date_to_start_prediction=as.Date(lastdate) ; ");
                 RScript += "date_to_start_prediction=as.Date(lastdate) ;\n";
 
-                re.eval(" date_to_start_prediction<-add."+timeGranularity+"(date_to_start_prediction, 1);");
-                RScript += "date_to_start_prediction<-add."+timeGranularity+"(date_to_start_prediction, 1);\n";
+                re.eval(" date_to_start_prediction<-add." + timeGranularity + "(date_to_start_prediction, 1);");
+                RScript += "date_to_start_prediction<-add." + timeGranularity + "(date_to_start_prediction, 1);\n";
 
-                re.eval(" Date = seq(date_to_start_prediction, by='"+timeGranularity+"', length="+timePredicion+"); ");
-                RScript += "Date = seq(date_to_start_prediction, by='"+timeGranularity+"', length="+timePredicion+");\n";
+                re.eval(" Date = seq(date_to_start_prediction, by='" + timeGranularity + "', length=" + timePredicion + "); ");
+                RScript += "Date = seq(date_to_start_prediction, by='" + timeGranularity + "', length=" + timePredicion + ");\n";
 
 //        re.eval(" m.ar2 <- arima(datats, order = c(1,1,0)); ");
 //        RScript += "m.ar2 <- arima(datats, order = c(1,1,0));\n";
@@ -214,22 +216,22 @@ public class ArimaAnalyticProcess extends AnalyticProcess {
 
                 long plot1_id = helpfulFunctions.manageNewPlot(analytics, "Forecasting Time Series for analyzed field: " + analyzedFieldValue, "plots/plotid" + analytics.getPlot1_id() + ".png", "plot1_id");
 
-                re.eval("png(file='" + Configuration.analyticsRepo + "plots/plotid" + plot1_id + ".png',width=600); a<-plot(forecast(m.ar2,h="+timePredicion+")); print(a); dev.off();");
-                RScript += "png(file='" + Configuration.analyticsRepo + "plots/plotid" + plot1_id + ".png',width=600);a<-plot(forecast(m.ar2,h="+timePredicion+")); print(a); dev.off();\n";
+                re.eval("png(file='" + Configuration.analyticsRepo + "plots/plotid" + plot1_id + ".png',width=600); a<-plot(forecast(m.ar2,h=" + timePredicion + ")); print(a); dev.off();");
+                RScript += "png(file='" + Configuration.analyticsRepo + "plots/plotid" + plot1_id + ".png',width=600);a<-plot(forecast(m.ar2,h=" + timePredicion + ")); print(a); dev.off();\n";
 
-                re.eval("arimaplottosave<-plot(forecast(m.ar2,h="+timePredicion+"));");
+                re.eval("arimaplottosave<-plot(forecast(m.ar2,h=" + timePredicion + "));");
                 re.eval("png(file='" + Configuration.analyticsRepo + "plots/plotid" + plot1_id + ".png',width=600)");
-                re.eval("arimaplottosave<-plot(forecast(m.ar2,h="+timePredicion+"));");
+                re.eval("arimaplottosave<-plot(forecast(m.ar2,h=" + timePredicion + "));");
                 re.eval("print(arimaplottosave);");
                 re.eval("dev.off();");
 
-                RScript += "arimaplottosave<-plot(forecast(m.ar2,h="+timePredicion+"));\n";
+                RScript += "arimaplottosave<-plot(forecast(m.ar2,h=" + timePredicion + "));\n";
                 RScript += "png(file='" + Configuration.analyticsRepo + "plots/plotid" + plot1_id + ".png',width=600);\n";
                 RScript += "print(arimaplottosave);\n";
                 RScript += "dev.off();\n";
 
-                re.eval("p <- predict(m.ar2, n.ahead = "+timePredicion+");");
-                RScript += "p <- predict(m.ar2, n.ahead = "+timePredicion+");\n";
+                re.eval("p <- predict(m.ar2, n.ahead = " + timePredicion + ");");
+                RScript += "p <- predict(m.ar2, n.ahead = " + timePredicion + ");\n";
 
                 re.eval("rounded_values <-as.numeric(round(p$pred, digits = 3)); ");
                 RScript += "rounded_values <-as.numeric(round(p$pred, digits = 3));\n";
@@ -245,7 +247,13 @@ public class ArimaAnalyticProcess extends AnalyticProcess {
 
                 helpfulFunctions.writeToFile(RScript, "processinfo", analytics);
 
-//        re.eval("write.csv(df_to_export, file = '/home/eleni/Desktop/mydatasets/airline2.csv',row.names=FALSE);");
+                //re.eval("write.csv(df_to_export, file = '/home/eleni/Desktop/mydatasets/airline2.csv',row.names=FALSE);");
+                
+
+                long elapsedTimeToRunAnalyticsMillis = System.currentTimeMillis() - startTimeToRun_analytics;
+                // Get elapsed time in seconds
+                timeToRun_analytics = elapsedTimeToRunAnalyticsMillis / 1000F;
+                analytics.setTimeToRun_analytics(timeToRun_analytics);
                 out.exportData(analytics, re);
             }
         }

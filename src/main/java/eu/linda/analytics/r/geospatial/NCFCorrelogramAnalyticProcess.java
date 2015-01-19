@@ -7,6 +7,7 @@ package eu.linda.analytics.r.geospatial;
 
 import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.controller.AnalyticProcess;
+import eu.linda.analytics.db.ConnectionController;
 import eu.linda.analytics.formats.InputFormat;
 import eu.linda.analytics.formats.OutputFormat;
 import eu.linda.analytics.model.Analytics;
@@ -28,16 +29,20 @@ public class NCFCorrelogramAnalyticProcess extends AnalyticProcess {
 
     HelpfulFunctionsSingleton helpfulFunctions;
     InputFormat input;
+    ConnectionController connectionController;
 
     public NCFCorrelogramAnalyticProcess(InputFormat input) {
         helpfulFunctions = HelpfulFunctionsSingleton.getInstance();
         helpfulFunctions.nicePrintMessage("Create analytic process for Geospatial Algorithm - NCF Correlogram Kriging");
         this.input = input;
+        connectionController = ConnectionController.getInstance();
 
     }
 
     @Override
     public void train(Analytics analytics) {
+        float timeToRun_analytics = 0;
+        long startTimeToRun_analytics = System.currentTimeMillis();
 
         String RScript = "";
         //clean previous eval info if exists
@@ -45,12 +50,12 @@ public class NCFCorrelogramAnalyticProcess extends AnalyticProcess {
         Rengine re;
         if (helpfulFunctions.isRDFInputFormat(analytics.getTrainQuery_id())) {
             //import train dataset
-            re = input.importData4R(Integer.toString(analytics.getTrainQuery_id()), true);
+            re = input.importData4R(Integer.toString(analytics.getTrainQuery_id()), true, analytics);
             RScript += "loaded_data <- read.csv('insertqueryid" + analytics.getTrainQuery_id() + "');\n";
 
         } else {
             //load train dataset
-            re = input.importData4R(Configuration.analyticsRepo + analytics.getDocument(), true);
+            re = input.importData4R(Configuration.analyticsRepo + analytics.getDocument(), true, analytics);
             RScript += "loaded_data <- read.csv('" + Configuration.analyticsRepo + analytics.getDocument() + "');\n";
 
         }
@@ -157,6 +162,12 @@ public class NCFCorrelogramAnalyticProcess extends AnalyticProcess {
 //       re.eval("write.csv(df_to_export, file = '"+Configuration.analyticsRepo+"tmp/tmp4processid"+analytics.getId()+".csv',row.names=FALSE);");
                 re.eval("rm(list=ls());");
 //        out.exportData(analytics, re);
+                long elapsedTimeToRunAnalyticsMillis = System.currentTimeMillis() - startTimeToRun_analytics;
+                // Get elapsed time in seconds
+                timeToRun_analytics = elapsedTimeToRunAnalyticsMillis / 1000F;
+                analytics.setTimeToRun_analytics(analytics.getTimeToRun_analytics() + timeToRun_analytics);
+                
+                connectionController.updateLindaAnalyticsProcessPerformanceTime(analytics);
             }
         }
 

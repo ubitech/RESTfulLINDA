@@ -6,6 +6,7 @@
 
 package eu.linda.analytics.formats;
 
+import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.weka.utils.HelpfulFunctionsSingleton;
 import java.util.AbstractList;
 import java.util.logging.Level;
@@ -30,7 +31,7 @@ public class ArffInputFormat extends InputFormat {
 
 
     @Override
-    public AbstractList importData4weka(String pathToFile, boolean isForRDFOutput) {
+    public AbstractList importData4weka(String pathToFile, boolean isForRDFOutput, Analytics analytics) {
 
     helpfulFuncions.nicePrintMessage("import Arff file "+pathToFile);
     
@@ -67,7 +68,7 @@ public class ArffInputFormat extends InputFormat {
     }
 
     @Override
-    public Rengine importData4R(String pathToFile, boolean isForRDFOutput) {
+    public Rengine importData4R(String pathToFile, boolean isForRDFOutput,Analytics analytics) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

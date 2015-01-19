@@ -85,6 +85,9 @@ public class ForecastingRDFGenerator extends RDFGenerator {
         Property wasGeneratedBy = model.createProperty("http://www.w3.org/ns/prov#wasGeneratedBy");
         Property actedOnBehalfOf = model.createProperty("http://www.w3.org/ns/prov#actedOnBehalfOf");
         Property wasAssociatedWith = model.createProperty("http://www.w3.org/ns/prov#wasAssociatedWith");
+        Property hasTrainDataset = model.createProperty(NS + "hasTrainDataset");
+        Property hasEvaluationDataset = model.createProperty(NS + "hasEvaluationDataset");
+        Property algorithmProperty = model.createProperty(NS + "algorithm");
 
         Resource entity = model.createResource("http://www.w3.org/ns/prov#Entity");
         Resource activity = model.createResource("http://www.w3.org/ns/prov#Activity");
@@ -104,8 +107,23 @@ public class ForecastingRDFGenerator extends RDFGenerator {
         analytic_process_statement.addProperty(wasAssociatedWith, software_statement);
         analytic_process_statement.addProperty(RDFS.label, "linda analytic process");
         analytic_process_statement.addProperty(RDFS.comment, analytics.getDescription());
+        analytic_process_statement.addProperty(algorithmProperty, analytics.getAlgorithm_name());
 
-        Resource linda_user_statement = model.createResource(analytics_NS + "User/"+analytics.getUser_name());
+        if (helpfulFunctions.isRDFInputFormat(analytics.getTrainQuery_id())) {
+
+            Resource analytic_train_dataset_statement = model.createResource(Configuration.lindaworkbenchURI + "sparql/?q_id=" + analytics.getTrainQuery_id());
+            analytic_process_statement.addProperty(hasTrainDataset, analytic_train_dataset_statement);
+
+        }
+
+        if (helpfulFunctions.isRDFInputFormat(analytics.getEvaluationQuery_id())) {
+
+            Resource analytic_evaluation_dataset_statement = model.createResource(Configuration.lindaworkbenchURI + "sparql/?q_id=" + analytics.getEvaluationQuery_id());
+            analytic_process_statement.addProperty(hasEvaluationDataset, analytic_evaluation_dataset_statement);
+
+        }
+
+        Resource linda_user_statement = model.createResource(analytics_NS + "User/" + analytics.getUser_name());
         linda_user_statement.addProperty(RDF.type, linda_user);
         linda_user_statement.addProperty(RDFS.subClassOf, agent);
         linda_user_statement.addProperty(RDFS.label, "linda user");
@@ -174,14 +192,12 @@ public class ForecastingRDFGenerator extends RDFGenerator {
 //        for (double d : predictedValuesAsDoubleArray) {
 //            System.out.println("predictedValues:" + d);
 //        }
-
         REXP uriAsCharacter = re.eval("as.character(loaded_data$uri)");
         String[] urisAsStringArray = uriAsCharacter.asStringArray();
 
 //        for (String string : urisAsStringArray) {
 //            System.out.println("urisAsStringArray" + string);
 //        }
-
         Date date = new Date();
         DateFormat formatter = new SimpleDateFormat("ddMMyyyy");
         String today = formatter.format(date);
@@ -213,7 +229,13 @@ public class ForecastingRDFGenerator extends RDFGenerator {
         Property wasGeneratedBy = model.createProperty("http://www.w3.org/ns/prov#wasGeneratedBy");
         Property actedOnBehalfOf = model.createProperty("http://www.w3.org/ns/prov#actedOnBehalfOf");
         Property wasAssociatedWith = model.createProperty("http://www.w3.org/ns/prov#wasAssociatedWith");
-        
+        Property hasTrainDataset = model.createProperty(ds + "hasTrainDataset");
+        Property hasEvaluationDataset = model.createProperty(ds + "hasEvaluationDataset");
+        Property algorithmProperty = model.createProperty(ds + "algorithm");
+        Property dataSizeOfAnalyzedDataProperty = model.createProperty(ds + "dataSizeOfAnalyzedDatainBytes");
+        Property timeToGetDataProperty = model.createProperty(ds + "timeToGetDataInSecs");
+        Property timeToRunAnalyticsProcessProperty = model.createProperty(ds + "timeToRunAnalyticsProcessInSecs");
+        Property timeToCreateRDFOutPutProperty = model.createProperty(ds + "timeToCreateRDFOutPutInSecs");
 
         Resource entity = model.createResource("http://www.w3.org/ns/prov#Entity");
         Resource activity = model.createResource("http://www.w3.org/ns/prov#Activity");
@@ -233,8 +255,28 @@ public class ForecastingRDFGenerator extends RDFGenerator {
         analytic_process_statement.addProperty(wasAssociatedWith, software_statement);
         analytic_process_statement.addProperty(RDFS.label, "linda analytic process");
         analytic_process_statement.addProperty(RDFS.comment, analytics.getDescription());
+        analytic_process_statement.addProperty(algorithmProperty, analytics.getAlgorithm_name());
+        
+        analytic_process_statement.addProperty(dataSizeOfAnalyzedDataProperty, Float.toString(analytics.getData_size()));
+        analytic_process_statement.addProperty(timeToGetDataProperty, Float.toString(analytics.getTimeToGet_data()));
+        analytic_process_statement.addProperty(timeToRunAnalyticsProcessProperty, Float.toString(analytics.getTimeToRun_analytics()));
+        analytic_process_statement.addProperty(timeToCreateRDFOutPutProperty, Float.toString(analytics.getTimeToCreate_RDF()));
 
-        Resource linda_user_statement = model.createResource(analytics_NS + "User/"+analytics.getUser_name());
+        if (helpfulFunctions.isRDFInputFormat(analytics.getTrainQuery_id())) {
+
+            Resource analytic_train_dataset_statement = model.createResource(Configuration.lindaworkbenchURI + "sparql/?q_id=" + analytics.getTrainQuery_id());
+            analytic_process_statement.addProperty(hasTrainDataset, analytic_train_dataset_statement);
+
+        }
+
+        if (helpfulFunctions.isRDFInputFormat(analytics.getEvaluationQuery_id())) {
+
+            Resource analytic_evaluation_dataset_statement = model.createResource(Configuration.lindaworkbenchURI + "sparql/?q_id=" + analytics.getEvaluationQuery_id());
+            analytic_process_statement.addProperty(hasEvaluationDataset, analytic_evaluation_dataset_statement);
+
+        }
+
+        Resource linda_user_statement = model.createResource(analytics_NS + "User/" + analytics.getUser_name());
         linda_user_statement.addProperty(RDF.type, linda_user);
         linda_user_statement.addProperty(RDFS.subClassOf, agent);
         linda_user_statement.addProperty(RDFS.label, "linda user");

@@ -48,20 +48,20 @@ public class LinearRegressionAnalyticProcess extends AnalyticProcess {
 
            if (helpfulFunctions.isRDFInputFormat(analytics.getTrainQuery_id()))
             {
-                data1 = input.importData4weka(Integer.toString(analytics.getTrainQuery_id()), true);
+                data1 = input.importData4weka(Integer.toString(analytics.getTrainQuery_id()), true, analytics);
                 data = (Instances) data1;
                 HashMap<String, Instances> separatedData = helpfulFunctions.separateDataFromMetadataInfo(data);
                 data = separatedData.get("newData");
 
             } else if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
                 // remove dataset metadata (first two columns)   
-                data1 = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(), true);
+                data1 = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(), true, analytics);
                 data = (Instances) data1;
                 HashMap<String, Instances> separatedData = helpfulFunctions.separateDataFromMetadataInfo(data);
                 data = separatedData.get("newData");
 
             } else {
-                data1 = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(), false);
+                data1 = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(), false, analytics);
                 data = (Instances) data1;
             }
 
@@ -102,20 +102,20 @@ public class LinearRegressionAnalyticProcess extends AnalyticProcess {
 
             if (helpfulFunctions.isRDFInputFormat(analytics.getEvaluationQuery_id()))
             {
-                abstractlistdata = input.importData4weka(Integer.toString(analytics.getEvaluationQuery_id()), true);
+                abstractlistdata = input.importData4weka(Integer.toString(analytics.getEvaluationQuery_id()), true, analytics);
                 data = (Instances) abstractlistdata;
 
                 separatedData = helpfulFunctions.separateDataFromMetadataInfo(data);
                 data = separatedData.get("newData");
 
             } else if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
-                abstractlistdata = input.importData4weka(Configuration.analyticsRepo + analytics.getTestdocument(), true);
+                abstractlistdata = input.importData4weka(Configuration.analyticsRepo + analytics.getTestdocument(), true, analytics);
                 data = (Instances) abstractlistdata;
 
                 separatedData = helpfulFunctions.separateDataFromMetadataInfo(data);
                 data = separatedData.get("newData");
             } else {
-                abstractlistdata = input.importData4weka(Configuration.analyticsRepo + analytics.getTestdocument(), false);
+                abstractlistdata = input.importData4weka(Configuration.analyticsRepo + analytics.getTestdocument(), false, analytics);
                 data = (Instances) abstractlistdata;
 
             }

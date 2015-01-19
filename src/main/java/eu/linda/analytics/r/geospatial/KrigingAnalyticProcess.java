@@ -38,17 +38,19 @@ public class KrigingAnalyticProcess extends AnalyticProcess {
 
     @Override
     public void eval(Analytics analytics, OutputFormat out) {
+        float timeToRun_analytics = 0;
+        long startTimeToRun_analytics = System.currentTimeMillis();
         String RScript = "";
         //clean previous eval info if exists
         helpfulFunctions.cleanPreviousInfo(analytics);
         Rengine re;
         if (helpfulFunctions.isRDFInputFormat(analytics.getTrainQuery_id())) {
             //import train dataset
-            re = input.importData4R(Integer.toString(analytics.getTrainQuery_id()), true);
+            re = input.importData4R(Integer.toString(analytics.getTrainQuery_id()), true, analytics);
             re.eval("loaded_data_train <- loaded_data;");
             RScript += "loaded_data_train <- read.csv('insertqueryid" + analytics.getTrainQuery_id() + "');\n";
 
-            re = input.importData4R(Integer.toString(analytics.getEvaluationQuery_id()), true);
+            re = input.importData4R(Integer.toString(analytics.getEvaluationQuery_id()), true, analytics);
             re.eval("loaded_data_eval <- loaded_data;");
             RScript += "loaded_data_eval <- read.csv('insertqueryid" + analytics.getEvaluationQuery_id() + "')\n";
 
@@ -57,13 +59,13 @@ public class KrigingAnalyticProcess extends AnalyticProcess {
 
         } else {
             //load train dataset
-            re = input.importData4R(Configuration.analyticsRepo + analytics.getDocument(), true);
+            re = input.importData4R(Configuration.analyticsRepo + analytics.getDocument(), true, analytics);
             re.eval("loaded_data_train <- loaded_data;");
             //re.eval("loaded_data_train <- read.csv('/home/eleni/Downloads/ca21.dat');");
             RScript += "loaded_data_train <- read.csv('" + Configuration.analyticsRepo + analytics.getDocument() + "');\n";
 
             //load eval dataset
-            re = input.importData4R(Configuration.analyticsRepo + analytics.getTestdocument(), true);
+            re = input.importData4R(Configuration.analyticsRepo + analytics.getTestdocument(), true, analytics);
             re.eval("loaded_data_eval <- loaded_data;");
             //re.eval("loaded_data_eval <- read.csv('/home/eleni/Downloads/ca21Evalwithuri1.dat')");
             RScript += "loaded_data_eval <- read.csv('" + Configuration.analyticsRepo + analytics.getTestdocument() + "')\n";
@@ -149,11 +151,10 @@ public class KrigingAnalyticProcess extends AnalyticProcess {
         re.eval("m <- fit.variogram(v, vgm(1, 'Sph', 300, 1))");
         RScript += "m <- fit.variogram(v, vgm(1, 'Sph', 300, 1))\n";
 
-        long plot1_id = helpfulFunctions.manageNewPlot(analytics,"Variogram Plot : Visualization of the spatial autocorrelation of the analyzed field: "+analyzedFieldValue, "plots/plotid"+analytics.getPlot1_id()+".png","plot1_id");
-        
-        
+        long plot1_id = helpfulFunctions.manageNewPlot(analytics, "Variogram Plot : Visualization of the spatial autocorrelation of the analyzed field: " + analyzedFieldValue, "plots/plotid" + analytics.getPlot1_id() + ".png", "plot1_id");
+
         re.eval("variogramplot<-plot(v, model = m)");
-        re.eval("png(file='"+Configuration.analyticsRepo+"plots/plotid"+plot1_id+".png',width=600)");
+        re.eval("png(file='" + Configuration.analyticsRepo + "plots/plotid" + plot1_id + ".png',width=600)");
         re.eval("print(variogramplot)");
         re.eval("dev.off()");
 
@@ -168,34 +169,20 @@ public class KrigingAnalyticProcess extends AnalyticProcess {
         re.eval("df_to_export[[column_to_predict]] <- df$sim1");
         RScript += "df_to_export[[column_to_predict]] <- df$sim1 \n";
 
-        long plot2_id = helpfulFunctions.manageNewPlot(analytics,"Spatial data spplot map for analyzed field :"+analyzedFieldValue, "plots/plotid"+analytics.getPlot2_id()+".png","plot2_id");
-        
-        
+        long plot2_id = helpfulFunctions.manageNewPlot(analytics, "Spatial data spplot map for analyzed field :" + analyzedFieldValue, "plots/plotid" + analytics.getPlot2_id() + ".png", "plot2_id");
+
         re.eval("tmp <- spplot(df)");
-        re.eval("png(file='"+Configuration.analyticsRepo+"plots/plotid"+plot2_id+".png',width=600)");
+        re.eval("png(file='" + Configuration.analyticsRepo + "plots/plotid" + plot2_id + ".png',width=600)");
         re.eval("print(tmp)");
         re.eval("dev.off()");
-        
-        
 
-        //test  to see if plot is saved
-//        String title = "R Plot in JFrame";
-//        String xlab = "X Label";
-//        String ylab = "Y Label";
-//        re.eval("a<-c(1,2,3,4,5,6,7,8,9,10)");
-//        re.eval("b<-c(1,3,2,4,5,6,7,8,9,10)");
-//        re.eval("png(file=\"graph5.png\",width=1600,height=1600,res=400)");
-//        re.eval("plot(a,b,type='o',col=\"Blue\",main=\"" + title + "\",xlab=\""+ xlab + "\",ylab=\"" + ylab + "\")");
-//        re.eval("dev.off()");
-//        
-//        re.eval("png('"+Configuration.analyticsRepo+"plots/plotid"+analytics.getPlot1_id()+".png'); spplot(df); dev.off();");
-//        RScript += "png('"+Configuration.analyticsRepo+"plots/plotid"+analytics.getPlot1_id()+".png');\n";      
-//        re.eval("spplot(df);");
-//        RScript += "spplot(df);\n";
+
         helpfulFunctions.writeToFile(RScript, "processinfo", analytics);
 
-//       re.eval("write.csv(df_to_export, file = '"+Configuration.analyticsRepo+"tmp/tmp4processid"+analytics.getId()+".csv',row.names=FALSE);");
-//       re.eval("rm(list=ls());");
+        long elapsedTimeToRunAnalyticsMillis = System.currentTimeMillis() - startTimeToRun_analytics;
+        // Get elapsed time in seconds
+        timeToRun_analytics = elapsedTimeToRunAnalyticsMillis / 1000F;
+        analytics.setTimeToRun_analytics(timeToRun_analytics);
         out.exportData(analytics, re);
     }
 

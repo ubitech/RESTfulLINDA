@@ -73,12 +73,17 @@ public class GeneralRDFGenerator extends RDFGenerator {
         // Define local properties
         Property analyzedField = model.createProperty(NS + "analyzedField");
         Property predictedValue = model.createProperty(NS + "predictedValue");
-//        Property confidence = model.createProperty(NS + "confidence");
-//        Property denotes = model.createProperty("http://semanticscience.org/ontology/sio#denotes");
         Property wasDerivedFrom = model.createProperty("http://www.w3.org/ns/prov#wasDerivedFrom");
         Property wasGeneratedBy = model.createProperty("http://www.w3.org/ns/prov#wasGeneratedBy");
         Property actedOnBehalfOf = model.createProperty("http://www.w3.org/ns/prov#actedOnBehalfOf");
         Property wasAssociatedWith = model.createProperty("http://www.w3.org/ns/prov#wasAssociatedWith");
+        Property hasTrainDataset = model.createProperty(NS + "hasTrainDataset");
+        Property hasEvaluationDataset = model.createProperty(NS + "hasEvaluationDataset");
+        Property algorithmProperty = model.createProperty(NS + "algorithm");
+        Property dataSizeOfAnalyzedDataProperty = model.createProperty(NS + "dataSizeOfAnalyzedDatainBytes");
+        Property timeToGetDataProperty = model.createProperty(NS + "timeToGetDataInSecs");
+        Property timeToRunAnalyticsProcessProperty = model.createProperty(NS + "timeToRunAnalyticsProcessInSecs");
+        Property timeToCreateRDFOutPutProperty = model.createProperty(NS + "timeToCreateRDFOutPutInSecs");
 
         Resource entity = model.createResource("http://www.w3.org/ns/prov#Entity");
         Resource activity = model.createResource("http://www.w3.org/ns/prov#Activity");
@@ -98,6 +103,26 @@ public class GeneralRDFGenerator extends RDFGenerator {
         analytic_process_statement.addProperty(wasAssociatedWith, software_statement);
         analytic_process_statement.addProperty(RDFS.label, "linda analytic process");
         analytic_process_statement.addProperty(RDFS.comment, analytics.getDescription());
+        analytic_process_statement.addProperty(algorithmProperty, analytics.getAlgorithm_name());
+
+        analytic_process_statement.addProperty(dataSizeOfAnalyzedDataProperty, Float.toString(analytics.getData_size()));
+        analytic_process_statement.addProperty(timeToGetDataProperty, Float.toString(analytics.getTimeToGet_data()));
+        analytic_process_statement.addProperty(timeToRunAnalyticsProcessProperty, Float.toString(analytics.getTimeToRun_analytics()));
+        analytic_process_statement.addProperty(timeToCreateRDFOutPutProperty, Float.toString(analytics.getTimeToCreate_RDF()));
+
+        if (helpfulFuncions.isRDFInputFormat(analytics.getTrainQuery_id())) {
+
+            Resource analytic_train_dataset_statement = model.createResource(Configuration.lindaworkbenchURI + "sparql/?q_id=" + analytics.getTrainQuery_id());
+            analytic_process_statement.addProperty(hasTrainDataset, analytic_train_dataset_statement);
+
+        }
+
+        if (helpfulFuncions.isRDFInputFormat(analytics.getEvaluationQuery_id())) {
+
+            Resource analytic_evaluation_dataset_statement = model.createResource(Configuration.lindaworkbenchURI + "sparql/?q_id=" + analytics.getEvaluationQuery_id());
+            analytic_process_statement.addProperty(hasEvaluationDataset, analytic_evaluation_dataset_statement);
+
+        }
 
         Resource linda_user_statement = model.createResource(analytics_NS + "User/" + analytics.getUser_name());
         linda_user_statement.addProperty(RDF.type, linda_user);
@@ -144,7 +169,7 @@ public class GeneralRDFGenerator extends RDFGenerator {
 
         helpfulFuncions.nicePrintMessage("Generate General RDFModel for R algorithms ");
 
-       // re.eval("uri<-data_matrix[,c('uri')]");
+        // re.eval("uri<-data_matrix[,c('uri')]");
 //        REXP basens = re.eval("data_matrix[1,1]");
 //        System.out.println("basens" + basens.asString());
         RVector dataToExportasVector = re.eval("df_to_export").asVector();
@@ -201,6 +226,13 @@ public class GeneralRDFGenerator extends RDFGenerator {
         Property wasGeneratedBy = model.createProperty("http://www.w3.org/ns/prov#wasGeneratedBy");
         Property actedOnBehalfOf = model.createProperty("http://www.w3.org/ns/prov#actedOnBehalfOf");
         Property wasAssociatedWith = model.createProperty("http://www.w3.org/ns/prov#wasAssociatedWith");
+        Property hasTrainDataset = model.createProperty(ds + "hasTrainDataset");
+        Property hasEvaluationDataset = model.createProperty(ds + "hasEvaluationDataset");
+        Property algorithmProperty = model.createProperty(ds + "algorithm");
+        Property dataSizeOfAnalyzedDataProperty = model.createProperty(ds + "dataSizeOfAnalyzedDatainBytes");
+        Property timeToGetDataProperty = model.createProperty(ds + "timeToGetDataInSecs");
+        Property timeToRunAnalyticsProcessProperty = model.createProperty(ds + "timeToRunAnalyticsProcessInSecs");
+        Property timeToCreateRDFOutPutProperty = model.createProperty(ds + "timeToCreateRDFOutPutInSecs");
 
         Resource entity = model.createResource("http://www.w3.org/ns/prov#Entity");
         Resource activity = model.createResource("http://www.w3.org/ns/prov#Activity");
@@ -220,6 +252,26 @@ public class GeneralRDFGenerator extends RDFGenerator {
         analytic_process_statement.addProperty(wasAssociatedWith, software_statement);
         analytic_process_statement.addProperty(RDFS.label, "linda analytic process");
         analytic_process_statement.addProperty(RDFS.comment, analytics.getDescription());
+        analytic_process_statement.addProperty(algorithmProperty, analytics.getAlgorithm_name());
+
+        analytic_process_statement.addProperty(dataSizeOfAnalyzedDataProperty, Float.toString(analytics.getData_size()));
+        analytic_process_statement.addProperty(timeToGetDataProperty, Float.toString(analytics.getTimeToGet_data()));
+        analytic_process_statement.addProperty(timeToRunAnalyticsProcessProperty, Float.toString(analytics.getTimeToRun_analytics()));
+        analytic_process_statement.addProperty(timeToCreateRDFOutPutProperty, Float.toString(analytics.getTimeToCreate_RDF()));
+
+        if (helpfulFuncions.isRDFInputFormat(analytics.getTrainQuery_id())) {
+
+            Resource analytic_train_dataset_statement = model.createResource(Configuration.lindaworkbenchURI + "sparql/?q_id=" + analytics.getTrainQuery_id());
+            analytic_process_statement.addProperty(hasTrainDataset, analytic_train_dataset_statement);
+
+        }
+
+        if (helpfulFuncions.isRDFInputFormat(analytics.getEvaluationQuery_id())) {
+
+            Resource analytic_evaluation_dataset_statement = model.createResource(Configuration.lindaworkbenchURI + "sparql/?q_id=" + analytics.getEvaluationQuery_id());
+            analytic_process_statement.addProperty(hasEvaluationDataset, analytic_evaluation_dataset_statement);
+
+        }
 
         Resource linda_user_statement = model.createResource(analytics_NS + "User/" + analytics.getUser_name());
         linda_user_statement.addProperty(RDF.type, linda_user);

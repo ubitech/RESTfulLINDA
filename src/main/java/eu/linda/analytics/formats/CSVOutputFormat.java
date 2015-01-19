@@ -29,6 +29,8 @@ public class CSVOutputFormat extends OutputFormat {
     @Override
     public void exportData(Analytics analytics, AbstractList dataToExport) {
         if (dataToExport.size() != 0) {
+            float timeToExportData = 0;
+            long startTimeToExportData = System.currentTimeMillis();
 
             helpfulFunctions.nicePrintMessage("Export to CSV");
             String[] splitedSourceFileName = analytics.getDocument().split("\\.");
@@ -45,6 +47,14 @@ public class CSVOutputFormat extends OutputFormat {
             connectionController.updateLindaAnalytics(targetFileNameCSV, "resultdocument", analytics.getId());
             connectionController.updateLindaAnalyticsVersion(analytics.getVersion(), analytics.getId());
 
+            // Get elapsed time in milliseconds
+            long elapsedTimeToExportData = System.currentTimeMillis() - startTimeToExportData;
+            // Get elapsed time in seconds
+            timeToExportData = elapsedTimeToExportData / 1000F;
+            System.out.println("timeToExportData" + timeToExportData);
+            analytics.setTimeToCreate_RDF(timeToExportData);
+            connectionController.updateLindaAnalyticsProcessPerformanceTime(analytics);
+
         } else {
             helpfulFunctions.nicePrintMessage("There are no data to be exported to CSV");
             if (!analytics.getResultdocument().equalsIgnoreCase("")) {
@@ -55,6 +65,8 @@ public class CSVOutputFormat extends OutputFormat {
 
     @Override
     public void exportData(Analytics analytics, Rengine re) {
+        float timeToExportData = 0;
+        long startTimeToExportData = System.currentTimeMillis();
 
         helpfulFunctions.nicePrintMessage("Export to CSV");
         String[] splitedSourceFileName = analytics.getDocument().split("\\.");
@@ -68,6 +80,14 @@ public class CSVOutputFormat extends OutputFormat {
 
         connectionController.updateLindaAnalytics(targetFileName, "resultdocument", analytics.getId());
         connectionController.updateLindaAnalyticsVersion(analytics.getVersion(), analytics.getId());
+
+        // Get elapsed time in milliseconds
+        long elapsedTimeToExportData = System.currentTimeMillis() - startTimeToExportData;
+        // Get elapsed time in seconds
+        timeToExportData = elapsedTimeToExportData / 1000F;
+        System.out.println("timeToExportData" + timeToExportData);
+        analytics.setTimeToCreate_RDF(timeToExportData);
+        connectionController.updateLindaAnalyticsProcessPerformanceTime(analytics);
 
     }
 
