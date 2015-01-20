@@ -12,6 +12,7 @@ import eu.linda.analytics.formats.OutputFormat;
 import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.weka.utils.HelpfulFunctionsSingleton;
 import java.util.Vector;
+import org.rosuda.JRI.RBool;
 import org.rosuda.JRI.RVector;
 import org.rosuda.JRI.Rengine;
 
@@ -43,14 +44,47 @@ public class KrigingAnalyticProcess extends AnalyticProcess {
         String RScript = "";
         //clean previous eval info if exists
         helpfulFunctions.cleanPreviousInfo(analytics);
+        analytics.setTimeToGet_data(0);
+        analytics.setTimeToRun_analytics(0);
+        analytics.setData_size(0);
+        analytics.setTimeToCreate_RDF(0);
         Rengine re;
         if (helpfulFunctions.isRDFInputFormat(analytics.getTrainQuery_id())) {
             //import train dataset
             re = input.importData4R(Integer.toString(analytics.getTrainQuery_id()), true, analytics);
+
+            //////////////
+            RBool is_train_query_responsive = re.eval("is_query_responsive").asBool();
+            System.out.println("is_query_responsive:" + is_train_query_responsive.isTRUE());
+
+            if (is_train_query_responsive.isFALSE()) {
+                helpfulFunctions.updateProcessMessageToAnalyticsTable("There is a connectivity issue. Could not reach data for predefined query.\n"
+                        + " Please check your connectivity and the responsiveness of the selected sparql endpoint.\n "
+                        + "Then click on re-Evaluate button to try to run again the analytic process.", analytics.getId());
+                re.eval("rm(list=ls());");
+                return;
+            }
+            /////////
+
             re.eval("loaded_data_train <- loaded_data;");
             RScript += "loaded_data_train <- read.csv('insertqueryid" + analytics.getTrainQuery_id() + "');\n";
 
             re = input.importData4R(Integer.toString(analytics.getEvaluationQuery_id()), true, analytics);
+            
+            
+            //////////////
+            RBool is_evaluateion_query_responsive = re.eval("is_query_responsive").asBool();
+            System.out.println("is_query_responsive:" + is_evaluateion_query_responsive.isTRUE());
+
+            if (is_evaluateion_query_responsive.isFALSE()) {
+                helpfulFunctions.updateProcessMessageToAnalyticsTable("There is a connectivity issue. Could not reach data for predefined query.\n"
+                        + " Please check your connectivity and the responsiveness of the selected sparql endpoint.\n "
+                        + "Then click on re-Evaluate button to try to run again the analytic process.", analytics.getId());
+                re.eval("rm(list=ls());");
+                return;
+            }
+            /////////
+            
             re.eval("loaded_data_eval <- loaded_data;");
             RScript += "loaded_data_eval <- read.csv('insertqueryid" + analytics.getEvaluationQuery_id() + "')\n";
 
@@ -175,7 +209,6 @@ public class KrigingAnalyticProcess extends AnalyticProcess {
         re.eval("png(file='" + Configuration.analyticsRepo + "plots/plotid" + plot2_id + ".png',width=600)");
         re.eval("print(tmp)");
         re.eval("dev.off()");
-
 
         helpfulFunctions.writeToFile(RScript, "processinfo", analytics);
 

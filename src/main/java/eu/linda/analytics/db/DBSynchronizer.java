@@ -254,7 +254,7 @@ public class DBSynchronizer {
         PreparedStatement preparedStatement = null;
         try {
 
-            String query = "update analytics_analytics set processinfo=? , resultdocument=? , processMessage=?, plot1_id=null , plot2_id=null where id=?";
+            String query = "update analytics_analytics set processinfo=? , resultdocument=? , processMessage=?, plot1_id=null , plot2_id=null, timeToGet_data=0 , data_size=0 , timeToRun_analytics=0 , timeToCreate_RDF=0 where id=?";
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, "");
             preparedStatement.setString(2, "");
@@ -291,8 +291,7 @@ public class DBSynchronizer {
         }
 
     }//EoM updateLindaAnalyticsPerformanceTime 
-    
-    
+
     /*
      * Updates updateLindaAnalyticsPerformanceTime
      */
@@ -384,6 +383,26 @@ public class DBSynchronizer {
         }
 
     }//EoM updateLindaAnalyticsPlot 
+
+    /*
+     * Updates updateLindaAnalyticsPlotToNull
+     */
+    public void updateLindaAnalyticsPlotToNull(int analytics_id, String plot) {
+        PreparedStatement preparedStatement = null;
+        try {
+
+            String query = "update analytics_analytics set " + plot + "=null  where id=?";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, analytics_id);
+            preparedStatement.executeUpdate();
+            preparedStatement.close();
+
+        } catch (SQLException ex) {
+            Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("ERROR SEVERE" + ex);
+        }
+
+    }//EoM updateLindaAnalyticsPlotToNull 
 
     /*
      * delete old plot Plot

@@ -9,6 +9,7 @@ package eu.linda.analytics.formats;
  *
  * @author eleni
  */
+import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
@@ -25,7 +26,9 @@ import eu.linda.analytics.weka.utils.HelpfulFunctionsSingleton;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.AbstractList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Vector;
 import org.rosuda.JRI.REXP;
 import org.rosuda.JRI.RVector;
@@ -236,6 +239,8 @@ public class ForecastingRDFGenerator extends RDFGenerator {
         Property timeToGetDataProperty = model.createProperty(ds + "timeToGetDataInSecs");
         Property timeToRunAnalyticsProcessProperty = model.createProperty(ds + "timeToRunAnalyticsProcessInSecs");
         Property timeToCreateRDFOutPutProperty = model.createProperty(ds + "timeToCreateRDFOutPutInSecs");
+         Property performanceProperty = model.createProperty(ds + "performance");
+        Property atTime = model.createProperty("http://www.w3.org/ns/prov#atTime");
 
         Resource entity = model.createResource("http://www.w3.org/ns/prov#Entity");
         Resource activity = model.createResource("http://www.w3.org/ns/prov#Activity");
@@ -245,6 +250,9 @@ public class ForecastingRDFGenerator extends RDFGenerator {
         Resource software_statement = model.createResource(analytics_NS + "Software/LinDa_analytics_software");
         Resource software = model.createResource(analytics_NS + "Software");
         Resource linda_user = model.createResource(analytics_NS + "User");
+        Resource performance = model.createResource(analytics_NS + "performance");
+        Resource performance_statement = model.createResource(analytics_NS + "performance/" + analytics.getId() + "/" + analytics.getVersion());
+
 
         Resource analytic_process = model.createResource(analytics_NS + "analytic_process");
         Resource analytic_process_statement = model.createResource(analytics_NS + "analytic_process/" + analytics.getId() + "/" + analytics.getVersion());
@@ -257,10 +265,16 @@ public class ForecastingRDFGenerator extends RDFGenerator {
         analytic_process_statement.addProperty(RDFS.comment, analytics.getDescription());
         analytic_process_statement.addProperty(algorithmProperty, analytics.getAlgorithm_name());
         
-        analytic_process_statement.addProperty(dataSizeOfAnalyzedDataProperty, Float.toString(analytics.getData_size()));
-        analytic_process_statement.addProperty(timeToGetDataProperty, Float.toString(analytics.getTimeToGet_data()));
-        analytic_process_statement.addProperty(timeToRunAnalyticsProcessProperty, Float.toString(analytics.getTimeToRun_analytics()));
-        analytic_process_statement.addProperty(timeToCreateRDFOutPutProperty, Float.toString(analytics.getTimeToCreate_RDF()));
+        Calendar cal = GregorianCalendar.getInstance();
+        Literal value = model.createTypedLiteral(cal);
+        analytic_process_statement.addProperty(atTime, value);
+
+        performance_statement.addProperty(RDF.type, performance);
+        performance_statement.addProperty(dataSizeOfAnalyzedDataProperty, Float.toString(analytics.getData_size()));
+        performance_statement.addProperty(timeToGetDataProperty, Float.toString(analytics.getTimeToGet_data()));
+        performance_statement.addProperty(timeToRunAnalyticsProcessProperty, Float.toString(analytics.getTimeToRun_analytics()));
+        performance_statement.addProperty(timeToCreateRDFOutPutProperty, Float.toString(analytics.getTimeToCreate_RDF()));
+        analytic_process_statement.addProperty(performanceProperty, performance_statement);
 
         if (helpfulFunctions.isRDFInputFormat(analytics.getTrainQuery_id())) {
 

@@ -46,6 +46,15 @@ public class ArimaAnalyticProcess extends AnalyticProcess {
         String timeGranularity = "months";
         String frequency = "12";
         String timePredicion = "1";
+        
+        
+        
+        //clean previous eval info if exists
+        helpfulFunctions.cleanPreviousInfo(analytics);
+        analytics.setTimeToGet_data(0);
+        analytics.setTimeToRun_analytics(0);
+        analytics.setData_size(0);
+        analytics.setTimeToCreate_RDF(0); 
 
         //get parameters
         String parameters = analytics.getParameters();
@@ -81,8 +90,7 @@ public class ArimaAnalyticProcess extends AnalyticProcess {
             }
         }
 
-        //clean previous eval info if exists
-        helpfulFunctions.cleanPreviousInfo(analytics);
+
         Rengine re;
         if (helpfulFunctions.isRDFInputFormat(analytics.getTrainQuery_id())) {
             re = input.importData4R(Integer.toString(analytics.getTrainQuery_id()), true, analytics);

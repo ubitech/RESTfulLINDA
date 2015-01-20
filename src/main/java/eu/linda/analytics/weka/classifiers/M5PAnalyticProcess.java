@@ -49,8 +49,17 @@ public class M5PAnalyticProcess extends AnalyticProcess {
 //trainModelM5P
     @Override
     public void train(Analytics analytics) {
-         float timeToRun_analytics = 0;
+
+        float timeToRun_analytics = 0;
         long startTimeToRun_analytics = System.currentTimeMillis();
+
+        //clean previous eval info if exists
+        helpfulFunctions.cleanPreviousInfo(analytics);
+        analytics.setTimeToGet_data(0);
+        analytics.setTimeToRun_analytics(0);
+        analytics.setData_size(0);
+        analytics.setTimeToCreate_RDF(0);
+
         helpfulFunctions.nicePrintMessage("Train  M5P");
         Vector M5Pmodel;
         try {
@@ -97,10 +106,10 @@ public class M5PAnalyticProcess extends AnalyticProcess {
         } catch (Exception ex) {
             Logger.getLogger(M5PAnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);
         }
-         long elapsedTimeToRunAnalyticsMillis = System.currentTimeMillis() - startTimeToRun_analytics;
-            // Get elapsed time in seconds
-            timeToRun_analytics = elapsedTimeToRunAnalyticsMillis / 1000F;
-            analytics.setTimeToRun_analytics(timeToRun_analytics);
+        long elapsedTimeToRunAnalyticsMillis = System.currentTimeMillis() - startTimeToRun_analytics;
+        // Get elapsed time in seconds
+        timeToRun_analytics = elapsedTimeToRunAnalyticsMillis / 1000F;
+        analytics.setTimeToRun_analytics(timeToRun_analytics);
     }
 
 //predictM5P
@@ -109,9 +118,6 @@ public class M5PAnalyticProcess extends AnalyticProcess {
         float timeToRun_analytics = 0;
         long startTimeToRun_analytics = System.currentTimeMillis();
         helpfulFunctions.nicePrintMessage("Eval M5P");
-
-        //clean previous eval info if exists
-        helpfulFunctions.cleanPreviousInfo(analytics);
 
         HashMap<String, Instances> separatedData = null;
         AbstractList dataToReturn = null;
@@ -222,12 +228,12 @@ public class M5PAnalyticProcess extends AnalyticProcess {
             Logger.getLogger(M5PAnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-         long elapsedTimeToRunAnalyticsMillis = System.currentTimeMillis() - startTimeToRun_analytics;
+        long elapsedTimeToRunAnalyticsMillis = System.currentTimeMillis() - startTimeToRun_analytics;
         // Get elapsed time in seconds
         timeToRun_analytics = elapsedTimeToRunAnalyticsMillis / 1000F;
-        analytics.setTimeToRun_analytics(analytics.getTimeToRun_analytics()+timeToRun_analytics);
+        analytics.setTimeToRun_analytics(analytics.getTimeToRun_analytics() + timeToRun_analytics);
         out.exportData(analytics, dataToReturn);
-        
+
         out.exportData(analytics, dataToReturn);
 
     }

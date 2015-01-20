@@ -49,6 +49,9 @@ public class MoransAnalyticProcess extends AnalyticProcess {
         String RScript = "";
         //clean previous eval info if exists
         helpfulFunctions.cleanPreviousInfo(analytics);
+        analytics.setTimeToGet_data(0);
+        analytics.setTimeToRun_analytics(0);
+        analytics.setData_size(0);
         Rengine re;
         if (helpfulFunctions.isRDFInputFormat(analytics.getTrainQuery_id())) {
             re = input.importData4R(Integer.toString(analytics.getTrainQuery_id()), true, analytics);

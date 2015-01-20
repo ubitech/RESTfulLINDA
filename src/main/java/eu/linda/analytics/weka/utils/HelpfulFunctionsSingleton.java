@@ -1,5 +1,7 @@
 package eu.linda.analytics.weka.utils;
 
+import com.sun.jna.Library;
+import com.sun.jna.Native;
 import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.db.ConnectionController;
 import eu.linda.analytics.model.Analytics;
@@ -9,6 +11,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import static java.sql.Types.NULL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
@@ -33,6 +36,12 @@ public class HelpfulFunctionsSingleton {
     ConnectionController connectionController;
 
     private static HelpfulFunctionsSingleton instance = null;
+    private static CLibrary libc = (CLibrary) Native.loadLibrary("c", CLibrary.class);
+
+    interface CLibrary extends Library {
+
+        public int chmod(String path, int mode);
+    }
 
     protected HelpfulFunctionsSingleton() {
         connectionController = ConnectionController.getInstance();
@@ -128,9 +137,9 @@ public class HelpfulFunctionsSingleton {
     }
 
     public void deleteFile(String fileToDelete) {
-        File file = new File(Configuration.docroot + fileToDelete);
+        File file = new File(fileToDelete);
 
-        if (!file.exists()) {
+        if (file.exists()) {
             file.delete();
         }
     }
@@ -301,8 +310,11 @@ public class HelpfulFunctionsSingleton {
     public long manageNewPlot(Analytics analytics, String description, String filepath, String plot) {
 
         //add plot to db
-        long plot_id = connectionController.manageNewPlot(analytics, description, filepath, plot);
+        long plot_id = connectionController.addPlot(description, filepath);
         connectionController.updatePlot((int) plot_id, "plots/plotid" + plot_id + ".png");
+
+        //add plot to analytics        
+        connectionController.updateLindaAnalyticsPlot(analytics, plot_id, plot);
 
         String oldPlotFileName;
         int oldPlotID;
@@ -313,11 +325,20 @@ public class HelpfulFunctionsSingleton {
             oldPlotFileName = Configuration.analyticsRepo + "plots/plotid" + analytics.getPlot2_id() + ".png";
             oldPlotID = analytics.getPlot2_id();
         }
-
-        //TODO the plots are not deleted - permision issue
         deleteFile(oldPlotFileName);
         connectionController.deletePlot(oldPlotID);
-
+        
+              
+//        System.out.println("change perms of "+oldPlotFileName);
+//        libc.chmod(oldPlotFileName, 0777);
+//       if (!image.getAbsoluteFile().exists()) {
+//            System.out.println("aaaaaaaaaaaaaaaaaaaaa"+Configuration.analyticsRepo +"plots/plotid" + plot_id + ".png");
+//                connectionController.updateProcessMessageToAnalyticsTable("No Plot was generated For this Dataset.", analytics.getId());
+//                
+//                connectionController.updateLindaAnalyticsPlotToNull(analytics, plot);
+//                connectionController.deletePlot((int)plot_id);
+//                return -1;
+//            }
         return plot_id;
     }
 

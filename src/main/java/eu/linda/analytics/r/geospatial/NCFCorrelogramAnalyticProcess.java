@@ -47,6 +47,9 @@ public class NCFCorrelogramAnalyticProcess extends AnalyticProcess {
         String RScript = "";
         //clean previous eval info if exists
         helpfulFunctions.cleanPreviousInfo(analytics);
+        analytics.setTimeToGet_data(0);
+        analytics.setTimeToRun_analytics(0);
+        analytics.setData_size(0);
         Rengine re;
         if (helpfulFunctions.isRDFInputFormat(analytics.getTrainQuery_id())) {
             //import train dataset
@@ -165,7 +168,7 @@ public class NCFCorrelogramAnalyticProcess extends AnalyticProcess {
                 long elapsedTimeToRunAnalyticsMillis = System.currentTimeMillis() - startTimeToRun_analytics;
                 // Get elapsed time in seconds
                 timeToRun_analytics = elapsedTimeToRunAnalyticsMillis / 1000F;
-                analytics.setTimeToRun_analytics(analytics.getTimeToRun_analytics() + timeToRun_analytics);
+                analytics.setTimeToRun_analytics(timeToRun_analytics);
                 
                 connectionController.updateLindaAnalyticsProcessPerformanceTime(analytics);
             }

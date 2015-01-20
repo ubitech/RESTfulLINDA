@@ -98,16 +98,14 @@ public final class ConnectionController {
     public void updateLindaAnalyticsVersion(int version, int analytics_id) {
         dbsynchronizer.updateLindaAnalyticsVersion(version, analytics_id);
     }//EoM updateLindaAnalyticsVersion 
-    
-    public void    updateLindaAnalyticsProcessPerformanceTime(Analytics analytics) {
+
+    public void updateLindaAnalyticsProcessPerformanceTime(Analytics analytics) {
         dbsynchronizer.updateLindaAnalyticsProcessPerformanceTime(analytics);
     }//EoM updateLindaAnalyticsProcessPerformanceTime 
-    
-    
-     public void    updateLindaAnalyticsInputDataPerformanceTime(Analytics analytics) {
+
+    public void updateLindaAnalyticsInputDataPerformanceTime(Analytics analytics) {
         dbsynchronizer.updateLindaAnalyticsInputDataPerformanceTime(analytics);
     }//EoM updateLindaAnalyticsInputDataPerformanceTime 
- 
 
     public void readProperties() {
         try {
@@ -142,13 +140,21 @@ public final class ConnectionController {
         }
     }//EoM readproperties  
 
-    public long manageNewPlot(Analytics analytics, String description, String filepath, String plot) {
-
+    public long addPlot(String description, String filepath) {
         long plot_id = dbsynchronizer.addPlot(description, filepath);
-        dbsynchronizer.updateLindaAnalyticsPlot(analytics.getId(), plot_id, plot);
-
         return plot_id;
     }//EoM addPlot 
+
+    public void updateLindaAnalyticsPlot(Analytics analytics, long plot_id, String plot) {
+        dbsynchronizer.updateLindaAnalyticsPlot(analytics.getId(), plot_id, plot);
+      
+    }//EoM updateLindaAnalyticsPlot 
+    
+        public void updateLindaAnalyticsPlotToNull(Analytics analytics,  String plot) {
+        dbsynchronizer.updateLindaAnalyticsPlotToNull(analytics.getId(),  plot);
+      
+    }//EoM updateLindaAnalyticsPlotToNull 
+    
 
     public void updatePlot(int plot_id, String image) {
 

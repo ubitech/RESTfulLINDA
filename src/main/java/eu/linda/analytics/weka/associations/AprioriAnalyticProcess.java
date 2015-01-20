@@ -29,11 +29,12 @@ public class AprioriAnalyticProcess extends AnalyticProcess {
 
     HelpfulFunctionsSingleton helpfulFunctions;
     InputFormat input;
+    ConnectionController connectionController;
 
     public AprioriAnalyticProcess(InputFormat input) {
         helpfulFunctions = HelpfulFunctionsSingleton.getInstance();
         helpfulFunctions.nicePrintMessage("Create analytic process for Apriori");
-        //aprioriOutput = new AprioriOutput(in);
+        connectionController = ConnectionController.getInstance();
         this.input = input;
 
     }
@@ -48,17 +49,22 @@ public class AprioriAnalyticProcess extends AnalyticProcess {
     public void eval(Analytics analytics, OutputFormat out) {
 
         try {
+            float timeToRun_analytics = 0;
+            long startTimeToRun_analytics = System.currentTimeMillis();
             helpfulFunctions.nicePrintMessage("Eval Apriori");
 
             //clean previous eval info if exists
             helpfulFunctions.cleanPreviousInfo(analytics);
+            analytics.setTimeToGet_data(0);
+            analytics.setTimeToRun_analytics(0);
+            analytics.setData_size(0);
+            analytics.setTimeToCreate_RDF(0);
 
             AbstractList<Instance> abstractListdata;
             Instances data;
 
             // remove dataset metadata (first two columns) 
-             if (helpfulFunctions.isRDFInputFormat(analytics.getEvaluationQuery_id()))
-            {
+            if (helpfulFunctions.isRDFInputFormat(analytics.getEvaluationQuery_id())) {
                 abstractListdata = input.importData4weka(Integer.toString(analytics.getEvaluationQuery_id()), true, analytics);
                 data = (Instances) abstractListdata;
                 HashMap<String, Instances> separatedData = helpfulFunctions.separateDataFromMetadataInfo(data);
@@ -96,10 +102,16 @@ public class AprioriAnalyticProcess extends AnalyticProcess {
 
             helpfulFunctions.writeToFile(apriori.toString(), "processinfo", analytics);
 
+            long elapsedTimeToRunAnalyticsMillis = System.currentTimeMillis() - startTimeToRun_analytics;
+            // Get elapsed time in seconds
+            timeToRun_analytics = elapsedTimeToRunAnalyticsMillis / 1000F;
+            analytics.setTimeToRun_analytics(timeToRun_analytics);
+            connectionController.updateLindaAnalyticsProcessPerformanceTime(analytics);
+
         } catch (Exception ex) {
             Logger.getLogger(AprioriAnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);
             ConnectionController.getInstance().updateProcessMessageToAnalyticsTable(ex.toString(), analytics.getId());
-//            helpfulFunctions.updateProcessMessageToAnalyticsTable(ex.toString(), analytics.getId());
+            // helpfulFunctions.updateProcessMessageToAnalyticsTable(ex.toString(), analytics.getId());
         }
 
     }

@@ -45,6 +45,14 @@ public class J48AnalyticProcess extends AnalyticProcess {
 
     @Override
     public void train(Analytics analytics) {
+        
+        //clean previous eval info if exists
+        helpfulFunctions.cleanPreviousInfo(analytics);
+        analytics.setTimeToGet_data(0);
+        analytics.setTimeToRun_analytics(0);
+        analytics.setData_size(0);
+        analytics.setTimeToCreate_RDF(0);
+        
         float timeToRun_analytics = 0;
         long startTimeToRun_analytics = System.currentTimeMillis();
 
@@ -115,8 +123,6 @@ public class J48AnalyticProcess extends AnalyticProcess {
 
         helpfulFunctions.nicePrintMessage("Eval J48");
 
-        //clean previous eval info if exists
-        helpfulFunctions.cleanPreviousInfo(analytics);
 
         try {
         //jsonresult = j48Output.getJ48TreeResultDataset(analytics);
