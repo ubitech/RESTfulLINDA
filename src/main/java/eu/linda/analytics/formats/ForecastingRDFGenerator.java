@@ -82,8 +82,6 @@ public class ForecastingRDFGenerator extends RDFGenerator {
         // Define local properties
         Property analyzedField = model.createProperty(NS + "#analyzedField");
         Property predictedValue = model.createProperty(NS + "#predictedValue");
-        Property confidence = model.createProperty(NS + "confidence");
-        Property denotes = model.createProperty("http://semanticscience.org/ontology/sio#denotes");
         Property wasDerivedFrom = model.createProperty("http://www.w3.org/ns/prov#wasDerivedFrom");
         Property wasGeneratedBy = model.createProperty("http://www.w3.org/ns/prov#wasGeneratedBy");
         Property actedOnBehalfOf = model.createProperty("http://www.w3.org/ns/prov#actedOnBehalfOf");

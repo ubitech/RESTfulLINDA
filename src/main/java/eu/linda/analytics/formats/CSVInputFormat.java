@@ -97,6 +97,7 @@ public class CSVInputFormat extends InputFormat {
             System.out.println("Cannot load R");
             System.out.println("is alive Rengine??" + re.isAlive());
         }
+        re.eval("is_query_responsive <-TRUE  ");
         re.eval(" loaded_data <- read.csv(file='" + pathToFile + "', header=TRUE, sep=',', na.strings='---');");
 
         FileInputStream fis = null;

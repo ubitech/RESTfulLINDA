@@ -73,6 +73,9 @@ public class KMeansAnalyticProcess extends AnalyticProcess {
         } else {
             //TODO Check that all values are numeric
 
+            re.eval("uri<-loaded_data$uri;");
+            RScript += "uri<-loaded_data$uri; \n";
+
             re.eval("myvars <- names(loaded_data) %in% c('rowID','uri');");
             RScript += "# Prepare Data \n myvars <- names(loaded_data) %in% c('rowID','uri'); \n";
 
@@ -112,14 +115,25 @@ public class KMeansAnalyticProcess extends AnalyticProcess {
             RScript += "print(clusplot(loaded_data, fit$cluster, color=TRUE, shade=TRUE, labels=2, lines=0));\n";
             RScript += "dev.off();\n";
 
+            re.eval("column_number<-ncol(loaded_data);");
+            RScript += "column_number<-ncol(loaded_data); \n";
+
+            re.eval("column_to_predict <-colnames(loaded_data[column_number]);");
+            RScript += "column_to_predict <-colnames(loaded_data[column_number]); \n";
+
+            re.eval("df_to_export <- data.frame(uri,loaded_data[column_to_predict]);");
+            RScript += "df_to_export <- data.frame(uri,loaded_data[column_to_predict]);\n";
+
             helpfulFunctions.writeToFile(RScript, "processinfo", analytics);
 
-            re.eval("rm(list=ls());");
+           
             long elapsedTimeToRunAnalyticsMillis = System.currentTimeMillis() - startTimeToRun_analytics;
             // Get elapsed time in seconds
             timeToRun_analytics = elapsedTimeToRunAnalyticsMillis / 1000F;
             analytics.setTimeToRun_analytics(analytics.getTimeToRun_analytics() + timeToRun_analytics);
             connectionController.updateLindaAnalyticsProcessPerformanceTime(analytics);
+            out.exportData(analytics, re);
+            
 
         }
 

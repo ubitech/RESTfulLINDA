@@ -14,6 +14,10 @@ import eu.linda.analytics.formats.OutputFormat;
 import eu.linda.analytics.formats.RDFInputFormat;
 import eu.linda.analytics.formats.RDFOutputFormat;
 import eu.linda.analytics.formats.TXTOutputFormat;
+import eu.linda.analytics.r.clustering.ClustersNumberAnalyticProcess;
+import eu.linda.analytics.r.clustering.KMeansAnalyticProcess;
+import eu.linda.analytics.r.clustering.ModelBasedClusteringAnalyticProcess;
+import eu.linda.analytics.r.clustering.WardHierarchicalAgglomerativeAnalyticProcess;
 import eu.linda.analytics.r.forecasting.ArimaAnalyticProcess;
 import eu.linda.analytics.r.geospatial.KrigingAnalyticProcess;
 import eu.linda.analytics.r.geospatial.MoransAnalyticProcess;
@@ -61,7 +65,20 @@ public class AnalyticsFactory {
             analyticProcess = new KrigingAnalyticProcess(inputFormat);
         } else if (algorithm.equalsIgnoreCase("NCF correlogram")) {
             analyticProcess = new NCFCorrelogramAnalyticProcess(inputFormat);
+        } else if (algorithm.equalsIgnoreCase("ClustersNumber")) {
+            analyticProcess = new ClustersNumberAnalyticProcess(inputFormat);
+        }else if (algorithm.equalsIgnoreCase("KMeans")) {
+            analyticProcess = new KMeansAnalyticProcess(inputFormat);
+        }else if (algorithm.equalsIgnoreCase("Ward Hierarchical Agglomerative")) {
+            analyticProcess = new WardHierarchicalAgglomerativeAnalyticProcess(inputFormat);
+        }else if (algorithm.equalsIgnoreCase("Model Based Clustering")) {
+            analyticProcess = new ModelBasedClusteringAnalyticProcess(inputFormat);
         }
+        
+        
+        
+        
+        
         
        
 
