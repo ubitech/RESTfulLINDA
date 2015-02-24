@@ -13,11 +13,17 @@ import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.weka.utils.HelpfulFunctionsSingleton;
 import java.util.AbstractList;
 import java.util.HashMap;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import weka.classifiers.Classifier;
+import weka.classifiers.Evaluation;
+import weka.classifiers.evaluation.output.prediction.PlainText;
 import weka.classifiers.functions.LinearRegression;
+import weka.core.Debug;
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.core.SerializationHelper;
 
 /**
  *
@@ -98,7 +104,7 @@ public class LinearRegressionAnalyticProcess extends AnalyticProcess {
         } catch (Exception ex) {
             Logger.getLogger(LinearRegressionAnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);
         }
-         long elapsedTimeToRunAnalyticsMillis = System.currentTimeMillis() - startTimeToRun_analytics;
+        long elapsedTimeToRunAnalyticsMillis = System.currentTimeMillis() - startTimeToRun_analytics;
         // Get elapsed time in seconds
         timeToRun_analytics = elapsedTimeToRunAnalyticsMillis / 1000F;
         analytics.setTimeToRun_analytics(timeToRun_analytics);
@@ -108,7 +114,7 @@ public class LinearRegressionAnalyticProcess extends AnalyticProcess {
     //Get LinearRegression Results
     @Override
     public void eval(Analytics analytics, OutputFormat out) {
-         float timeToRun_analytics = 0;
+        float timeToRun_analytics = 0;
         long startTimeToRun_analytics = System.currentTimeMillis();
 
         helpfulFunctions.nicePrintMessage("Eval Linear Regresion");
@@ -175,15 +181,24 @@ public class LinearRegressionAnalyticProcess extends AnalyticProcess {
                 dataToReturn = labeled;
             }
 
+            Evaluation eval = new Evaluation(labeled);
+            StringBuffer forPredictionsPrinting = new StringBuffer();
+            PlainText output = new PlainText();
+            output.setBuffer(forPredictionsPrinting);
+            weka.core.Range attsToOutput = null;
+            Boolean outputDistribution = new Boolean(true);
+            eval.crossValidateModel(model, data, 10, new Debug.Random(1), output, attsToOutput, outputDistribution);
+
+             helpfulFunctions.writeToFile(eval.toSummaryString(), "processinfo", analytics);
+             
         } catch (Exception ex) {
             Logger.getLogger(LinearRegressionAnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-         long elapsedTimeToRunAnalyticsMillis = System.currentTimeMillis() - startTimeToRun_analytics;
+
+        long elapsedTimeToRunAnalyticsMillis = System.currentTimeMillis() - startTimeToRun_analytics;
         // Get elapsed time in seconds
         timeToRun_analytics = elapsedTimeToRunAnalyticsMillis / 1000F;
         analytics.setTimeToRun_analytics(analytics.getTimeToRun_analytics() + timeToRun_analytics);
-
 
         out.exportData(analytics, dataToReturn);
 

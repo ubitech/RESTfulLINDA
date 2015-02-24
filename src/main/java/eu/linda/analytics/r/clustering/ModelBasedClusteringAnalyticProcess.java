@@ -73,8 +73,11 @@ public class ModelBasedClusteringAnalyticProcess extends AnalyticProcess {
         } else {
             //TODO Check that all values are numeric
 
-            re.eval("myvars <- names(loaded_data) %in% c('rowID','uri');");
-            RScript += "# Prepare Data \n myvars <- names(loaded_data) %in% c('rowID','uri'); \n";
+            re.eval("column_with_uri <-colnames(loaded_data[2]);");
+            RScript += "# Prepare Data \n column_with_uri <-colnames(loaded_data[2]); \n";
+
+            re.eval("myvars <- names(loaded_data) %in% c('rowID',column_with_uri);");
+            RScript += "# Prepare Data \n myvars <- names(loaded_data) %in% c('rowID',column_with_uri); \n";
 
             re.eval("loaded_data <- loaded_data[!myvars]");
             RScript += "loaded_data <- loaded_data[!myvars]\n";
@@ -97,7 +100,6 @@ public class ModelBasedClusteringAnalyticProcess extends AnalyticProcess {
             re.eval("png(file='" + Configuration.analyticsRepo + "plots/plotid" + plot1_id + ".png',width=600);");
             re.eval("print(plot(fit ,what='classification'));");
             re.eval("dev.off();");
-
 
             RScript += "# display dendogram  \n ";
             RScript += "png(file='" + Configuration.analyticsRepo + "plots/plotid" + plot1_id + ".png',width=600);\n";

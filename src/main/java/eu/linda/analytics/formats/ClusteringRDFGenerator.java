@@ -32,7 +32,6 @@ import java.util.Vector;
 import org.rosuda.JRI.REXP;
 import org.rosuda.JRI.RVector;
 import org.rosuda.JRI.Rengine;
-import weka.core.Instances;
 
 /**
  *
@@ -60,7 +59,22 @@ public class ClusteringRDFGenerator extends RDFGenerator {
         helpfulFuncions.nicePrintMessage("Generate Clustering RDFModel for R algorithms ");
 
         int clustersNum = 5;
-        int current_version =(analytics.getVersion() + 1);
+
+        //get parameters
+        String parameters = analytics.getParameters();
+
+        String[] splitedparameters = parameters.split("->");
+        for (String parameter : splitedparameters) {
+            System.out.println("parameter" + parameter);
+
+            if (parameter.contains("k")) {
+                String[] clustersNumP = parameter.split("k");
+                clustersNum = Integer.parseInt(clustersNumP[1].trim());
+                System.out.println("clustersNum" + clustersNum);
+            }
+        }
+
+        int current_version = (analytics.getVersion() + 1);
 
         String analyzedFieldValue = "clusters-" + analytics.getId() + "-" + current_version;
 

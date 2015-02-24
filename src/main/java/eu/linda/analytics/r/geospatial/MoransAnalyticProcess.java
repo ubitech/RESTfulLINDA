@@ -98,8 +98,11 @@ public class MoransAnalyticProcess extends AnalyticProcess {
                 re.eval("loaded_data <- na.omit(loaded_data);");
                 RScript += "loaded_data <- na.omit(loaded_data);\n";
 
-                re.eval("myvars <- names(loaded_data) %in% c('rowID','basens','uri');");
-                RScript += "myvars <- names(loaded_data) %in% c('rowID','basens','uri');\n";
+                re.eval("column_with_uri <-colnames(loaded_data[2]);");
+                RScript += "column_with_uri <-colnames(loaded_data[2]); \n";
+
+                re.eval("myvars <- names(loaded_data) %in% c('rowID','basens',column_with_uri);");
+                RScript += "myvars <- names(loaded_data) %in% c('rowID','basens',column_with_uri);\n";
 
                 re.eval("loaded_data <- loaded_data[!myvars];");
                 RScript += "loaded_data <- loaded_data[!myvars];\n";

@@ -96,8 +96,11 @@ public class NCFCorrelogramAnalyticProcess extends AnalyticProcess {
                 String analyzedFieldValue = colnamesArray[colnames.size() - 1];
                 //
 
-                re.eval("myvars <- names(loaded_data) %in% c('rowID','basens','uri'); ");
-                RScript += "myvars <- names(loaded_data) %in% c('rowID','basens','uri'); \n";
+                re.eval("column_with_uri <-colnames(loaded_data[2]);");
+                RScript += "# Prepare Data \n column_with_uri <-colnames(loaded_data[2]); \n";
+
+                re.eval("myvars <- names(loaded_data) %in% c('rowID','basens',column_with_uri); ");
+                RScript += "myvars <- names(loaded_data) %in% c('rowID','basens',column_with_uri); \n";
 
                 re.eval("loaded_data <- loaded_data[!myvars] ");
                 RScript += "loaded_data <- loaded_data[!myvars] \n";
@@ -169,7 +172,7 @@ public class NCFCorrelogramAnalyticProcess extends AnalyticProcess {
                 // Get elapsed time in seconds
                 timeToRun_analytics = elapsedTimeToRunAnalyticsMillis / 1000F;
                 analytics.setTimeToRun_analytics(timeToRun_analytics);
-                
+
                 connectionController.updateLindaAnalyticsProcessPerformanceTime(analytics);
             }
         }

@@ -95,13 +95,19 @@ public class M5PAnalyticProcess extends AnalyticProcess {
             cl.setUseUnsmoothed(true);
             cl.setBuildRegressionTree(true);
             cl.setSaveInstances(true);
+            cl.setDebug(true);
             cl.buildClassifier(data);
+            
+           
             // save model + header
             M5Pmodel = new Vector();
             M5Pmodel.add(cl);
-            M5Pmodel.add(new Instances(data, 0));
+            //M5Pmodel.add(new Instances(data, 0));
+            M5Pmodel.add(new Instances(data));
 
-            helpfulFunctions.saveModelasVector(M5Pmodel, analytics);
+            //helpfulFunctions.saveModelasVector(M5Pmodel, analytics);
+            cl.buildClassifier(data);
+            helpfulFunctions.saveModel(cl, analytics);
 
         } catch (Exception ex) {
             Logger.getLogger(M5PAnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);
@@ -144,7 +150,9 @@ public class M5PAnalyticProcess extends AnalyticProcess {
             }
 
             data.setClassIndex(data.numAttributes() - 1);
-            Vector v = (Vector) SerializationHelper.read(Configuration.analyticsRepo + analytics.getModel());
+           // Vector v = (Vector) SerializationHelper.read(Configuration.analyticsRepo + analytics.getModel());
+
+            M5P model = (M5P) weka.core.SerializationHelper.read(Configuration.analyticsRepo + analytics.getModel());
 
             //model evaluation
             Evaluation eval = new Evaluation(data);
@@ -154,10 +162,10 @@ public class M5PAnalyticProcess extends AnalyticProcess {
             weka.core.Range attsToOutput = null;
             Boolean outputDistribution = new Boolean(true);
 
-            Classifier cl = (Classifier) v.get(0);
-            Instances header = (Instances) v.get(1);
+            //Classifier cl = (Classifier) v.get(0);
+            //Instances header = (Instances) v.get(1);
 
-            eval.crossValidateModel(cl, data, 10, new Debug.Random(1),
+            eval.crossValidateModel(model, data, 10, new Debug.Random(1),
                     output, attsToOutput, outputDistribution);
 
             // output predictions
@@ -181,9 +189,9 @@ public class M5PAnalyticProcess extends AnalyticProcess {
                 // used during training the classifier, e.g., different order of
                 // nominal values, different number of attributes.
                 Instance inst = data.lastInstance();
-                inst.setDataset(header);
-                for (int n = 0; n < header.numAttributes(); n++) {
-                    Attribute att = data.attribute(header.attribute(n).name());
+                inst.setDataset(data);
+                for (int n = 0; n < data.numAttributes(); n++) {
+                    Attribute att = data.attribute(data.attribute(n).name());
                     // original attribute is also present in the current dataset
                     if (att != null) {
                         if (att.isNominal()) {
@@ -192,9 +200,9 @@ public class M5PAnalyticProcess extends AnalyticProcess {
                             // "numValues() > 0" is only used to avoid problems with nominal 
                             // attributes that have 0 labels, which can easily happen with
                             // data loaded from a database
-                            if ((header.attribute(n).numValues() > 0) && (att.numValues() > 0)) {
+                            if ((data.attribute(n).numValues() > 0) && (att.numValues() > 0)) {
                                 String label = curr.stringValue(att);
-                                int index = header.attribute(n).indexOfValue(label);
+                                int index = data.attribute(n).indexOfValue(label);
                                 if (index != -1) {
                                     inst.setValue(n, index);
                                 }
@@ -208,7 +216,7 @@ public class M5PAnalyticProcess extends AnalyticProcess {
                 }
 
                 // predict class
-                double pred = cl.classifyInstance(inst);
+                double pred = model.classifyInstance(inst);
                 //double error = pred - inst.classValue();
                 curr.setClassValue(pred);
 

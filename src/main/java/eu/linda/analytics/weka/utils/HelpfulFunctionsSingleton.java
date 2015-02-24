@@ -231,7 +231,7 @@ public class HelpfulFunctionsSingleton {
 
         String[] options = new String[2];
         options[0] = "-R";    // "range"
-        options[1] = "1,2";
+        options[1] = "1";
         Instances newData = null;
         Instances metaData = null;
         try {
@@ -368,12 +368,21 @@ public class HelpfulFunctionsSingleton {
     public boolean isURLValid(String url) {
 
         UrlValidator urlValidator = new UrlValidator();
+        System.out.println("ti exei to url"+url);
         //valid URL
+         
         if (urlValidator.isValid(url)) {
             return true;
         } else {
             return false;
         }
+        
+//        
+//        if (urlValidator.isValid(url)) {
+//            return true;
+//        } else {
+//            return false;
+//        }
 
     }
 

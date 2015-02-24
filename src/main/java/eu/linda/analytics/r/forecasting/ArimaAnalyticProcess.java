@@ -11,6 +11,7 @@ import eu.linda.analytics.formats.InputFormat;
 import eu.linda.analytics.formats.OutputFormat;
 import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.weka.utils.HelpfulFunctionsSingleton;
+import java.io.InputStream;
 import java.util.Vector;
 import org.rosuda.JRI.RBool;
 import org.rosuda.JRI.RVector;

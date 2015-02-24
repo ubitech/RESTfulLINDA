@@ -218,7 +218,7 @@
             </properties>
        </profile>
        <profile>
-            <id>deployment</id>
+            <id>deploymentOLD</id>
             <properties>
                 <!--db.driverClass>com.mysql.jdbc.Driver</db.driverClass>
                 <db.connectionURL>jdbc:mysql://127.0.0.1:3306/</db.connectionURL-->
@@ -233,7 +233,23 @@
                 <Lindaworkbench.URI>http://107.170.70.175:8000/</Lindaworkbench.URI>
             </properties>
        </profile>
-       </profiles>     
+       <profile>
+            <id>deployment</id>
+            <properties>
+                <!--db.driverClass>com.mysql.jdbc.Driver</db.driverClass>
+                <db.connectionURL>jdbc:mysql://127.0.0.1:3306/</db.connectionURL-->
+                <db.ip>127.0.0.1</db.ip>
+                <db.port>3306</db.port>
+                <db.name>linda</db.name>
+                <db.username>root</db.username>
+                <db.password>lind@!</db.password>
+                <rdf2any.server>http://localhost:8081</rdf2any.server>
+                <analytics.repo>/usr/share/nginx/html/LindaAnalytics/</analytics.repo>
+                <Lindaworkbench.docroot>/home/linda/Desktop/LindaWorkbench/linda/</Lindaworkbench.docroot>
+                <Lindaworkbench.URI>http://localhost:8000/</Lindaworkbench.URI>
+            </properties>
+       </profile>
+    </profiles>     
     
     <!--profiles>
         <profile>

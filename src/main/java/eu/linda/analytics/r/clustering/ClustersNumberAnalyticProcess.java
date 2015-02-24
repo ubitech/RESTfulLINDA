@@ -72,9 +72,14 @@ public class ClustersNumberAnalyticProcess extends AnalyticProcess {
             re.eval("rm(list=ls());");
         } else {
             //TODO Check that all values are numeric
+            
+            
+            re.eval("column_with_uri <-colnames(loaded_data[2]);");
+            RScript += "# Prepare Data \n column_with_uri <-colnames(loaded_data[2]); \n";
 
-            re.eval("myvars <- names(loaded_data) %in% c('rowID','uri');");
-            RScript += "# Prepare Data \n myvars <- names(loaded_data) %in% c('rowID','uri'); \n";
+
+            re.eval("myvars <- names(loaded_data) %in% c('rowID',column_with_uri);");
+            RScript += "myvars <- names(loaded_data) %in% c('rowID',column_with_uri); \n";
 
             re.eval("loaded_data <- loaded_data[!myvars]");
             RScript += "loaded_data <- loaded_data[!myvars]\n";

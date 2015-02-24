@@ -44,14 +44,31 @@ public class KMeansAnalyticProcess extends AnalyticProcess {
 
     @Override
     public void eval(Analytics analytics, OutputFormat out) {
+
         float timeToRun_analytics = 0;
         long startTimeToRun_analytics = System.currentTimeMillis();
+        int clustersNum = 5;
         String RScript = "";
         //clean previous eval info if exists
         helpfulFunctions.cleanPreviousInfo(analytics);
         analytics.setTimeToGet_data(0);
         analytics.setTimeToRun_analytics(0);
         analytics.setData_size(0);
+
+        //get parameters
+        String parameters = analytics.getParameters();
+
+        String[] splitedparameters = parameters.split("->");
+        for (String parameter : splitedparameters) {
+            System.out.println("parameter" + parameter);
+
+            if (parameter.contains("k")) {
+                String[] clustersNumP = parameter.split("k");
+                clustersNum = Integer.parseInt(clustersNumP[1].trim());
+                System.out.println("clustersNum" + clustersNum);
+            }
+        }
+
         Rengine re;
         if (helpfulFunctions.isRDFInputFormat(analytics.getTrainQuery_id())) {
             re = input.importData4R(Integer.toString(analytics.getTrainQuery_id()), true, analytics);
@@ -73,11 +90,17 @@ public class KMeansAnalyticProcess extends AnalyticProcess {
         } else {
             //TODO Check that all values are numeric
 
-            re.eval("uri<-loaded_data$uri;");
-            RScript += "uri<-loaded_data$uri; \n";
+//            re.eval("uri<-loaded_data$uri;");
+//            RScript += "uri<-loaded_data$uri; \n";
+            
+            re.eval("uri<-loaded_data[2];");
+            RScript += "# Prepare Data \n uri<-loaded_data[2]; \n";
 
-            re.eval("myvars <- names(loaded_data) %in% c('rowID','uri');");
-            RScript += "# Prepare Data \n myvars <- names(loaded_data) %in% c('rowID','uri'); \n";
+            re.eval("column_with_uri <-colnames(loaded_data[2]);");
+            RScript += "column_with_uri <-colnames(loaded_data[2]); \n";
+
+            re.eval("myvars <- names(loaded_data) %in% c('rowID',column_with_uri);");
+            RScript += "# Prepare Data \n myvars <- names(loaded_data) %in% c('rowID',column_with_uri); \n";
 
             re.eval("loaded_data <- loaded_data[!myvars]");
             RScript += "loaded_data <- loaded_data[!myvars]\n";
@@ -89,8 +112,8 @@ public class KMeansAnalyticProcess extends AnalyticProcess {
             RScript += "loaded_data <- scale(loaded_data) # standardize variables\n";
 
             //Partitioning
-            re.eval("fit <- kmeans(loaded_data, 5)");
-            RScript += "#Partitioning\n # K-Means Cluster Analysis \n fit <- kmeans(loaded_data, 5) # 5 cluster solution \n";
+            re.eval("fit <- kmeans(loaded_data, " + clustersNum + ")");
+            RScript += "#Partitioning\n # K-Means Cluster Analysis \n fit <- kmeans(loaded_data, " + clustersNum + ") # " + clustersNum + " cluster solution \n";
 
             re.eval("aggregate(loaded_data,by=list(fit$cluster),FUN=mean);");
             RScript += "# get cluster means \n aggregate(loaded_data,by=list(fit$cluster),FUN=mean) \n ";
@@ -99,13 +122,13 @@ public class KMeansAnalyticProcess extends AnalyticProcess {
             RScript += "# append cluster assignment \n  loaded_data <- data.frame(loaded_data, fit$cluster) \n";
 
             //Visualize
-            re.eval("fit <- kmeans(loaded_data, 5);");
-            RScript += "# Visualize \n #Plotting Cluster Solutions \n # K-Means Clustering with 5 clusters \n fit <- kmeans(loaded_data, 5) \n";
+            re.eval("fit <- kmeans(loaded_data, " + clustersNum + ");");
+            RScript += "# Visualize \n #Plotting Cluster Solutions \n # K-Means Clustering with " + clustersNum + " clusters \n fit <- kmeans(loaded_data, " + clustersNum + ") \n";
 
             re.eval("library(cluster);");
             RScript += "# Cluster Plot against 1st 2 principal components  \n # vary parameters for most readable graph \n library(cluster); \n";
 
-            long plot1_id = helpfulFunctions.manageNewPlot(analytics, "K-Means Clustering with 5 clusters", "plots/plotid" + analytics.getPlot1_id() + ".png", "plot1_id");
+            long plot1_id = helpfulFunctions.manageNewPlot(analytics, "K-Means Clustering with " + clustersNum + " clusters", "plots/plotid" + analytics.getPlot1_id() + ".png", "plot1_id");
 
             re.eval("png(file='" + Configuration.analyticsRepo + "plots/plotid" + plot1_id + ".png',width=600);");
             re.eval("print(clusplot(loaded_data, fit$cluster, color=TRUE, shade=TRUE, labels=2, lines=0));");
@@ -126,14 +149,12 @@ public class KMeansAnalyticProcess extends AnalyticProcess {
 
             helpfulFunctions.writeToFile(RScript, "processinfo", analytics);
 
-           
             long elapsedTimeToRunAnalyticsMillis = System.currentTimeMillis() - startTimeToRun_analytics;
             // Get elapsed time in seconds
             timeToRun_analytics = elapsedTimeToRunAnalyticsMillis / 1000F;
             analytics.setTimeToRun_analytics(analytics.getTimeToRun_analytics() + timeToRun_analytics);
             connectionController.updateLindaAnalyticsProcessPerformanceTime(analytics);
             out.exportData(analytics, re);
-            
 
         }
 

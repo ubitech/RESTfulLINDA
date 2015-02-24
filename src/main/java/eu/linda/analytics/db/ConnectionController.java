@@ -111,7 +111,9 @@ public final class ConnectionController {
         try {
 
             ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-            InputStream input = classLoader.getResourceAsStream("RESTfulLINDA.properties");
+            //InputStream input = classLoader.getResourceAsStream("RESTfulLINDA.properties");
+            InputStream input = this.getClass().getClassLoader().getResourceAsStream("RESTfulLINDA.properties");  
+
             try {
                 prop.load(input);
             } catch (IOException ex) {
