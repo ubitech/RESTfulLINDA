@@ -10,7 +10,6 @@ import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.weka.utils.HelpfulFunctionsSingleton;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.AbstractList;
 import java.util.logging.Level;
@@ -52,6 +51,9 @@ public class RDFInputFormat extends InputFormat {
             File tmpfile4lindaquery = File.createTempFile("tmpfile4lindaquery" + query_id, ".tmp");
             FileUtils.copyURLToFile(url, tmpfile4lindaquery);
 
+            helpfulFunctions.cleanTmpFileFromDatatypes(tmpfile4lindaquery.getAbsolutePath());
+            System.out.println("tmpfile4lindaquery.getAbsolutePath()" + tmpfile4lindaquery.getAbsolutePath());
+
             System.out.println("Downloaded File Query: " + tmpfile4lindaquery);
 
             CSVLoader loader = new CSVLoader();
@@ -80,8 +82,8 @@ public class RDFInputFormat extends InputFormat {
             timeToGetQuery = elapsedTimeToGetQueryMillis / 1000F;
             analytics.setTimeToGet_data(analytics.getTimeToGet_data() + timeToGetQuery);
             System.out.println("timeToGetQuery" + timeToGetQuery);
-            
-             connectionController.updateLindaAnalyticsInputDataPerformanceTime(analytics);
+
+            connectionController.updateLindaAnalyticsInputDataPerformanceTime(analytics);
 
         } catch (Exception ex) {
             Logger.getLogger(ArffInputFormat.class.getName()).log(Level.SEVERE, null, ex);
@@ -126,6 +128,9 @@ public class RDFInputFormat extends InputFormat {
 
                 File tmpfile4lindaquery = File.createTempFile("tmpfile4lindaquery" + query_id, ".tmp");
                 FileUtils.copyURLToFile(url, tmpfile4lindaquery);
+
+                helpfulFunctions.cleanTmpFileFromDatatypes(tmpfile4lindaquery.getAbsolutePath());
+                System.out.println("tmpfile4lindaquery.getAbsolutePath()" + tmpfile4lindaquery.getAbsolutePath());
 
                 re.eval(" loaded_data <- read.csv(file='" + tmpfile4lindaquery + "', header=TRUE, sep=',', na.strings='---');");
                 System.out.println(" loaded_data <- read.csv(file='" + tmpfile4lindaquery + "', header=TRUE, sep=',', na.strings='---');");

@@ -22,6 +22,7 @@ import eu.linda.analytics.r.forecasting.ArimaAnalyticProcess;
 import eu.linda.analytics.r.geospatial.KrigingAnalyticProcess;
 import eu.linda.analytics.r.geospatial.MoransAnalyticProcess;
 import eu.linda.analytics.r.geospatial.NCFCorrelogramAnalyticProcess;
+import eu.linda.analytics.r.regression.MultipleLinearRegressionInR;
 import eu.linda.analytics.weka.associations.AprioriAnalyticProcess;
 import eu.linda.analytics.weka.classifiers.J48AnalyticProcess;
 import eu.linda.analytics.weka.classifiers.M5PAnalyticProcess;
@@ -73,7 +74,12 @@ public class AnalyticsFactory {
             analyticProcess = new WardHierarchicalAgglomerativeAnalyticProcess(inputFormat);
         }else if (algorithm.equalsIgnoreCase("Model Based Clustering")) {
             analyticProcess = new ModelBasedClusteringAnalyticProcess(inputFormat);
+        }else if (algorithm.equalsIgnoreCase("LinearRegression in R")) {
+            analyticProcess = new MultipleLinearRegressionInR(inputFormat);
         }
+        
+        
+        
         
         
         

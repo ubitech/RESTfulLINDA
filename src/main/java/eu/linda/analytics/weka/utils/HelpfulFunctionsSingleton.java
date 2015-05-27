@@ -5,10 +5,15 @@ import com.sun.jna.Native;
 import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.db.ConnectionController;
 import eu.linda.analytics.model.Analytics;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import static java.sql.Types.NULL;
@@ -110,9 +115,10 @@ public class HelpfulFunctionsSingleton {
             connectionController.updateLindaAnalytics(targetFileName, column, analytics.getId());
 
         }
-
         return true;
     }
+    
+    
 
     public boolean saveFile(String targetFileNameFullPath, String content) {
 
@@ -128,6 +134,32 @@ public class HelpfulFunctionsSingleton {
             FileWriter fw = new FileWriter(file.getAbsoluteFile());
             BufferedWriter bw = new BufferedWriter(fw);
             bw.write(content);
+            bw.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
+    
+        public boolean saveFile(String targetFileNameFullPath, String[] content) {
+
+        try {
+
+            File file = new File(targetFileNameFullPath);
+
+            // if file doesnt exists, then create it
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+
+            FileWriter fw = new FileWriter(file.getAbsoluteFile());
+            BufferedWriter bw = new BufferedWriter(fw);
+            
+            for (String string : content) {
+               bw.write(string +"\n"); 
+            }
+            
             bw.close();
 
         } catch (IOException e) {
@@ -327,8 +359,7 @@ public class HelpfulFunctionsSingleton {
         }
         deleteFile(oldPlotFileName);
         connectionController.deletePlot(oldPlotID);
-        
-              
+
 //        System.out.println("change perms of "+oldPlotFileName);
 //        libc.chmod(oldPlotFileName, 0777);
 //       if (!image.getAbsoluteFile().exists()) {
@@ -368,22 +399,72 @@ public class HelpfulFunctionsSingleton {
     public boolean isURLValid(String url) {
 
         UrlValidator urlValidator = new UrlValidator();
-        System.out.println("ti exei to url"+url);
+        System.out.println("ti exei to url" + url);
         //valid URL
-         
+
         if (urlValidator.isValid(url)) {
             return true;
         } else {
             return false;
         }
-        
+
 //        
 //        if (urlValidator.isValid(url)) {
 //            return true;
 //        } else {
 //            return false;
 //        }
+    }
 
+    public boolean cleanTmpFileFromDatatypes(String csvFile) {
+
+        BufferedReader br = null;
+        String line = "";
+        String cvsSplitBy = ",";
+
+        try {
+
+            br = new BufferedReader(new FileReader(csvFile));
+
+            //after put in buffer delete file
+            File file = new File(csvFile);
+            file.delete();
+
+            File fout = new File(csvFile);
+            FileOutputStream fos = new FileOutputStream(fout);
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
+            while ((line = br.readLine()) != null) {
+
+                // use comma as separator
+                String[] columns = line.split(cvsSplitBy);
+
+                String newline = "";
+
+                for (int i = 0; i < columns.length; i++) {
+
+                    if (i == 0) {
+                        newline += columns[i];
+                    } else if (columns[i].contains("^^")) {
+                        String[] splitedvalues = columns[i].split("\\^\\^http");
+                        newline += "," + splitedvalues[0];
+                    } else {
+                        newline += "," + columns[i];
+                    }
+                }
+                bw.write(newline);
+                bw.newLine();
+
+            }
+
+            bw.close();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return true;
     }
 
 }

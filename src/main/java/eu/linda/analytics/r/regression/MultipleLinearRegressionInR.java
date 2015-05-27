@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package eu.linda.analytics.r.clustering;
+package eu.linda.analytics.r.regression;
 
 import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.controller.AnalyticProcess;
@@ -12,64 +12,43 @@ import eu.linda.analytics.formats.InputFormat;
 import eu.linda.analytics.formats.OutputFormat;
 import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.weka.utils.HelpfulFunctionsSingleton;
-import java.util.Vector;
 import org.rosuda.JRI.RBool;
 import org.rosuda.JRI.REXP;
-;
-import org.rosuda.JRI.RVector;
 import org.rosuda.JRI.Rengine;
+import org.rosuda.REngine.REXPString;
 
 /**
  *
  * @author eleni
  */
-
-
-public class KMeansAnalyticProcess extends AnalyticProcess {
+public class MultipleLinearRegressionInR extends AnalyticProcess {
 
     HelpfulFunctionsSingleton helpfulFunctions;
     InputFormat input;
     ConnectionController connectionController;
 
-    public KMeansAnalyticProcess(InputFormat input) {
+    public MultipleLinearRegressionInR(InputFormat input) {
         helpfulFunctions = HelpfulFunctionsSingleton.getInstance();
-        helpfulFunctions.nicePrintMessage("Create analytic process for K-Means Algorithm");
+        helpfulFunctions.nicePrintMessage("Create analytic process for Multiple LinearRegression In R Algorithm");
         this.input = input;
         connectionController = ConnectionController.getInstance();
-
     }
 
     @Override
     public void train(Analytics analytics) {
+
     }
 
     @Override
     public void eval(Analytics analytics, OutputFormat out) {
-
         float timeToRun_analytics = 0;
         long startTimeToRun_analytics = System.currentTimeMillis();
-        int clustersNum = 5;
         String RScript = "";
         //clean previous eval info if exists
         helpfulFunctions.cleanPreviousInfo(analytics);
         analytics.setTimeToGet_data(0);
         analytics.setTimeToRun_analytics(0);
         analytics.setData_size(0);
-
-        //get parameters
-        String parameters = analytics.getParameters();
-
-        String[] splitedparameters = parameters.split("->");
-        for (String parameter : splitedparameters) {
-            System.out.println("parameter" + parameter);
-
-            if (parameter.contains("k")) {
-                String[] clustersNumP = parameter.split("k");
-                clustersNum = Integer.parseInt(clustersNumP[1].trim());
-                System.out.println("clustersNum" + clustersNum);
-            }
-        }
-
         Rengine re;
         if (helpfulFunctions.isRDFInputFormat(analytics.getTrainQuery_id())) {
             re = input.importData4R(Integer.toString(analytics.getTrainQuery_id()), true, analytics);
@@ -91,59 +70,55 @@ public class KMeansAnalyticProcess extends AnalyticProcess {
         } else {
             //TODO Check that all values are numeric
 
-//            re.eval("uri<-loaded_data$uri;");
-//            RScript += "uri<-loaded_data$uri; \n";
+            re.eval("loaded_data <- na.omit(loaded_data);");
+            RScript += "loaded_data <- na.omit(loaded_data) # listwise deletion of missing\n";
             
-            re.eval("uri<-loaded_data[2];");
+            re.eval("names(loaded_data)[2]<-\"uri\"");
+            RScript += "names(loaded_data)[2]<-\"uri\" \n";
+
+            re.eval("uri<-loaded_data[2]; ");
             RScript += "# Prepare Data \n uri<-loaded_data[2]; \n";
 
             re.eval("column_with_uri <-colnames(loaded_data[2]);");
             RScript += "column_with_uri <-colnames(loaded_data[2]); \n";
 
             re.eval("myvars <- names(loaded_data) %in% c('rowID',column_with_uri);");
-            RScript += "# Prepare Data \n myvars <- names(loaded_data) %in% c('rowID',column_with_uri); \n";
+            RScript += "myvars <- names(loaded_data) %in% c('rowID',column_with_uri); \n";
 
             re.eval("loaded_data <- loaded_data[!myvars]");
             RScript += "loaded_data <- loaded_data[!myvars]\n";
 
-            re.eval("loaded_data <- na.omit(loaded_data)");
-            RScript += "loaded_data <- na.omit(loaded_data) # listwise deletion of missing\n";
+            re.eval("column_number<-ncol(loaded_data);");
+            RScript += "column_number<-ncol(loaded_data); \n";
 
-            re.eval("loaded_data <- scale(loaded_data)");
-            RScript += "loaded_data <- scale(loaded_data) # standardize variables\n";
+            re.eval("names(loaded_data)[column_number]<-\"topredict\"");
+            RScript += "names(loaded_data)[column_number]<-\"topredict\" \n";
 
-            //Partitioning
-            re.eval("fit <- kmeans(loaded_data, " + clustersNum + ")");
-            RScript += "#Partitioning\n # K-Means Cluster Analysis \n fit <- kmeans(loaded_data, " + clustersNum + ") # " + clustersNum + " cluster solution \n";
+            re.eval("LMmodel <- lm(topredict ~ ., data=loaded_data);");
+            RScript += "# Multiple Linear Regression Constuction \n LMmodel <- lm(topredict ~ ., data=loaded_data); \n";
 
-            re.eval("aggregate(loaded_data,by=list(fit$cluster),FUN=mean);");
-            RScript += "# get cluster means \n aggregate(loaded_data,by=list(fit$cluster),FUN=mean) \n ";
+            re.eval("summary(LMmodel);");
+            RScript += "# show results \n  summary(LMmodel); \n ";
 
-            re.eval("loaded_data <- data.frame(loaded_data, fit$cluster);");
-            RScript += "# append cluster assignment \n  loaded_data <- data.frame(loaded_data, fit$cluster) \n";
+            re.eval("predictTest = predict(LMmodel, newdata=loaded_data);");
+            RScript += "#EVALUATE  \n predictTest = predict(LMmodel, newdata=loaded_data); \n";
 
-            //Visualize
-            re.eval("fit <- kmeans(loaded_data, " + clustersNum + ");");
-            RScript += "# Visualize \n #Plotting Cluster Solutions \n # K-Means Clustering with " + clustersNum + " clusters \n fit <- kmeans(loaded_data, " + clustersNum + ") \n";
+            re.eval("column_to_predict <-colnames(loaded_data[column_number]);");
+            RScript += "column_to_predict <-colnames(loaded_data[column_number]); \n";
 
-            re.eval("library(cluster);");
-            RScript += "# Cluster Plot against 1st 2 principal components  \n # vary parameters for most readable graph \n library(cluster); \n";
 
-            long plot1_id = helpfulFunctions.manageNewPlot(analytics, "K-Means Clustering with " + clustersNum + " clusters", "plots/plotid" + analytics.getPlot1_id() + ".png", "plot1_id");
+            re.eval("df_to_export <- data.frame(uri,loaded_data[column_to_predict]);");
+            RScript += "df_to_export <- data.frame(uri,loaded_data[column_to_predict]);\n";
 
-            re.eval("png(file='" + Configuration.analyticsRepo + "plots/plotid" + plot1_id + ".png',width=600);");
-            re.eval("print(clusplot(loaded_data, fit$cluster, color=TRUE, shade=TRUE, labels=2, lines=0));");
-            re.eval("dev.off();");
-
-            RScript += "png(file='" + Configuration.analyticsRepo + "plots/plotid" + plot1_id + ".png',width=600);\n";
-            RScript += "print(clusplot(loaded_data, fit$cluster, color=TRUE, shade=TRUE, labels=2, lines=0));\n";
-            RScript += "dev.off();\n";
-            
-             //Save model Readable
+            //Save model Readable
             String modelFileName = "models/analyticsID" + analytics.getId() + "_" + analytics.getAlgorithm_id() + "ModelReadable" + ".txt";
             String modelFileNameFullPath = Configuration.analyticsRepo + modelFileName;
-            
-            REXP s = re.eval("capture.output(fit$centers)");
+
+            RScript += "sink(\"" + modelFileNameFullPath + "\");\n";
+            RScript += "summary(LMmodel);\n";
+            RScript += "sink();\n";
+
+            REXP s = re.eval("capture.output(summary(LMmodel))");
             String[] output = s.asStringArray();
             for (String string : output) {
                 System.out.println("string" + string);
@@ -151,15 +126,6 @@ public class KMeansAnalyticProcess extends AnalyticProcess {
 
             helpfulFunctions.saveFile(modelFileNameFullPath, output);
             connectionController.updateLindaAnalytics(modelFileName, "modelReadable", analytics.getId());
-
-            re.eval("column_number<-ncol(loaded_data);");
-            RScript += "column_number<-ncol(loaded_data); \n";
-
-            re.eval("column_to_predict <-colnames(loaded_data[column_number]);");
-            RScript += "column_to_predict <-colnames(loaded_data[column_number]); \n";
-
-            re.eval("df_to_export <- data.frame(uri,loaded_data[column_to_predict]);");
-            RScript += "df_to_export <- data.frame(uri,loaded_data[column_to_predict]);\n";
 
             helpfulFunctions.writeToFile(RScript, "processinfo", analytics);
 
@@ -169,7 +135,6 @@ public class KMeansAnalyticProcess extends AnalyticProcess {
             analytics.setTimeToRun_analytics(analytics.getTimeToRun_analytics() + timeToRun_analytics);
             connectionController.updateLindaAnalyticsProcessPerformanceTime(analytics);
             out.exportData(analytics, re);
-
         }
 
     }

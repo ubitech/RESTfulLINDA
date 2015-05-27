@@ -193,18 +193,18 @@ public class ArimaAnalyticProcess extends AnalyticProcess {
                 re.eval("valuesToClean<-loaded_data[column_to_predict];");
                 RScript += "valuesToClean<-loaded_data[column_to_predict];\n";
 
-                re.eval("valuesToCleanNum<-rows_number;");
-                RScript += "valuesToCleanNum<-rows_number;\n";
-
-                re.eval("trimmedValues<- data.frame();");
-                RScript += "trimmedValues<- data.frame();\n";
-
-                re.eval("for(i in 1:valuesToCleanNum){ valueToTrim <- as.character(valuesToClean[i,1]);  if(grepl(\"#\", valueToTrim)) {  position<-which(strsplit(valueToTrim, \"\")[[1]]==\"^\"); trimmedValues[i,1]<-substr(valueToTrim, 1, position[1]-1);  }else{ trimmedValues[i,1]<-valueToTrim; }  }");
-                RScript += "for(i in 1:valuesToCleanNum){ valueToTrim <- as.character(valuesToClean[i,1]);  if(grepl(\"#\", valueToTrim)) {  position<-which(strsplit(valueToTrim, \"\")[[1]]==\"^\"); trimmedValues[i,1]<-substr(valueToTrim, 1, position[1]-1);  }else{ trimmedValues[i,1]<-valueToTrim; }  }\n";
+//                re.eval("valuesToCleanNum<-rows_number;");
+//                RScript += "valuesToCleanNum<-rows_number;\n";
+//
+//                re.eval("trimmedValues<- data.frame();");
+//                RScript += "trimmedValues<- data.frame();\n";
+//
+//                re.eval("for(i in 1:valuesToCleanNum){ valueToTrim <- as.character(valuesToClean[i,1]);  if(grepl(\"#\", valueToTrim)) {  position<-which(strsplit(valueToTrim, \"\")[[1]]==\"^\"); trimmedValues[i,1]<-substr(valueToTrim, 1, position[1]-1);  }else{ trimmedValues[i,1]<-valueToTrim; }  }");
+//                RScript += "for(i in 1:valuesToCleanNum){ valueToTrim <- as.character(valuesToClean[i,1]);  if(grepl(\"#\", valueToTrim)) {  position<-which(strsplit(valueToTrim, \"\")[[1]]==\"^\"); trimmedValues[i,1]<-substr(valueToTrim, 1, position[1]-1);  }else{ trimmedValues[i,1]<-valueToTrim; }  }\n";
 
                 //re.eval(" datats <- ts(loaded_data[column_number], frequency=12, start=c(year_to_start,month_to_start)); ");
-                re.eval(" datats <- ts(trimmedValues, frequency=" + frequency + ", start=c(year_to_start,month_to_start)); ");
-                RScript += "datats <- ts(trimmedValues, frequency=" + frequency + ", start=c(year_to_start,month_to_start));\n";
+                re.eval(" datats <- ts(loaded_data[column_to_predict], frequency=" + frequency + ", start=c(year_to_start,month_to_start)); ");
+                RScript += "datats <- ts(loaded_data[column_to_predict], frequency=" + frequency + ", start=c(year_to_start,month_to_start));\n";
 
                 re.eval(" add." + timeGranularity + "= function(date,n) seq(date, by = paste (n, '" + timeGranularity + "'), length = 2)[2];");
                 RScript += "add." + timeGranularity + "= function(date,n) seq(date, by = paste (n, '" + timeGranularity + "'), length = 2)[2];\n";
@@ -218,8 +218,6 @@ public class ArimaAnalyticProcess extends AnalyticProcess {
                 re.eval(" Date = seq(date_to_start_prediction, by='" + timeGranularity + "', length=" + timePredicion + "); ");
                 RScript += "Date = seq(date_to_start_prediction, by='" + timeGranularity + "', length=" + timePredicion + ");\n";
 
-//        re.eval(" m.ar2 <- arima(datats, order = c(1,1,0)); ");
-//        RScript += "m.ar2 <- arima(datats, order = c(1,1,0));\n";
                 re.eval("m.ar2 <- auto.arima(datats);");
                 RScript += "m.ar2 <- auto.arima(datats);\n";
 
