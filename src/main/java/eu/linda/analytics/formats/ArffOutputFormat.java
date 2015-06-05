@@ -11,6 +11,7 @@ import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.weka.utils.HelpfulFunctionsSingleton;
 import java.util.AbstractList;
 import org.rosuda.JRI.Rengine;
+import org.rosuda.REngine.Rserve.RConnection;
 
 
 /**
@@ -54,6 +55,11 @@ public class ArffOutputFormat extends OutputFormat {
 
     @Override
     public void exportData(Analytics analytics, Rengine dataToExport) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    @Override
+    public void exportData(Analytics analytics, RConnection dataToExport) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

@@ -12,6 +12,7 @@ import java.util.AbstractList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.rosuda.JRI.Rengine;
+import org.rosuda.REngine.Rserve.RConnection;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils;
 import weka.filters.Filter;
@@ -69,6 +70,11 @@ public class ArffInputFormat extends InputFormat {
 
     @Override
     public Rengine importData4R(String pathToFile, boolean isForRDFOutput,Analytics analytics) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    @Override
+    public RConnection importData4R1(String pathToFile, boolean isForRDFOutput,Analytics analytics) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

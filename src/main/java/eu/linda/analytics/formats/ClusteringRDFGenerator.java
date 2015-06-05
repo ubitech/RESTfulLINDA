@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import org.rosuda.JRI.REXP;
 import org.rosuda.JRI.Rengine;
+import org.rosuda.REngine.Rserve.RConnection;
 
 /**
  *
@@ -46,6 +47,12 @@ public class ClusteringRDFGenerator extends RDFGenerator {
         //NOT IMPLEMENTED YET
         return null;
 
+    }
+    
+    @Override
+    public Model generateRDFModel(Analytics analytics, RConnection re) {
+        //NOT IMPLEMENTED YET
+        return null;
     }
 
     @Override

@@ -315,7 +315,7 @@ public class HelpfulFunctionsSingleton {
     public boolean isRDFExportFormat(String exportFormat) {
         if (exportFormat.equalsIgnoreCase("RDFXML")
                 || exportFormat.equalsIgnoreCase("TTL")
-                || exportFormat.equalsIgnoreCase("NTRIPLES")) {
+                || exportFormat.equalsIgnoreCase("N-Tripples")) {
             return true;
         }
         return false;

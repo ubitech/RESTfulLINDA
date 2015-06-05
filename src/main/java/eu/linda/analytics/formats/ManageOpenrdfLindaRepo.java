@@ -64,7 +64,7 @@ public class ManageOpenrdfLindaRepo {
                 } else if (a.getExportFormat().equalsIgnoreCase("TTL")) {
                     con.add(file, baseURI, RDFFormat.TURTLE, datasetContext);
 
-                } else if (a.getExportFormat().equalsIgnoreCase("NTRIPLES")) {
+                } else if (a.getExportFormat().equalsIgnoreCase("N-Tripples")) {
                     con.add(file, baseURI, RDFFormat.N3, datasetContext);
                 }
 

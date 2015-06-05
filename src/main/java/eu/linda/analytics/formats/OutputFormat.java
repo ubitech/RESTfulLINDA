@@ -8,6 +8,7 @@ package eu.linda.analytics.formats;
 import eu.linda.analytics.model.Analytics;
 import java.util.AbstractList;
 import org.rosuda.JRI.Rengine;
+import org.rosuda.REngine.Rserve.RConnection;
 
 /**
  *
@@ -18,5 +19,7 @@ abstract public class OutputFormat {
     abstract public void exportData(Analytics analytics, AbstractList dataToExport);
 
     abstract public void exportData(Analytics analytics, Rengine dataToExport);
+    
+    abstract public void exportData(Analytics analytics, RConnection dataToExport);
 
 }

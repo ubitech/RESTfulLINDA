@@ -11,7 +11,7 @@ public class Analytics {
     public Analytics() {
     }
 
-    public Analytics(int id, int category_id, int algorithm_id, String document, String testdocument, int trainQuery_id, int evaluationQuery_id, String model, String modelReadable, String processinfo, String resultdocument, String exportFormat, int version, String description, boolean publishedToTriplestore, String loadedRDFContext, String parameters, int plot1_id, int plot2_id,String user_name,    float timeToGet_data, float data_size, float timeToRun_analytics, float timeToCreate_RDF
+    public Analytics(int id, int category_id, int algorithm_id, String document, String testdocument, int trainQuery_id, int evaluationQuery_id, String model, String modelReadable, String processinfo, String resultdocument, String exportFormat, int version, String description, boolean publishedToTriplestore, String loadedRDFContext, String parameters, int plot1_id, int plot2_id,String user_name,    float timeToGet_data, float data_size, float timeToRun_analytics, float timeToCreate_RDF,boolean createModel
 ) {
         this.id = id;
         this.category_id = category_id;
@@ -37,6 +37,7 @@ public class Analytics {
         this.data_size = data_size;
         this.timeToRun_analytics = timeToRun_analytics;
         this.timeToCreate_RDF = timeToCreate_RDF;
+        this.createModel = createModel;
 
         
     }
@@ -66,6 +67,7 @@ public class Analytics {
     private float data_size;
     private float timeToRun_analytics;
     private float timeToCreate_RDF;
+    private boolean createModel;
     
     
 
@@ -268,6 +270,15 @@ public class Analytics {
     public void setTimeToCreate_RDF(float timeToCreate_RDF) {
         this.timeToCreate_RDF = timeToCreate_RDF;
     }
+
+    public boolean isCreateModel() {
+        return createModel;
+    }
+
+    public void setCreateModel(boolean createModel) {
+        this.createModel = createModel;
+    }
+
     
     
     

@@ -33,6 +33,7 @@ import java.util.Vector;
 import org.rosuda.JRI.REXP;
 import org.rosuda.JRI.RVector;
 import org.rosuda.JRI.Rengine;
+import org.rosuda.REngine.Rserve.RConnection;
 import weka.core.Instances;
 
 /**
@@ -332,5 +333,11 @@ public class ForecastingRDFGenerator extends RDFGenerator {
         re.eval("rm(list=ls());");
 
         return model;
+    }
+    
+    @Override
+    public Model generateRDFModel(Analytics analytics, RConnection re) {
+        //NOT IMPLEMENTED YET
+        return null;
     }
 }

@@ -72,7 +72,8 @@ public class DBSynchronizer {
                         rs.getFloat("timeToGet_data"),
                         rs.getFloat("data_size"),
                         rs.getFloat("timeToRun_analytics"),
-                        rs.getFloat("timeToCreate_RDF")
+                        rs.getFloat("timeToCreate_RDF"),
+                        rs.getBoolean("createModel")
                 );
                 analytics.setAlgorithm_name(rs.getString("name"));
                 rs.close();

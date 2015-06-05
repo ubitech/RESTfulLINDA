@@ -9,6 +9,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import eu.linda.analytics.model.Analytics;
 import java.util.AbstractList;
 import org.rosuda.JRI.Rengine;
+import org.rosuda.REngine.Rserve.RConnection;
 
 /**
  *
@@ -20,5 +21,7 @@ abstract public class RDFGenerator {
     abstract public Model generateRDFModel(Analytics analytics, AbstractList dataToExport);
     //generateRDFModelasR
     abstract public Model generateRDFModel(Analytics analytics, Rengine re);
+    
+    abstract public Model generateRDFModel(Analytics analytics, RConnection re);
 
 }

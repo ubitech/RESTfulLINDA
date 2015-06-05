@@ -11,6 +11,7 @@ import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.weka.utils.HelpfulFunctionsSingleton;
 import java.util.AbstractList;
 import org.rosuda.JRI.Rengine;
+import org.rosuda.REngine.Rserve.RConnection;
 
 /**
  *
@@ -89,6 +90,11 @@ public class CSVOutputFormat extends OutputFormat {
         analytics.setTimeToCreate_RDF(timeToExportData);
         connectionController.updateLindaAnalyticsProcessPerformanceTime(analytics);
 
+    }
+    
+    @Override
+    public void exportData(Analytics analytics, RConnection dataToExport) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }
