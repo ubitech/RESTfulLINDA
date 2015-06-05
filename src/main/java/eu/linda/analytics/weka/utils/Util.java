@@ -36,25 +36,19 @@ import weka.filters.unsupervised.attribute.Remove;
  * Generates a little ARFF file with different attribute types.
  *
  */
-public class HelpfulFunctionsSingleton {
+public class Util {
 
     ConnectionController connectionController;
 
-    private static HelpfulFunctionsSingleton instance = null;
-    private static CLibrary libc = (CLibrary) Native.loadLibrary("c", CLibrary.class);
+    private static Util instance = null;
 
-    interface CLibrary extends Library {
-
-        public int chmod(String path, int mode);
-    }
-
-    protected HelpfulFunctionsSingleton() {
+    protected Util() {
         connectionController = ConnectionController.getInstance();
     }
 
-    public static HelpfulFunctionsSingleton getInstance() {
+    public static Util getInstance() {
         if (instance == null) {
-            instance = new HelpfulFunctionsSingleton();
+            instance = new Util();
         }
         return instance;
     }
@@ -256,7 +250,7 @@ public class HelpfulFunctionsSingleton {
             remove1.setInputFormat(data);              // inform filter about dataset **AFTER** setting options
             newData1 = Filter.useFilter(data, remove1); // apply filter                
         } catch (Exception ex) {
-            Logger.getLogger(HelpfulFunctionsSingleton.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Util.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         data = newData1;
@@ -278,7 +272,7 @@ public class HelpfulFunctionsSingleton {
             metaData = Filter.useFilter(data, remove);
 
         } catch (Exception ex) {
-            Logger.getLogger(HelpfulFunctionsSingleton.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Util.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         HashMap resultMap = new HashMap<String, Instances>();
@@ -306,7 +300,7 @@ public class HelpfulFunctionsSingleton {
             }
 
         } catch (Exception ex) {
-            Logger.getLogger(HelpfulFunctionsSingleton.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Util.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return mergedData;
@@ -360,16 +354,6 @@ public class HelpfulFunctionsSingleton {
         deleteFile(oldPlotFileName);
         connectionController.deletePlot(oldPlotID);
 
-//        System.out.println("change perms of "+oldPlotFileName);
-//        libc.chmod(oldPlotFileName, 0777);
-//       if (!image.getAbsoluteFile().exists()) {
-//            System.out.println("aaaaaaaaaaaaaaaaaaaaa"+Configuration.analyticsRepo +"plots/plotid" + plot_id + ".png");
-//                connectionController.updateProcessMessageToAnalyticsTable("No Plot was generated For this Dataset.", analytics.getId());
-//                
-//                connectionController.updateLindaAnalyticsPlotToNull(analytics, plot);
-//                connectionController.deletePlot((int)plot_id);
-//                return -1;
-//            }
         return plot_id;
     }
 
@@ -390,7 +374,7 @@ public class HelpfulFunctionsSingleton {
             }
             this.nicePrintMessage("url http url connection succesfull");
         } catch (IOException ex) {
-            Logger.getLogger(HelpfulFunctionsSingleton.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Util.class.getName()).log(Level.SEVERE, null, ex);
         }
         return true;
 

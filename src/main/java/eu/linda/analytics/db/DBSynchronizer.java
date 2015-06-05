@@ -6,7 +6,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import static java.sql.Types.NULL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -299,6 +298,7 @@ public class DBSynchronizer {
     public void updateLindaAnalyticsInputDataPerformanceTime(Analytics analytics) {
         PreparedStatement preparedStatement = null;
         try {
+            establishConnection();
 
             String query = "update analytics_analytics set timeToGet_data=? , data_size=?  where id=?";
             preparedStatement = connection.prepareStatement(query);

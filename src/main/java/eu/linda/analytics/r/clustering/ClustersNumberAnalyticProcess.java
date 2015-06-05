@@ -11,12 +11,21 @@ import eu.linda.analytics.db.ConnectionController;
 import eu.linda.analytics.formats.InputFormat;
 import eu.linda.analytics.formats.OutputFormat;
 import eu.linda.analytics.model.Analytics;
-import eu.linda.analytics.weka.utils.HelpfulFunctionsSingleton;
+import eu.linda.analytics.weka.utils.Util;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.rosuda.JRI.RBool;
 ;
 import org.rosuda.JRI.RVector;
 import org.rosuda.JRI.Rengine;
+import org.rosuda.REngine.REXPMismatchException;
+import org.rosuda.REngine.Rserve.RConnection;
+import org.rosuda.REngine.Rserve.RserveException;import org.rosuda.JRI.RVector;
+import org.rosuda.JRI.Rengine;
+import org.rosuda.REngine.REXPMismatchException;
+import org.rosuda.REngine.Rserve.RConnection;
+import org.rosuda.REngine.Rserve.RserveException;
 
 /**
  *
@@ -26,12 +35,12 @@ import org.rosuda.JRI.Rengine;
 
 public class ClustersNumberAnalyticProcess extends AnalyticProcess {
 
-    HelpfulFunctionsSingleton helpfulFunctions;
+    Util helpfulFunctions;
     InputFormat input;
     ConnectionController connectionController;
 
     public ClustersNumberAnalyticProcess(InputFormat input) {
-        helpfulFunctions = HelpfulFunctionsSingleton.getInstance();
+        helpfulFunctions = Util.getInstance();
         helpfulFunctions.nicePrintMessage("Create analytic process for K-Means Algorithm");
         this.input = input;
         connectionController = ConnectionController.getInstance();
@@ -44,78 +53,89 @@ public class ClustersNumberAnalyticProcess extends AnalyticProcess {
 
     @Override
     public void eval(Analytics analytics, OutputFormat out) {
-        float timeToRun_analytics = 0;
-        long startTimeToRun_analytics = System.currentTimeMillis();
-        String RScript = "";
-        //clean previous eval info if exists
-        helpfulFunctions.cleanPreviousInfo(analytics);
-        analytics.setTimeToGet_data(0);
-        analytics.setTimeToRun_analytics(0);
-        analytics.setData_size(0);
-        Rengine re;
-        if (helpfulFunctions.isRDFInputFormat(analytics.getTrainQuery_id())) {
-            re = input.importData4R(Integer.toString(analytics.getTrainQuery_id()), true, analytics);
-
-        } else {
-            re = input.importData4R(Configuration.analyticsRepo + analytics.getDocument(), true, analytics);
-            RScript += "loaded_data <- read.csv(file='" + Configuration.analyticsRepo + analytics.getDocument() + "', header=TRUE, sep=',');\n";
-
-        }
-
-        RBool is_query_responsive = re.eval("is_query_responsive").asBool();
-        System.out.println("is_query_responsive:" + is_query_responsive.isTRUE());
-
-        if (is_query_responsive.isFALSE()) {
-            helpfulFunctions.updateProcessMessageToAnalyticsTable("There is a connectivity issue. Could not reach data for predefined query.\n"
-                    + " Please check your connectivity and the responsiveness of the selected sparql endpoint.\n "
-                    + "Then click on re-Evaluate button to try to run again the analytic process.", analytics.getId());
-            re.eval("rm(list=ls());");
-        } else {
-            //TODO Check that all values are numeric
+        try {
+            float timeToRun_analytics = 0;
+            long startTimeToRun_analytics = System.currentTimeMillis();
+            String RScript = "";
+            //clean previous eval info if exists
+            helpfulFunctions.cleanPreviousInfo(analytics);
+            analytics.setTimeToGet_data(0);
+            analytics.setTimeToRun_analytics(0);
+            analytics.setData_size(0);
+            RConnection re;
+            if (helpfulFunctions.isRDFInputFormat(analytics.getTrainQuery_id())) {
+                re = input.importData4R1(Integer.toString(analytics.getTrainQuery_id()), true, analytics);
+                
+            } else {
+                re = input.importData4R1(Configuration.analyticsRepo + analytics.getDocument(), true, analytics);
+                RScript += "loaded_data <- read.csv(file='" + Configuration.analyticsRepo + analytics.getDocument() + "', header=TRUE, sep=',');\n";
+                
+            }
+            
+            org.rosuda.REngine.REXP is_query_responsive = re.eval("is_query_responsive");
             
             
-            re.eval("column_with_uri <-colnames(loaded_data[2]);");
-            RScript += "# Prepare Data \n column_with_uri <-colnames(loaded_data[2]); \n";
-
-
-            re.eval("myvars <- names(loaded_data) %in% c('rowID',column_with_uri);");
-            RScript += "myvars <- names(loaded_data) %in% c('rowID',column_with_uri); \n";
-
-            re.eval("loaded_data <- loaded_data[!myvars]");
-            RScript += "loaded_data <- loaded_data[!myvars]\n";
-
-            re.eval("loaded_data <- na.omit(loaded_data)");
-            RScript += "loaded_data <- na.omit(loaded_data) # listwise deletion of missing\n";
-
-            re.eval("loaded_data <- scale(loaded_data)");
-            RScript += "loaded_data <- scale(loaded_data) # standardize variables\n";
-
-            re.eval("wss <- (nrow(loaded_data)-1)*sum(apply(loaded_data,2,var));");
-            RScript += "# Determine number of clusters \n wss <- (nrow(loaded_data)-1)*sum(apply(loaded_data,2,var)); \n";
-
-            re.eval("for (i in 2:15) wss[i] <- sum(kmeans(loaded_data, centers=i)$withinss);");
-            RScript += "for (i in 2:15) wss[i] <- sum(kmeans(loaded_data, centers=i)$withinss); \n";
-
-            long plot1_id = helpfulFunctions.manageNewPlot(analytics, "Definition of Clusters number", "plots/plotid" + analytics.getPlot1_id() + ".png", "plot1_id");
-
-            re.eval("png(file='" + Configuration.analyticsRepo + "plots/plotid" + plot1_id + ".png',width=600);");
-            re.eval("print(plot(1:15, wss, type='b', xlab='Number of Clusters', ylab='Within groups sum of squares'));");
-            re.eval("dev.off();");
-
-            RScript += "png(file='" + Configuration.analyticsRepo + "plots/plotid" + plot1_id + ".png',width=600);\n";
-            RScript += "plot(1:15, wss, type='b', xlab='Number of Clusters', ylab='Within groups sum of squares');\n";
-            RScript += "dev.off();\n";
-
-            
-            helpfulFunctions.writeToFile(RScript, "processinfo", analytics);
-
-            re.eval("rm(list=ls());");
-            long elapsedTimeToRunAnalyticsMillis = System.currentTimeMillis() - startTimeToRun_analytics;
-            // Get elapsed time in seconds
-            timeToRun_analytics = elapsedTimeToRunAnalyticsMillis / 1000F;
-            analytics.setTimeToRun_analytics(analytics.getTimeToRun_analytics() + timeToRun_analytics);
-            connectionController.updateLindaAnalyticsProcessPerformanceTime(analytics);
-
+            if (is_query_responsive.asString().equalsIgnoreCase("FALSE")) {
+                helpfulFunctions.updateProcessMessageToAnalyticsTable("There is a connectivity issue. Could not reach data for predefined query.\n"
+                        + " Please check your connectivity and the responsiveness of the selected sparql endpoint.\n "
+                        + "Then click on re-Evaluate button to try to run again the analytic process.", analytics.getId());
+                re.eval("rm(list=ls());");
+            } else {
+                //TODO Check that all values are numeric
+                
+                
+                re.eval("column_with_uri <-colnames(loaded_data[2]);");
+                RScript += "# Prepare Data \n column_with_uri <-colnames(loaded_data[2]); \n";
+                
+                
+                re.eval("myvars <- names(loaded_data) %in% c('rowID',column_with_uri);");
+                RScript += "myvars <- names(loaded_data) %in% c('rowID',column_with_uri); \n";
+                
+                re.eval("loaded_data <- loaded_data[!myvars]");
+                RScript += "loaded_data <- loaded_data[!myvars]\n";
+                
+                re.eval("loaded_data <- na.omit(loaded_data)");
+                RScript += "loaded_data <- na.omit(loaded_data) # listwise deletion of missing\n";
+                
+                re.eval("loaded_data <- scale(loaded_data)");
+                RScript += "loaded_data <- scale(loaded_data) # standardize variables\n";
+                
+                re.eval("wss <- (nrow(loaded_data)-1)*sum(apply(loaded_data,2,var));");
+                RScript += "# Determine number of clusters \n wss <- (nrow(loaded_data)-1)*sum(apply(loaded_data,2,var)); \n";
+                
+                re.eval("if(nrow(loaded_data)-1>15) {cluster_num <-15;} else {cluster_num <-nrow(loaded_data)-1;}");
+                RScript += "if(nrow(loaded_data)-1>15) {cluster_num <-15;} else {cluster_num <-nrow(loaded_data)-1;} \n";
+                
+               
+                
+                re.eval("for (i in 2:cluster_num) wss[i] <- sum(kmeans(loaded_data, centers=i)$withinss);");
+                RScript += "for (i in 2:cluster_num) wss[i] <- sum(kmeans(loaded_data, centers=i)$withinss);  \n";
+                
+                long plot1_id = helpfulFunctions.manageNewPlot(analytics, "Definition of Clusters number", "plots/plotid" + analytics.getPlot1_id() + ".png", "plot1_id");
+                
+                re.eval("png(file='" + Configuration.analyticsRepo + "plots/plotid" + plot1_id + ".png',width=600);");
+                re.eval("plot(1:cluster_num, wss, type='b', xlab='Number of Clusters', ylab='Within groups sum of squares');");
+                re.eval("dev.off();");
+                
+                RScript += "png(file='" + Configuration.analyticsRepo + "plots/plotid" + plot1_id + ".png',width=600);\n";
+                RScript += "plot(1:cluster_num, wss, type='b', xlab='Number of Clusters', ylab='Within groups sum of squares');\n";
+                RScript += "dev.off();\n";
+                
+                
+                helpfulFunctions.writeToFile(RScript, "processinfo", analytics);
+                
+                re.eval("rm(list=ls());");
+                long elapsedTimeToRunAnalyticsMillis = System.currentTimeMillis() - startTimeToRun_analytics;
+                // Get elapsed time in seconds
+                timeToRun_analytics = elapsedTimeToRunAnalyticsMillis / 1000F;
+                analytics.setTimeToRun_analytics(analytics.getTimeToRun_analytics() + timeToRun_analytics);
+                connectionController.updateLindaAnalyticsProcessPerformanceTime(analytics);
+                
+            }
+        } catch (RserveException ex) {
+            Logger.getLogger(ClustersNumberAnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (REXPMismatchException ex) {
+            Logger.getLogger(ClustersNumberAnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }

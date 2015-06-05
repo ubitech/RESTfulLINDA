@@ -11,7 +11,7 @@ import eu.linda.analytics.controller.RDFGenerationFactory;
 import eu.linda.analytics.db.ConnectionController;
 import eu.linda.analytics.db.DBSynchronizer;
 import eu.linda.analytics.model.Analytics;
-import eu.linda.analytics.weka.utils.HelpfulFunctionsSingleton;
+import eu.linda.analytics.weka.utils.Util;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -31,14 +31,14 @@ import weka.core.Instances;
  */
 public class RDFOutputFormat extends OutputFormat {
 
-    HelpfulFunctionsSingleton helpfulFuncions;
+    Util helpfulFuncions;
     RDFGenerationFactory rdfGenerationFactory;
     RDFGenerator rdfGenerator;
     ConnectionController connectionController;
 
     public RDFOutputFormat() {
         super();
-        helpfulFuncions = HelpfulFunctionsSingleton.getInstance();
+        helpfulFuncions = Util.getInstance();
         connectionController = ConnectionController.getInstance();
         rdfGenerationFactory = new RDFGenerationFactory();
     }

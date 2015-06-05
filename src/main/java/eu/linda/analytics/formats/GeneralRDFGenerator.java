@@ -17,7 +17,7 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 import com.hp.hpl.jena.vocabulary.XSD;
 import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.model.Analytics;
-import eu.linda.analytics.weka.utils.HelpfulFunctionsSingleton;
+import eu.linda.analytics.weka.utils.Util;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.AbstractList;
@@ -41,10 +41,10 @@ import weka.core.Instances;
  */
 public class GeneralRDFGenerator extends RDFGenerator {
 
-    HelpfulFunctionsSingleton helpfulFuncions;
+    Util helpfulFuncions;
 
     public GeneralRDFGenerator() {
-        helpfulFuncions = HelpfulFunctionsSingleton.getInstance();
+        helpfulFuncions = Util.getInstance();
     }
 
     @Override

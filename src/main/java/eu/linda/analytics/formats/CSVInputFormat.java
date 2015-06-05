@@ -7,7 +7,7 @@ package eu.linda.analytics.formats;
 
 import eu.linda.analytics.db.ConnectionController;
 import eu.linda.analytics.model.Analytics;
-import eu.linda.analytics.weka.utils.HelpfulFunctionsSingleton;
+import eu.linda.analytics.weka.utils.Util;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -26,11 +26,11 @@ import weka.core.converters.CSVLoader;
  */
 public class CSVInputFormat extends InputFormat {
 
-    HelpfulFunctionsSingleton helpfulFuncions;
+    Util helpfulFuncions;
     ConnectionController connectionController;
 
     public CSVInputFormat() {
-        helpfulFuncions = HelpfulFunctionsSingleton.getInstance();
+        helpfulFuncions = Util.getInstance();
         connectionController = ConnectionController.getInstance();
     }
 

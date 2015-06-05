@@ -22,7 +22,7 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 import com.hp.hpl.jena.vocabulary.XSD;
 import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.model.Analytics;
-import eu.linda.analytics.weka.utils.HelpfulFunctionsSingleton;
+import eu.linda.analytics.weka.utils.Util;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.AbstractList;
@@ -42,10 +42,10 @@ import weka.core.Instances;
  */
 public class ForecastingRDFGenerator extends RDFGenerator {
 
-    HelpfulFunctionsSingleton helpfulFunctions;
+    Util helpfulFunctions;
 
     public ForecastingRDFGenerator() {
-        helpfulFunctions = HelpfulFunctionsSingleton.getInstance();
+        helpfulFunctions = Util.getInstance();
     }
 
     //Generate General RDF Model

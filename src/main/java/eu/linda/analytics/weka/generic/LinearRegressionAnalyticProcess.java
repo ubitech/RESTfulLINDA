@@ -10,7 +10,7 @@ import eu.linda.analytics.controller.AnalyticProcess;
 import eu.linda.analytics.formats.InputFormat;
 import eu.linda.analytics.formats.OutputFormat;
 import eu.linda.analytics.model.Analytics;
-import eu.linda.analytics.weka.utils.HelpfulFunctionsSingleton;
+import eu.linda.analytics.weka.utils.Util;
 import java.util.AbstractList;
 import java.util.HashMap;
 import java.util.Vector;
@@ -31,12 +31,12 @@ import weka.core.SerializationHelper;
  */
 public class LinearRegressionAnalyticProcess extends AnalyticProcess {
 
-    HelpfulFunctionsSingleton helpfulFunctions;
+    Util helpfulFunctions;
     InputFormat input;
 
     public LinearRegressionAnalyticProcess(InputFormat input) {
 
-        helpfulFunctions = HelpfulFunctionsSingleton.getInstance();
+        helpfulFunctions = Util.getInstance();
         helpfulFunctions.nicePrintMessage("Create analytic process for LinearRegression");
         this.input = input;
 

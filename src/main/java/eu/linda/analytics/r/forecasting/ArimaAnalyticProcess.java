@@ -10,7 +10,7 @@ import eu.linda.analytics.controller.AnalyticProcess;
 import eu.linda.analytics.formats.InputFormat;
 import eu.linda.analytics.formats.OutputFormat;
 import eu.linda.analytics.model.Analytics;
-import eu.linda.analytics.weka.utils.HelpfulFunctionsSingleton;
+import eu.linda.analytics.weka.utils.Util;
 import java.io.InputStream;
 import java.util.Vector;
 import org.rosuda.JRI.RBool;
@@ -23,11 +23,11 @@ import org.rosuda.JRI.Rengine;
  */
 public class ArimaAnalyticProcess extends AnalyticProcess {
 
-    HelpfulFunctionsSingleton helpfulFunctions;
+    Util helpfulFunctions;
     InputFormat input;
 
     public ArimaAnalyticProcess(InputFormat input) {
-        helpfulFunctions = HelpfulFunctionsSingleton.getInstance();
+        helpfulFunctions = Util.getInstance();
         helpfulFunctions.nicePrintMessage("Create analytic process for Forecasting Arima Algorithm");
         this.input = input;
 

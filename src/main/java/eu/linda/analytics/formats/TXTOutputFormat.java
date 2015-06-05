@@ -9,7 +9,7 @@ import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.db.ConnectionController;
 import eu.linda.analytics.db.DBSynchronizer;
 import eu.linda.analytics.model.Analytics;
-import eu.linda.analytics.weka.utils.HelpfulFunctionsSingleton;
+import eu.linda.analytics.weka.utils.Util;
 import java.util.AbstractList;
 import org.json.JSONArray;
 import org.rosuda.JRI.Rengine;
@@ -23,11 +23,11 @@ import org.rosuda.REngine.Rserve.RConnection;
 public class TXTOutputFormat extends OutputFormat {
 
     ConnectionController connectionController;
-    HelpfulFunctionsSingleton helpfulFuncions;
+    Util helpfulFuncions;
 
     public TXTOutputFormat() {
         connectionController = ConnectionController.getInstance();
-        helpfulFuncions = HelpfulFunctionsSingleton.getInstance();
+        helpfulFuncions = Util.getInstance();
     }
 
     @Override

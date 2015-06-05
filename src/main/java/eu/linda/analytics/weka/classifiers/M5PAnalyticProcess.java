@@ -10,7 +10,7 @@ import eu.linda.analytics.controller.AnalyticProcess;
 import eu.linda.analytics.formats.InputFormat;
 import eu.linda.analytics.formats.OutputFormat;
 import eu.linda.analytics.model.Analytics;
-import eu.linda.analytics.weka.utils.HelpfulFunctionsSingleton;
+import eu.linda.analytics.weka.utils.Util;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,11 +35,11 @@ import weka.core.SerializationHelper;
 public class M5PAnalyticProcess extends AnalyticProcess {
 
     //M5POutput m5pOutput;
-    HelpfulFunctionsSingleton helpfulFunctions;
+    Util helpfulFunctions;
     InputFormat input;
 
     public M5PAnalyticProcess(InputFormat input) {
-        helpfulFunctions = HelpfulFunctionsSingleton.getInstance();
+        helpfulFunctions = Util.getInstance();
         helpfulFunctions.nicePrintMessage("Create analytic process for M5P");
         //m5pOutput = new M5POutput(in);
         this.input = input;

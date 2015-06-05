@@ -11,7 +11,7 @@ import eu.linda.analytics.db.ConnectionController;
 import eu.linda.analytics.formats.InputFormat;
 import eu.linda.analytics.formats.OutputFormat;
 import eu.linda.analytics.model.Analytics;
-import eu.linda.analytics.weka.utils.HelpfulFunctionsSingleton;
+import eu.linda.analytics.weka.utils.Util;
 import java.io.IOException;
 import java.util.Vector;
 import java.util.logging.Level;
@@ -27,12 +27,12 @@ import org.rosuda.JRI.Rengine;
  */
 public class NCFCorrelogramAnalyticProcess extends AnalyticProcess {
 
-    HelpfulFunctionsSingleton helpfulFunctions;
+    Util helpfulFunctions;
     InputFormat input;
     ConnectionController connectionController;
 
     public NCFCorrelogramAnalyticProcess(InputFormat input) {
-        helpfulFunctions = HelpfulFunctionsSingleton.getInstance();
+        helpfulFunctions = Util.getInstance();
         helpfulFunctions.nicePrintMessage("Create analytic process for Geospatial Algorithm - NCF Correlogram Kriging");
         this.input = input;
         connectionController = ConnectionController.getInstance();

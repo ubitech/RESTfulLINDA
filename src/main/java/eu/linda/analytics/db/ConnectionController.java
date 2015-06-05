@@ -9,7 +9,7 @@ import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.formats.CSVOutputFormat;
 import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.model.Query;
-import eu.linda.analytics.weka.utils.HelpfulFunctionsSingleton;
+import eu.linda.analytics.weka.utils.Util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -20,7 +20,6 @@ import org.apache.commons.httpclient.util.URIUtil;
 
 public final class ConnectionController {
 
-    //private final static Logger LOGGER = LoggerFactory.getLogger();
     private final Properties prop = new Properties();
     private InputStream input = null;
     DBSynchronizer dbsynchronizer;
@@ -71,7 +70,7 @@ public final class ConnectionController {
             query_uri = Configuration.rdf2anyServer + "/rdf2any/v1.0/convert/csv-converter.csv?dataset=" + linda_query.getEndpoint() + "&query=" + URIUtil.encodeQuery(linda_query.getSparql());
 
         } catch (URIException ex) {
-            Logger.getLogger(HelpfulFunctionsSingleton.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Util.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         //System.out.println("query_uri" + query_uri);

@@ -11,7 +11,7 @@ import eu.linda.analytics.db.ConnectionController;
 import eu.linda.analytics.formats.InputFormat;
 import eu.linda.analytics.formats.OutputFormat;
 import eu.linda.analytics.model.Analytics;
-import eu.linda.analytics.weka.utils.HelpfulFunctionsSingleton;
+import eu.linda.analytics.weka.utils.Util;
 import java.util.HashMap;
 import java.util.Vector;
 import org.rosuda.JRI.RBool;
@@ -26,12 +26,12 @@ import weka.core.Instances;
  */
 public class MoransAnalyticProcess extends AnalyticProcess {
 
-    HelpfulFunctionsSingleton helpfulFunctions;
+    Util helpfulFunctions;
     InputFormat input;
     ConnectionController connectionController;
 
     public MoransAnalyticProcess(InputFormat input) {
-        helpfulFunctions = HelpfulFunctionsSingleton.getInstance();
+        helpfulFunctions = Util.getInstance();
         helpfulFunctions.nicePrintMessage("Create analytic process for Moran's I Algorithm");
         this.input = input;
         connectionController = ConnectionController.getInstance();

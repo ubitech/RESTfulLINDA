@@ -7,7 +7,7 @@
 package eu.linda.analytics.formats;
 
 import eu.linda.analytics.model.Analytics;
-import eu.linda.analytics.weka.utils.HelpfulFunctionsSingleton;
+import eu.linda.analytics.weka.utils.Util;
 import java.util.AbstractList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -24,10 +24,10 @@ import weka.filters.unsupervised.attribute.Remove;
  */
 public class ArffInputFormat extends InputFormat {
     
-    HelpfulFunctionsSingleton helpfulFuncions;
+    Util helpfulFuncions;
 
     public ArffInputFormat() {
-        helpfulFuncions = HelpfulFunctionsSingleton.getInstance();
+        helpfulFuncions = Util.getInstance();
     }
 
 

@@ -8,7 +8,7 @@ package eu.linda.analytics.formats;
 import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.db.ConnectionController;
 import eu.linda.analytics.model.Analytics;
-import eu.linda.analytics.weka.utils.HelpfulFunctionsSingleton;
+import eu.linda.analytics.weka.utils.Util;
 import java.util.AbstractList;
 import org.rosuda.JRI.Rengine;
 import org.rosuda.REngine.Rserve.RConnection;
@@ -20,11 +20,11 @@ import org.rosuda.REngine.Rserve.RConnection;
 public class CSVOutputFormat extends OutputFormat {
 
     ConnectionController connectionController;
-    HelpfulFunctionsSingleton helpfulFunctions;
+    Util helpfulFunctions;
 
     public CSVOutputFormat() {
         connectionController = ConnectionController.getInstance();
-        helpfulFunctions = HelpfulFunctionsSingleton.getInstance();
+        helpfulFunctions = Util.getInstance();
     }
 
     @Override

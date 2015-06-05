@@ -7,7 +7,7 @@ package eu.linda.analytics.formats;
 
 import eu.linda.analytics.db.ConnectionController;
 import eu.linda.analytics.model.Analytics;
-import eu.linda.analytics.weka.utils.HelpfulFunctionsSingleton;
+import eu.linda.analytics.weka.utils.Util;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -32,11 +32,11 @@ import weka.core.converters.CSVLoader;
  */
 public class RDFInputFormat extends InputFormat {
 
-    HelpfulFunctionsSingleton helpfulFunctions;
+    Util helpfulFunctions;
     ConnectionController connectionController;
 
     public RDFInputFormat() {
-        helpfulFunctions = HelpfulFunctionsSingleton.getInstance();
+        helpfulFunctions = Util.getInstance();
         connectionController = ConnectionController.getInstance();
     }
 

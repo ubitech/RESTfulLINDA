@@ -11,7 +11,7 @@ import eu.linda.analytics.db.ConnectionController;
 import eu.linda.analytics.formats.InputFormat;
 import eu.linda.analytics.formats.OutputFormat;
 import eu.linda.analytics.model.Analytics;
-import eu.linda.analytics.weka.utils.HelpfulFunctionsSingleton;
+import eu.linda.analytics.weka.utils.Util;
 import java.util.AbstractList;
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -31,12 +31,12 @@ import weka.core.Instances;
  */
 public class J48AnalyticProcess extends AnalyticProcess {
 
-    HelpfulFunctionsSingleton helpfulFunctions;
+    Util helpfulFunctions;
     InputFormat input;
     ConnectionController connectionController;
 
     public J48AnalyticProcess(InputFormat input) {
-        helpfulFunctions = HelpfulFunctionsSingleton.getInstance();
+        helpfulFunctions = Util.getInstance();
         connectionController = ConnectionController.getInstance();
         helpfulFunctions.nicePrintMessage("Create analytic process for J48");
         this.input = input;
