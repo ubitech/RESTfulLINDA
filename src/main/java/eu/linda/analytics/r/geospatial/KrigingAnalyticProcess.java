@@ -12,9 +12,14 @@ import eu.linda.analytics.formats.OutputFormat;
 import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.weka.utils.Util;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.rosuda.JRI.RBool;
 import org.rosuda.JRI.RVector;
 import org.rosuda.JRI.Rengine;
+import org.rosuda.REngine.REXPMismatchException;
+import org.rosuda.REngine.Rserve.RConnection;
+import org.rosuda.REngine.Rserve.RserveException;
 
 /**
  *
@@ -48,175 +53,174 @@ public class KrigingAnalyticProcess extends AnalyticProcess {
         analytics.setTimeToRun_analytics(0);
         analytics.setData_size(0);
         analytics.setTimeToCreate_RDF(0);
-        Rengine re;
-        if (helpfulFunctions.isRDFInputFormat(analytics.getTrainQuery_id())) {
-            //import train dataset
-            re = input.importData4R(Integer.toString(analytics.getTrainQuery_id()), true, analytics);
+        RConnection re;
+        try {
+            if (helpfulFunctions.isRDFInputFormat(analytics.getTrainQuery_id())) {
 
-            //////////////
-            RBool is_train_query_responsive = re.eval("is_query_responsive").asBool();
-            System.out.println("is_query_responsive:" + is_train_query_responsive.isTRUE());
+                //import train dataset
+                re = input.importData4R1(Integer.toString(analytics.getTrainQuery_id()), true, analytics);
 
-            if (is_train_query_responsive.isFALSE()) {
-                helpfulFunctions.updateProcessMessageToAnalyticsTable("There is a connectivity issue. Could not reach data for predefined query.\n"
-                        + " Please check your connectivity and the responsiveness of the selected sparql endpoint.\n "
-                        + "Then click on re-Evaluate button to try to run again the analytic process.", analytics.getId());
-                re.eval("rm(list=ls());");
-                return;
+         
+                org.rosuda.REngine.REXP is_train_query_responsive = re.eval("is_query_responsive");
+
+                if (is_train_query_responsive.asString().equalsIgnoreCase("FALSE")) {
+                    helpfulFunctions.updateProcessMessageToAnalyticsTable("There is a connectivity issue. Could not reach data for predefined query.\n"
+                            + " Please check your connectivity and the responsiveness of the selected sparql endpoint.\n "
+                            + "Then click on re-Evaluate button to try to run again the analytic process.", analytics.getId());
+                    re.eval("rm(list=ls());");
+                    return;
+                }
+             
+
+                re.eval("loaded_data_train <- loaded_data;");
+                RScript += "loaded_data_train <- read.csv('insertqueryid" + analytics.getTrainQuery_id() + "');\n";
+
+                re = input.importData4R1(Integer.toString(analytics.getEvaluationQuery_id()), true, analytics);
+
+             
+                org.rosuda.REngine.REXP is_evaluateion_query_responsive = re.eval("is_query_responsive");
+
+                if (is_evaluateion_query_responsive.asString().equalsIgnoreCase("FALSE")) {
+                    helpfulFunctions.updateProcessMessageToAnalyticsTable("There is a connectivity issue. Could not reach data for predefined query.\n"
+                            + " Please check your connectivity and the responsiveness of the selected sparql endpoint.\n "
+                            + "Then click on re-Evaluate button to try to run again the analytic process.", analytics.getId());
+                    re.eval("rm(list=ls());");
+                    return;
+                }
+                
+
+                re.eval("loaded_data_eval <- loaded_data;");
+                RScript += "loaded_data_eval <- read.csv('insertqueryid" + analytics.getEvaluationQuery_id() + "')\n";
+
+                re.eval("df_to_export<- loaded_data;");
+                RScript += "df_to_export<- read.csv('insertqueryid" + analytics.getEvaluationQuery_id() + "');\n";
+
+            } else {
+                //load train dataset
+                re = input.importData4R1(Configuration.analyticsRepo + analytics.getDocument(), true, analytics);
+                re.eval("loaded_data_train <- loaded_data;");
+                //re.eval("loaded_data_train <- read.csv('/home/eleni/Downloads/ca21.dat');");
+                RScript += "loaded_data_train <- read.csv('" + Configuration.analyticsRepo + analytics.getDocument() + "');\n";
+
+                //load eval dataset
+                re = input.importData4R1(Configuration.analyticsRepo + analytics.getTestdocument(), true, analytics);
+                re.eval("loaded_data_eval <- loaded_data;");
+                //re.eval("loaded_data_eval <- read.csv('/home/eleni/Downloads/ca21Evalwithuri1.dat')");
+                RScript += "loaded_data_eval <- read.csv('" + Configuration.analyticsRepo + analytics.getTestdocument() + "')\n";
+
+                re.eval("df_to_export<- loaded_data;");
+                //re.eval("df_to_export<- read.csv('/home/eleni/Downloads/ca21Evalwithuri1.dat');");
+                RScript += "df_to_export<- read.csv('" + Configuration.analyticsRepo + analytics.getTestdocument() + "');\n";
+
             }
-            /////////
 
-            re.eval("loaded_data_train <- loaded_data;");
-            RScript += "loaded_data_train <- read.csv('insertqueryid" + analytics.getTrainQuery_id() + "');\n";
+            re.eval("loaded_data_train <- subset(loaded_data_train, !duplicated(loaded_data_train[4:5]));");
+            RScript += "#remove any duplicated coordinates\n";
+            RScript += "loaded_data_train <- subset(loaded_data_train, !duplicated(loaded_data_train[4:5]));\n";
+            re.eval("loaded_data_eval <- subset(loaded_data_eval, !duplicated(loaded_data_eval[4:5]));");
+            RScript += "loaded_data_eval <- subset(loaded_data_eval, !duplicated(loaded_data_eval[4:5]));\n";
+            re.eval("df_to_export <- subset(df_to_export, !duplicated(df_to_export[4:5]));");
+            RScript += "df_to_export <- subset(df_to_export, !duplicated(df_to_export[4:5]));\n";
 
-            re = input.importData4R(Integer.toString(analytics.getEvaluationQuery_id()), true, analytics);
-            
-            
-            //////////////
-            RBool is_evaluateion_query_responsive = re.eval("is_query_responsive").asBool();
-            System.out.println("is_query_responsive:" + is_evaluateion_query_responsive.isTRUE());
+            re.eval("library(sp)");
+            RScript += "library(sp)\n";
 
-            if (is_evaluateion_query_responsive.isFALSE()) {
-                helpfulFunctions.updateProcessMessageToAnalyticsTable("There is a connectivity issue. Could not reach data for predefined query.\n"
-                        + " Please check your connectivity and the responsiveness of the selected sparql endpoint.\n "
-                        + "Then click on re-Evaluate button to try to run again the analytic process.", analytics.getId());
-                re.eval("rm(list=ls());");
-                return;
-            }
-            /////////
-            
-            re.eval("loaded_data_eval <- loaded_data;");
-            RScript += "loaded_data_eval <- read.csv('insertqueryid" + analytics.getEvaluationQuery_id() + "')\n";
+            re.eval("library(gstat)");
+            RScript += "library(gstat)\n";
 
-            re.eval("df_to_export<- loaded_data;");
-            RScript += "df_to_export<- read.csv('insertqueryid" + analytics.getEvaluationQuery_id() + "');\n";
+            re.eval("column_number<-ncol(loaded_data_train);");
+            RScript += "column_number<-ncol(loaded_data_train);\n";
 
-        } else {
-            //load train dataset
-            re = input.importData4R(Configuration.analyticsRepo + analytics.getDocument(), true, analytics);
-            re.eval("loaded_data_train <- loaded_data;");
-            //re.eval("loaded_data_train <- read.csv('/home/eleni/Downloads/ca21.dat');");
-            RScript += "loaded_data_train <- read.csv('" + Configuration.analyticsRepo + analytics.getDocument() + "');\n";
+            re.eval("column_to_predict <-colnames(loaded_data_train[column_number]);");
+            RScript += "column_to_predict <-colnames(loaded_data_train[column_number]);\n";
 
-            //load eval dataset
-            re = input.importData4R(Configuration.analyticsRepo + analytics.getTestdocument(), true, analytics);
-            re.eval("loaded_data_eval <- loaded_data;");
-            //re.eval("loaded_data_eval <- read.csv('/home/eleni/Downloads/ca21Evalwithuri1.dat')");
-            RScript += "loaded_data_eval <- read.csv('" + Configuration.analyticsRepo + analytics.getTestdocument() + "')\n";
+            re.eval("rows_number<-nrow(loaded_data_train);");
+            RScript += "rows_number<-nrow(loaded_data_train);\n";
 
-            re.eval("df_to_export<- loaded_data;");
-            //re.eval("df_to_export<- read.csv('/home/eleni/Downloads/ca21Evalwithuri1.dat');");
-            RScript += "df_to_export<- read.csv('" + Configuration.analyticsRepo + analytics.getTestdocument() + "');\n";
+            re.eval("valuesToClean<-loaded_data_train[column_to_predict];");
+            RScript += "valuesToClean<-loaded_data_train[column_to_predict];\n";
 
-        }
+            // ---- get analyzedFieldValue ----
+            org.rosuda.REngine.REXP column_to_predict = re.eval("column_to_predict");
+            String analyzedFieldValue = column_to_predict.asString();
 
-        re.eval("loaded_data_train <- subset(loaded_data_train, !duplicated(loaded_data_train[4:5]));");
-        RScript += "#remove any duplicated coordinates\n";
-        RScript += "loaded_data_train <- subset(loaded_data_train, !duplicated(loaded_data_train[4:5]));\n";
-        re.eval("loaded_data_eval <- subset(loaded_data_eval, !duplicated(loaded_data_eval[4:5]));");
-        RScript += "loaded_data_eval <- subset(loaded_data_eval, !duplicated(loaded_data_eval[4:5]));\n";
-        re.eval("df_to_export <- subset(df_to_export, !duplicated(df_to_export[4:5]));");
-        RScript += "df_to_export <- subset(df_to_export, !duplicated(df_to_export[4:5]));\n";
+            re.eval("valuesToCleanNum<-rows_number;");
+            RScript += "valuesToCleanNum<-rows_number;\n";
 
-        re.eval("library(sp)");
-        RScript += "library(sp)\n";
+            re.eval("trimmedValues<- data.frame();");
+            RScript += "trimmedValues<- data.frame();\n";
 
-        re.eval("library(gstat)");
-        RScript += "library(gstat)\n";
+            re.eval("for(i in 1:valuesToCleanNum){ valueToTrim <- as.character(valuesToClean[i,1]);  if(grepl(\"#\", valueToTrim)) {  position<-which(strsplit(valueToTrim, \"\")[[1]]==\"^\");  trimmedValues[i,1]<-substr(valueToTrim, 1, position[1]-1); }else{ trimmedValues[i,1]<-valueToTrim;}  }");
+            RScript += "for(i in 1:valuesToCleanNum){ valueToTrim <- as.character(valuesToClean[i,1]);  if(grepl(\"#\", valueToTrim)) {  position<-which(strsplit(valueToTrim, \"\")[[1]]==\"^\");  trimmedValues[i,1]<-substr(valueToTrim, 1, position[1]-1); }else{ trimmedValues[i,1]<-valueToTrim;}  }\n";
 
-        // ---- get analyzedFieldValue ----
-        RVector dataToExportasVector = re.eval("loaded_data_train").asVector();
-        Vector colnames = dataToExportasVector.getNames();
+            re.eval("result_column_number<-ncol(loaded_data_train);");
+            RScript += "result_column_number<-ncol(loaded_data_train);\n";
 
-        String[] colnamesArray = new String[colnames.size()];
-        colnames.copyInto(colnamesArray);
+            re.eval("colnames(trimmedValues)[1]<- column_to_predict;");
+            RScript += "colnames(trimmedValues)[1]<- column_to_predict;\n";
 
-        String analyzedFieldValue = colnamesArray[colnames.size() - 1];
-        //
+            re.eval("trimmedValues$" + analyzedFieldValue + "<-as.numeric(trimmedValues$" + analyzedFieldValue + ");");
+            RScript += "trimmedValues$" + analyzedFieldValue + "<-as.numeric(trimmedValues$" + analyzedFieldValue + ");\n";
 
-        re.eval("column_number<-ncol(loaded_data_train);");
-        RScript += "column_number<-ncol(loaded_data_train);\n";
+            re.eval("loaded_data_train[[column_to_predict]] <- trimmedValues;");
+            RScript += "loaded_data_train[[column_to_predict]] <- trimmedValues;\n";
 
-        re.eval("column_to_predict <-colnames(loaded_data_train[column_number]);");
-        RScript += "column_to_predict <-colnames(loaded_data_train[column_number]);\n";
+            re.eval("loaded_data_train$" + analyzedFieldValue + "<-as.numeric(unlist(loaded_data_train$" + analyzedFieldValue + "));");
+            RScript += "loaded_data_train$" + analyzedFieldValue + "<-as.numeric(unlist(loaded_data_train$" + analyzedFieldValue + "));\n";
 
-        re.eval("rows_number<-nrow(loaded_data_train);");
-        RScript += "rows_number<-nrow(loaded_data_train);\n";
+            re.eval("loaded_data_train<-data.frame(loaded_data_train);");
+            RScript += " loaded_data_train<-data.frame(loaded_data_train);\n";
 
-        re.eval("valuesToClean<-loaded_data_train[column_to_predict];");
-        RScript += "valuesToClean<-loaded_data_train[column_to_predict];\n";
+            re.eval("loaded_data_eval<-data.frame(loaded_data_eval);");
+            RScript += "loaded_data_eval<-data.frame(loaded_data_eval);\n";
 
-        re.eval("valuesToCleanNum<-rows_number;");
-        RScript += "valuesToCleanNum<-rows_number;\n";
+            re.eval("coordinates(loaded_data_train) = ~x+y");
+            RScript += "coordinates(loaded_data_train) = ~x+y\n";
 
-        re.eval("trimmedValues<- data.frame();");
-        RScript += "trimmedValues<- data.frame();\n";
+            re.eval("v <- variogram(log(" + analyzedFieldValue + ")~1, loaded_data_train)");
+            RScript += "v <- variogram(log(" + analyzedFieldValue + ")~1, loaded_data_train)\n";
 
-        re.eval("for(i in 1:valuesToCleanNum){ valueToTrim <- as.character(valuesToClean[i,1]);  if(grepl(\"#\", valueToTrim)) {  position<-which(strsplit(valueToTrim, \"\")[[1]]==\"^\");  trimmedValues[i,1]<-substr(valueToTrim, 1, position[1]-1); }else{ trimmedValues[i,1]<-valueToTrim;}  }");
-        RScript += "for(i in 1:valuesToCleanNum){ valueToTrim <- as.character(valuesToClean[i,1]);  if(grepl(\"#\", valueToTrim)) {  position<-which(strsplit(valueToTrim, \"\")[[1]]==\"^\");  trimmedValues[i,1]<-substr(valueToTrim, 1, position[1]-1); }else{ trimmedValues[i,1]<-valueToTrim;}  }\n";
+            re.eval("m <- fit.variogram(v, vgm(1, 'Sph', 300, 1))");
+            RScript += "m <- fit.variogram(v, vgm(1, 'Sph', 300, 1))\n";
 
-        re.eval("result_column_number<-ncol(loaded_data_train);");
-        RScript += "result_column_number<-ncol(loaded_data_train);\n";
+            long plot1_id = helpfulFunctions.manageNewPlot(analytics, "Variogram Plot : Visualization of the spatial autocorrelation of the analyzed field: " + analyzedFieldValue, "plots/plotid" + analytics.getPlot1_id() + ".png", "plot1_id");
 
-        re.eval("colnames(trimmedValues)[1]<- column_to_predict;");
-        RScript += "colnames(trimmedValues)[1]<- column_to_predict;\n";
+            re.eval("variogramplot<-plot(v, model = m)");
+            re.eval("png(file='" + Configuration.analyticsRepo + "plots/plotid" + plot1_id + ".png',width=600)");
+            re.eval("print(variogramplot)");
+            re.eval("dev.off()");
 
-        re.eval("trimmedValues$" + analyzedFieldValue + "<-as.numeric(trimmedValues$" + analyzedFieldValue + ");");
-        RScript += "trimmedValues$" + analyzedFieldValue + "<-as.numeric(trimmedValues$" + analyzedFieldValue + ");\n";
-
-        re.eval("loaded_data_train[[column_to_predict]] <- trimmedValues;");
-        RScript += "loaded_data_train[[column_to_predict]] <- trimmedValues;\n";
-
-        re.eval("loaded_data_train$" + analyzedFieldValue + "<-as.numeric(unlist(loaded_data_train$" + analyzedFieldValue + "));");
-        RScript += "loaded_data_train$" + analyzedFieldValue + "<-as.numeric(unlist(loaded_data_train$" + analyzedFieldValue + "));\n";
-
-        re.eval("loaded_data_train<-data.frame(loaded_data_train);");
-        RScript += " loaded_data_train<-data.frame(loaded_data_train);\n";
-
-        re.eval("loaded_data_eval<-data.frame(loaded_data_eval);");
-        RScript += "loaded_data_eval<-data.frame(loaded_data_eval);\n";
-
-        re.eval("coordinates(loaded_data_train) = ~x+y");
-        RScript += "coordinates(loaded_data_train) = ~x+y\n";
-
-        re.eval("v <- variogram(log(" + analyzedFieldValue + ")~1, loaded_data_train)");
-        RScript += "v <- variogram(log(" + analyzedFieldValue + ")~1, loaded_data_train)\n";
-
-        re.eval("m <- fit.variogram(v, vgm(1, 'Sph', 300, 1))");
-        RScript += "m <- fit.variogram(v, vgm(1, 'Sph', 300, 1))\n";
-
-        long plot1_id = helpfulFunctions.manageNewPlot(analytics, "Variogram Plot : Visualization of the spatial autocorrelation of the analyzed field: " + analyzedFieldValue, "plots/plotid" + analytics.getPlot1_id() + ".png", "plot1_id");
-
-        re.eval("variogramplot<-plot(v, model = m)");
-        re.eval("png(file='" + Configuration.analyticsRepo + "plots/plotid" + plot1_id + ".png',width=600)");
-        re.eval("print(variogramplot)");
-        re.eval("dev.off()");
-
-        re.eval("coordinates(loaded_data_eval) = ~x+y");
-        RScript += "coordinates(loaded_data_eval) = ~x+y\n";
+            re.eval("coordinates(loaded_data_eval) = ~x+y");
+            RScript += "coordinates(loaded_data_eval) = ~x+y\n";
 
         //#sim <- krige(formula = log(ca20)~1, d, dEval, model = m, nmax = 15, beta = 5.9, nsim = 3)
-        //#sim <- krige(formula = ca20~sqrt(altitude), d, dEval, model = m, nmax = 15, nsim = 3)
-        re.eval("df <- krige(formula = " + analyzedFieldValue + "~1, loaded_data_train, loaded_data_eval, model = m, nmax = 15, beta = 5.9, nsim = 1)");
-        RScript += "df <- krige(formula = " + analyzedFieldValue + "~1, loaded_data_train, loaded_data_eval, model = m, nmax = 15, beta = 5.9, nsim = 1)\n";
+            //#sim <- krige(formula = ca20~sqrt(altitude), d, dEval, model = m, nmax = 15, nsim = 3)
+            re.eval("df <- krige(formula = " + analyzedFieldValue + "~1, loaded_data_train, loaded_data_eval, model = m, nmax = 15, beta = 5.9, nsim = 1)");
+            RScript += "df <- krige(formula = " + analyzedFieldValue + "~1, loaded_data_train, loaded_data_eval, model = m, nmax = 15, beta = 5.9, nsim = 1)\n";
 
-        re.eval("df_to_export[[column_to_predict]] <- df$sim1");
-        RScript += "df_to_export[[column_to_predict]] <- df$sim1 \n";
+            re.eval("df_to_export[[column_to_predict]] <- df$sim1");
+            RScript += "df_to_export[[column_to_predict]] <- df$sim1 \n";
 
-        long plot2_id = helpfulFunctions.manageNewPlot(analytics, "Spatial data spplot map for analyzed field :" + analyzedFieldValue, "plots/plotid" + analytics.getPlot2_id() + ".png", "plot2_id");
+            long plot2_id = helpfulFunctions.manageNewPlot(analytics, "Spatial data spplot map for analyzed field :" + analyzedFieldValue, "plots/plotid" + analytics.getPlot2_id() + ".png", "plot2_id");
 
-        re.eval("tmp <- spplot(df)");
-        re.eval("png(file='" + Configuration.analyticsRepo + "plots/plotid" + plot2_id + ".png',width=600)");
-        re.eval("print(tmp)");
-        re.eval("dev.off()");
+            re.eval("tmp <- spplot(df)");
+            re.eval("png(file='" + Configuration.analyticsRepo + "plots/plotid" + plot2_id + ".png',width=600)");
+            re.eval("print(tmp)");
+            re.eval("dev.off()");
 
-        helpfulFunctions.writeToFile(RScript, "processinfo", analytics);
+            helpfulFunctions.writeToFile(RScript, "processinfo", analytics);
 
-        long elapsedTimeToRunAnalyticsMillis = System.currentTimeMillis() - startTimeToRun_analytics;
-        // Get elapsed time in seconds
-        timeToRun_analytics = elapsedTimeToRunAnalyticsMillis / 1000F;
-        analytics.setTimeToRun_analytics(timeToRun_analytics);
-        out.exportData(analytics, re);
+            long elapsedTimeToRunAnalyticsMillis = System.currentTimeMillis() - startTimeToRun_analytics;
+            // Get elapsed time in seconds
+            timeToRun_analytics = elapsedTimeToRunAnalyticsMillis / 1000F;
+            analytics.setTimeToRun_analytics(timeToRun_analytics);
+            out.exportData(analytics, re);
+
+        } catch (RserveException ex) {
+            Logger.getLogger(KrigingAnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (REXPMismatchException ex) {
+            Logger.getLogger(KrigingAnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
 }
