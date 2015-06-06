@@ -12,13 +12,8 @@ import eu.linda.analytics.formats.InputFormat;
 import eu.linda.analytics.formats.OutputFormat;
 import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.weka.utils.Util;
-import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.rosuda.JRI.RBool;
-import org.rosuda.JRI.REXP;
-import org.rosuda.JRI.RVector;
-import org.rosuda.JRI.Rengine;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.Rserve.RConnection;
 import org.rosuda.REngine.Rserve.RserveException;
@@ -56,19 +51,19 @@ public class NCFCorrelogramAnalyticProcess extends AnalyticProcess {
             RConnection re;
             if (helpfulFunctions.isRDFInputFormat(analytics.getTrainQuery_id())) {
                 //import train dataset
-                re = input.importData4R1(Integer.toString(analytics.getTrainQuery_id()), true, analytics);
+                re = input.importData4R1(Integer.toString(analytics.getTrainQuery_id()),"", true, analytics);
                 RScript += "loaded_data <- read.csv('insertqueryid" + analytics.getTrainQuery_id() + "');\n";
 
             } else {
                 //load train dataset
-                re = input.importData4R1(Configuration.analyticsRepo + analytics.getDocument(), true, analytics);
+                re = input.importData4R1(Configuration.analyticsRepo + analytics.getDocument(),"", true, analytics);
                 RScript += "loaded_data <- read.csv('" + Configuration.analyticsRepo + analytics.getDocument() + "');\n";
 
             }
 
-            org.rosuda.REngine.REXP is_query_responsive = re.eval("is_query_responsive");
+            org.rosuda.REngine.REXP is_train_query_responsive = re.eval("is_train_query_responsive");
 
-            if (is_query_responsive.asString().equalsIgnoreCase("FALSE")) {
+            if (is_train_query_responsive.asString().equalsIgnoreCase("FALSE")) {
 
                 helpfulFunctions.updateProcessMessageToAnalyticsTable("There is a connectivity issue. Could not reach data for predefined query.\n"
                         + " Please check your connectivity and the responsiveness of the selected sparql endpoint.\n "

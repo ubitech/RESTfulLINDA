@@ -81,58 +81,58 @@ public class CSVInputFormat extends InputFormat {
 
     }
 
+//    @Override
+//    public Rengine importData4R(String pathToFile, boolean isForRDFOutput, Analytics analytics) {
+//        float timeToGetQuery = 0;
+//        long startTimeToGetQuery = System.currentTimeMillis();
+//
+//        System.out.println(System.getProperty("java.library.path"));
+//        System.out.println("R_HOME" + System.getenv().get("R_HOME"));
+//
+//        Rengine re = Rengine.getMainEngine();
+//        if (re == null) {
+//            re = new Rengine(new String[]{"--vanilla"}, false, null);
+//        }
+//
+//        if (!re.waitForR()) {
+//            System.out.println("Cannot load R");
+//            System.out.println("is alive Rengine??" + re.isAlive());
+//        }
+//        re.eval("is_query_responsive <-TRUE  ");
+//        re.eval(" loaded_data <- read.csv(file='" + pathToFile + "', header=TRUE, sep=',', na.strings='---');");
+//
+//        FileInputStream fis = null;
+//        try {
+//
+//            fis = new FileInputStream(pathToFile);
+//            System.out.println("fis.getChannel().size() " + fis.getChannel().size());
+//            analytics.setData_size(analytics.getData_size() + fis.getChannel().size());
+//        } catch (FileNotFoundException ex) {
+//            Logger.getLogger(CSVInputFormat.class.getName()).log(Level.SEVERE, null, ex);
+//        } catch (IOException ex) {
+//            Logger.getLogger(CSVInputFormat.class.getName()).log(Level.SEVERE, null, ex);
+//        } finally {
+//            try {
+//                fis.close();
+//            } catch (IOException ex) {
+//                Logger.getLogger(CSVInputFormat.class.getName()).log(Level.SEVERE, null, ex);
+//            }
+//        }
+//
+//        // Get elapsed time in milliseconds
+//        long elapsedTimeToGetQueryMillis = System.currentTimeMillis() - startTimeToGetQuery;
+//        // Get elapsed time in seconds
+//        timeToGetQuery = elapsedTimeToGetQueryMillis / 1000F;
+//        analytics.setTimeToGet_data(analytics.getTimeToGet_data() + timeToGetQuery);
+//        System.out.println("timeToGetQuery" + timeToGetQuery);
+//
+//        connectionController.updateLindaAnalyticsInputDataPerformanceTime(analytics);
+//
+//        return re;
+//    }
+//    
     @Override
-    public Rengine importData4R(String pathToFile, boolean isForRDFOutput, Analytics analytics) {
-        float timeToGetQuery = 0;
-        long startTimeToGetQuery = System.currentTimeMillis();
-
-        System.out.println(System.getProperty("java.library.path"));
-        System.out.println("R_HOME" + System.getenv().get("R_HOME"));
-
-        Rengine re = Rengine.getMainEngine();
-        if (re == null) {
-            re = new Rengine(new String[]{"--vanilla"}, false, null);
-        }
-
-        if (!re.waitForR()) {
-            System.out.println("Cannot load R");
-            System.out.println("is alive Rengine??" + re.isAlive());
-        }
-        re.eval("is_query_responsive <-TRUE  ");
-        re.eval(" loaded_data <- read.csv(file='" + pathToFile + "', header=TRUE, sep=',', na.strings='---');");
-
-        FileInputStream fis = null;
-        try {
-
-            fis = new FileInputStream(pathToFile);
-            System.out.println("fis.getChannel().size() " + fis.getChannel().size());
-            analytics.setData_size(analytics.getData_size() + fis.getChannel().size());
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(CSVInputFormat.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(CSVInputFormat.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            try {
-                fis.close();
-            } catch (IOException ex) {
-                Logger.getLogger(CSVInputFormat.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-
-        // Get elapsed time in milliseconds
-        long elapsedTimeToGetQueryMillis = System.currentTimeMillis() - startTimeToGetQuery;
-        // Get elapsed time in seconds
-        timeToGetQuery = elapsedTimeToGetQueryMillis / 1000F;
-        analytics.setTimeToGet_data(analytics.getTimeToGet_data() + timeToGetQuery);
-        System.out.println("timeToGetQuery" + timeToGetQuery);
-
-        connectionController.updateLindaAnalyticsInputDataPerformanceTime(analytics);
-
-        return re;
-    }
-    
-    @Override
-    public RConnection importData4R1(String pathToFile, boolean isForRDFOutput,Analytics analytics) {
+    public RConnection importData4R1(String trainDataset,String evaluationDataset, boolean isForRDFOutput,Analytics analytics) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

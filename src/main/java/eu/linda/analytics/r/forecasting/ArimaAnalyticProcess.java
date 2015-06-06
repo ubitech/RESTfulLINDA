@@ -11,13 +11,8 @@ import eu.linda.analytics.formats.InputFormat;
 import eu.linda.analytics.formats.OutputFormat;
 import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.weka.utils.Util;
-import java.io.InputStream;
-import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.rosuda.JRI.RBool;
-import org.rosuda.JRI.RVector;
-import org.rosuda.JRI.Rengine;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.Rserve.RConnection;
 import org.rosuda.REngine.Rserve.RserveException;
@@ -97,14 +92,14 @@ public class ArimaAnalyticProcess extends AnalyticProcess {
 
             RConnection re;
             if (helpfulFunctions.isRDFInputFormat(analytics.getTrainQuery_id())) {
-                re = input.importData4R1(Integer.toString(analytics.getTrainQuery_id()), true, analytics);
+                re = input.importData4R1(Integer.toString(analytics.getTrainQuery_id()),"", true, analytics);
             } else {
-                re = input.importData4R1(Configuration.analyticsRepo + analytics.getDocument(), true, analytics);
+                re = input.importData4R1(Configuration.analyticsRepo + analytics.getDocument(),"", true, analytics);
             }
 
-            org.rosuda.REngine.REXP is_query_responsive = re.eval("is_query_responsive");
+            org.rosuda.REngine.REXP is_train_query_responsive = re.eval("is_train_query_responsive");
 
-            if (is_query_responsive.asString().equalsIgnoreCase("FALSE")) {
+            if (is_train_query_responsive.asString().equalsIgnoreCase("FALSE")) {
                 helpfulFunctions.updateProcessMessageToAnalyticsTable("There is a connectivity issue. Could not reach data for predefined query.\n"
                         + " Please check your connectivity and the responsiveness of the selected sparql endpoint.\n "
                         + "Then click on re-Evaluate button to try to run again the analytic process.", analytics.getId());
@@ -118,8 +113,6 @@ public class ArimaAnalyticProcess extends AnalyticProcess {
                     helpfulFunctions.updateProcessMessageToAnalyticsTable("The data you provided has no information about time.\n Please enter a dataset with a date column or provide the adecuate parameters.", analytics.getId());
                     re.eval("rm(list=ls());");
                 } else {
-
-                    //re.eval(" loaded_data <- read.csv(file='" + Configuration.docroot + analytics.getDocument() + "', header=TRUE, sep=',');");
                     String RScript = "loaded_data <- read.csv(file='" + Configuration.docroot + analytics.getDocument() + "', header=TRUE, sep=',');\n";
 
                     re.eval(" column_number<-ncol(loaded_data);");
@@ -216,7 +209,6 @@ public class ArimaAnalyticProcess extends AnalyticProcess {
                     re.eval("png(file='" + Configuration.analyticsRepo + "plots/plotid" + plot1_id + ".png',width=600); a<-plot(forecast(m.ar2,h=" + timePredicion + ")); print(a); dev.off();");
                     RScript += "png(file='" + Configuration.analyticsRepo + "plots/plotid" + plot1_id + ".png',width=600);a<-plot(forecast(m.ar2,h=" + timePredicion + ")); print(a); dev.off();\n";
 
-                    //re.eval("arimaplottosave<-plot(forecast(m.ar2,h=" + timePredicion + "));");
                     re.eval("png(file='" + Configuration.analyticsRepo + "plots/plotid" + plot1_id + ".png',width=600)");
                     re.eval("arimaplottosave<-plot(forecast(m.ar2,h=" + timePredicion + "));");
                     re.eval("print(arimaplottosave);");

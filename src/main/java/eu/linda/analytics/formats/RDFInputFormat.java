@@ -99,123 +99,158 @@ public class RDFInputFormat extends InputFormat {
 
     }
 
+//    @Override
+//    public Rengine importData4R(String query_id, boolean isForRDFOutput, Analytics analytics) {
+//        System.out.println(System.getProperty("java.library.path"));
+//        System.out.println("R_HOME" + System.getenv().get("R_HOME"));
+//
+//        Rengine re = Rengine.getMainEngine();
+//        if (re == null) {
+////            re = new Rengine(new String[]{"--vanilla"}, false, null);
+//            String newargs[] = {"--no-save"};
+//            re = new Rengine(newargs, false, null);
+//
+//        }
+//
+//        if (!re.waitForR()) {
+//            System.out.println("Cannot load R");
+//            System.out.println("is alive Rengine??" + re.isAlive());
+//        }
+//
+//        String queryURI = connectionController.getQueryURI(query_id);
+//
+//        helpfulFunctions.nicePrintMessage("import data from uri " + queryURI);
+//        try {
+//            float timeToGetQuery = 0;
+//            long startTimeToGetQuery = System.currentTimeMillis();
+//            URL url = new URL(queryURI);
+//
+//            if (!helpfulFunctions.isURLResponsive(url)) {
+//                re.eval(" is_query_responsive <-FALSE ");
+//                System.out.println("is_query_responsive <-FALSE ");
+//
+//            } else {
+//                re.eval("is_query_responsive <-TRUE  ");
+//                System.out.println("is_query_responsive <-TRUE ");
+//
+//                File tmpfile4lindaquery = File.createTempFile("tmpfile4lindaquery" + query_id, ".tmp");
+//                FileUtils.copyURLToFile(url, tmpfile4lindaquery);
+//
+//                helpfulFunctions.cleanTmpFileFromDatatypes(tmpfile4lindaquery.getAbsolutePath());
+//                System.out.println("tmpfile4lindaquery.getAbsolutePath()" + tmpfile4lindaquery.getAbsolutePath());
+//
+//                re.eval(" loaded_data <- read.csv(file='" + tmpfile4lindaquery + "', header=TRUE, sep=',', na.strings='---');");
+//                System.out.println(" loaded_data <- read.csv(file='" + tmpfile4lindaquery + "', header=TRUE, sep=',', na.strings='---');");
+//
+//                FileInputStream fis = null;
+//                try {
+//
+//                    fis = new FileInputStream(tmpfile4lindaquery);
+//                    System.out.println("fis.getChannel().size() " + fis.getChannel().size());
+//                    analytics.setData_size(analytics.getData_size() + fis.getChannel().size());
+//                } finally {
+//                    fis.close();
+//                }
+//            }
+//
+//            // Get elapsed time in milliseconds
+//            long elapsedTimeToGetQueryMillis = System.currentTimeMillis() - startTimeToGetQuery;
+//            // Get elapsed time in seconds
+//            timeToGetQuery = elapsedTimeToGetQueryMillis / 1000F;
+//            System.out.println("timeToGetQuery" + timeToGetQuery);
+//            analytics.setTimeToGet_data(analytics.getTimeToGet_data() + timeToGetQuery);
+//
+//            connectionController.updateLindaAnalyticsInputDataPerformanceTime(analytics);
+//
+//        } catch (Exception ex) {
+//            Logger.getLogger(ArffInputFormat.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//        return re;
+//    }
+
     @Override
-    public Rengine importData4R(String query_id, boolean isForRDFOutput, Analytics analytics) {
-        System.out.println(System.getProperty("java.library.path"));
-        System.out.println("R_HOME" + System.getenv().get("R_HOME"));
-
-        Rengine re = Rengine.getMainEngine();
-        if (re == null) {
-//            re = new Rengine(new String[]{"--vanilla"}, false, null);
-            String newargs[] = {"--no-save"};
-            re = new Rengine(newargs, false, null);
-
-        }
-
-        if (!re.waitForR()) {
-            System.out.println("Cannot load R");
-            System.out.println("is alive Rengine??" + re.isAlive());
-        }
-
-        String queryURI = connectionController.getQueryURI(query_id);
-
-        helpfulFunctions.nicePrintMessage("import data from uri " + queryURI);
-        try {
-            float timeToGetQuery = 0;
-            long startTimeToGetQuery = System.currentTimeMillis();
-            URL url = new URL(queryURI);
-
-            if (!helpfulFunctions.isURLResponsive(url)) {
-                re.eval(" is_query_responsive <-FALSE ");
-                System.out.println("is_query_responsive <-FALSE ");
-
-            } else {
-                re.eval("is_query_responsive <-TRUE  ");
-                System.out.println("is_query_responsive <-TRUE ");
-
-                File tmpfile4lindaquery = File.createTempFile("tmpfile4lindaquery" + query_id, ".tmp");
-                FileUtils.copyURLToFile(url, tmpfile4lindaquery);
-
-                helpfulFunctions.cleanTmpFileFromDatatypes(tmpfile4lindaquery.getAbsolutePath());
-                System.out.println("tmpfile4lindaquery.getAbsolutePath()" + tmpfile4lindaquery.getAbsolutePath());
-
-                re.eval(" loaded_data <- read.csv(file='" + tmpfile4lindaquery + "', header=TRUE, sep=',', na.strings='---');");
-                System.out.println(" loaded_data <- read.csv(file='" + tmpfile4lindaquery + "', header=TRUE, sep=',', na.strings='---');");
-
-                FileInputStream fis = null;
-                try {
-
-                    fis = new FileInputStream(tmpfile4lindaquery);
-                    System.out.println("fis.getChannel().size() " + fis.getChannel().size());
-                    analytics.setData_size(analytics.getData_size() + fis.getChannel().size());
-                } finally {
-                    fis.close();
-                }
-            }
-
-            // Get elapsed time in milliseconds
-            long elapsedTimeToGetQueryMillis = System.currentTimeMillis() - startTimeToGetQuery;
-            // Get elapsed time in seconds
-            timeToGetQuery = elapsedTimeToGetQueryMillis / 1000F;
-            System.out.println("timeToGetQuery" + timeToGetQuery);
-            analytics.setTimeToGet_data(analytics.getTimeToGet_data() + timeToGetQuery);
-
-            connectionController.updateLindaAnalyticsInputDataPerformanceTime(analytics);
-
-        } catch (Exception ex) {
-            Logger.getLogger(ArffInputFormat.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return re;
-    }
-    
-    @Override
-    public RConnection importData4R1(String query_id, boolean isForRDFOutput, Analytics analytics) {
+    public RConnection importData4R1(String train_query_id, String evaluation_query_id, boolean isForRDFOutput, Analytics analytics) {
         System.out.println(System.getProperty("java.library.path"));
         System.out.println("R_HOME" + System.getenv().get("R_HOME"));
 
         RConnection re = null;
+        FileInputStream trainfis = null;
+        long trainfisSize = 0;
+        FileInputStream evalfis = null;
         try {
-            re = new RConnection();                        
+            re = new RConnection();
             REXP x = re.eval("R.version.string");
             System.out.println(x.asString());
-        
-        
-        String queryURI = connectionController.getQueryURI(query_id);
 
-        helpfulFunctions.nicePrintMessage("import data from uri " + queryURI);
-        
             float timeToGetQuery = 0;
             long startTimeToGetQuery = System.currentTimeMillis();
-            URL url = new URL(queryURI);
 
-            if (!helpfulFunctions.isURLResponsive(url)) {
-                re.eval(" is_query_responsive <-FALSE ");
-                System.out.println("is_query_responsive <-FALSE ");
+            String trainQueryURI = connectionController.getQueryURI(train_query_id);
+            URL train_url = new URL(trainQueryURI);
+            helpfulFunctions.nicePrintMessage("import data from train uri " + trainQueryURI);
+
+            if (!helpfulFunctions.isURLResponsive(train_url)) {
+                re.eval(" is_train_query_responsive <-FALSE ");
+                System.out.println("is_train_query_responsive <-FALSE ");
 
             } else {
-                re.eval("is_query_responsive <-TRUE  ");
-                System.out.println("is_query_responsive <-TRUE ");
+                re.eval("is_train_query_responsive <-TRUE  ");
+                System.out.println("is_train_query_responsive <-TRUE ");
 
-                File tmpfile4lindaquery = File.createTempFile("tmpfile4lindaquery" + query_id, ".tmp");
-                FileUtils.copyURLToFile(url, tmpfile4lindaquery);
+                File traintmpfile4lindaquery = File.createTempFile("traintmpfile4lindaquery" + train_query_id, ".tmp");
+                FileUtils.copyURLToFile(train_url, traintmpfile4lindaquery);
 
-                helpfulFunctions.cleanTmpFileFromDatatypes(tmpfile4lindaquery.getAbsolutePath());
-                System.out.println("tmpfile4lindaquery.getAbsolutePath()" + tmpfile4lindaquery.getAbsolutePath());
+                helpfulFunctions.cleanTmpFileFromDatatypes(traintmpfile4lindaquery.getAbsolutePath());
 
-                re.eval(" loaded_data <- read.csv(file='" + tmpfile4lindaquery + "', header=TRUE, sep=',', na.strings='---');");
-                System.out.println(" loaded_data <- read.csv(file='" + tmpfile4lindaquery + "', header=TRUE, sep=',', na.strings='---');");
+                re.eval(" loaded_data <- read.csv(file='" + traintmpfile4lindaquery + "', header=TRUE, sep=',', na.strings='---');");
+                System.out.println(" loaded_data <- read.csv(file='" + traintmpfile4lindaquery + "', header=TRUE, sep=',', na.strings='---');");
 
-                FileInputStream fis = null;
-                try {
+                trainfis = new FileInputStream(traintmpfile4lindaquery);
+                System.out.println("fis.getChannel().size() " + trainfis.getChannel().size());
+                trainfisSize = trainfis.getChannel().size();
+                analytics.setData_size(analytics.getData_size() + trainfisSize);
+                trainfis.close();
+                
+                 if (!evaluation_query_id.equalsIgnoreCase("") && train_query_id.equalsIgnoreCase(evaluation_query_id)) {
 
-                    fis = new FileInputStream(tmpfile4lindaquery);
-                    System.out.println("fis.getChannel().size() " + fis.getChannel().size());
-                    analytics.setData_size(analytics.getData_size() + fis.getChannel().size());
-                } catch (FileNotFoundException ex) {
-                    Logger.getLogger(RDFInputFormat.class.getName()).log(Level.SEVERE, null, ex);
-                } finally {
-                    fis.close();
+                    re.eval("is_eval_query_responsive <-TRUE; "
+                            + "loaded_data_eval <- loaded_data; ");
+                    System.out.println("is_eval_query_responsive <-TRUE; "
+                            + "loaded_data_eval <- loaded_data; ");
                 }
+
+                if (!evaluation_query_id.equalsIgnoreCase("") && !train_query_id.equalsIgnoreCase(evaluation_query_id)) {
+
+                    String evalQueryURI = connectionController.getQueryURI(evaluation_query_id);
+                    helpfulFunctions.nicePrintMessage("import data from uri " + evalQueryURI);
+                    URL eval_url = new URL(evalQueryURI);
+
+                    if (!helpfulFunctions.isURLResponsive(eval_url)) {
+                        re.eval(" is_eval_query_responsive <-FALSE ");
+                        System.out.println("is_eval_query_responsive <-FALSE ");
+
+                    } else {
+                        re.eval("is_eval_query_responsive <-TRUE  ");
+                        System.out.println("is_eval_query_responsive <-TRUE ");
+
+                        File evaltmpfile4lindaquery = File.createTempFile("evaltmpfile4lindaquery" + evaluation_query_id, ".tmp");
+                        FileUtils.copyURLToFile(eval_url, evaltmpfile4lindaquery);
+
+                        helpfulFunctions.cleanTmpFileFromDatatypes(evaltmpfile4lindaquery.getAbsolutePath());
+
+                        re.eval(" loaded_data_eval <- read.csv(file='" + evaltmpfile4lindaquery + "', header=TRUE, sep=',', na.strings='---');");
+                        System.out.println(" loaded_data_eval <- read.csv(file='" + evaltmpfile4lindaquery + "', header=TRUE, sep=',', na.strings='---');");
+
+                        evalfis = new FileInputStream(evaltmpfile4lindaquery);
+                        System.out.println("fis.getChannel().size() " + evalfis.getChannel().size());
+                        analytics.setData_size(analytics.getData_size() + trainfisSize + evalfis.getChannel().size());
+                        evalfis.close();
+                    }
+
+                }
+
+               
+
             }
 
             // Get elapsed time in milliseconds
@@ -238,6 +273,5 @@ public class RDFInputFormat extends InputFormat {
         }
         return re;
     }
-
 
 }

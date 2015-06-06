@@ -14,13 +14,6 @@ import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.weka.utils.Util;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.rosuda.JRI.RBool;
-import org.rosuda.JRI.REXP;
-;
-import org.rosuda.JRI.Rengine;
-import org.rosuda.REngine.REXPMismatchException;
-import org.rosuda.REngine.Rserve.RConnection;
-import org.rosuda.REngine.Rserve.RserveException;import org.rosuda.JRI.Rengine;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.Rserve.RConnection;
 import org.rosuda.REngine.Rserve.RserveException;
@@ -79,17 +72,17 @@ public class KMeansAnalyticProcess extends AnalyticProcess {
             
             RConnection re;
             if (util.isRDFInputFormat(analytics.getTrainQuery_id())) {
-                re = input.importData4R1(Integer.toString(analytics.getTrainQuery_id()), true, analytics);
+                re = input.importData4R1(Integer.toString(analytics.getTrainQuery_id()),"", true, analytics);
                 
             } else {
-                re = input.importData4R1(Configuration.analyticsRepo + analytics.getDocument(), true, analytics);
+                re = input.importData4R1(Configuration.analyticsRepo + analytics.getDocument(),"", true, analytics);
                 RScript += "loaded_data <- read.csv(file='" + Configuration.analyticsRepo + analytics.getDocument() + "', header=TRUE, sep=',');\n";
                 
             }
             
-            org.rosuda.REngine.REXP is_query_responsive = re.eval("is_query_responsive");
+            org.rosuda.REngine.REXP is_train_query_responsive = re.eval("is_train_query_responsive");
             
-            if (is_query_responsive.asString().equalsIgnoreCase("FALSE")) {
+            if (is_train_query_responsive.asString().equalsIgnoreCase("FALSE")) {
                 util.updateProcessMessageToAnalyticsTable("There is a connectivity issue. Could not reach data for predefined query.\n"
                         + " Please check your connectivity and the responsiveness of the selected sparql endpoint.\n "
                         + "Then click on re-Evaluate button to try to run again the analytic process.", analytics.getId());

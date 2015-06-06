@@ -68,13 +68,13 @@ public class ArffInputFormat extends InputFormat {
     
     }
 
-    @Override
-    public Rengine importData4R(String pathToFile, boolean isForRDFOutput,Analytics analytics) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+//    @Override
+//    public Rengine importData4R(String pathToFile, boolean isForRDFOutput,Analytics analytics) {
+//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+//    }
     
     @Override
-    public RConnection importData4R1(String pathToFile, boolean isForRDFOutput,Analytics analytics) {
+    public RConnection importData4R1(String trainDataset,String evaluationDataset, boolean isForRDFOutput,Analytics analytics) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
