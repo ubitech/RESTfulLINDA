@@ -92,9 +92,9 @@ public class ArimaAnalyticProcess extends AnalyticProcess {
 
             RConnection re;
             if (helpfulFunctions.isRDFInputFormat(analytics.getTrainQuery_id())) {
-                re = input.importData4R1(Integer.toString(analytics.getTrainQuery_id()),"", true, analytics);
+                re = input.importData4R(Integer.toString(analytics.getTrainQuery_id()),"", true, analytics);
             } else {
-                re = input.importData4R1(Configuration.analyticsRepo + analytics.getDocument(),"", true, analytics);
+                re = input.importData4R(Configuration.analyticsRepo + analytics.getDocument(),"", true, analytics);
             }
 
             org.rosuda.REngine.REXP is_train_query_responsive = re.eval("is_train_query_responsive");

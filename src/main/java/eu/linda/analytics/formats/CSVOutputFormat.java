@@ -10,8 +10,11 @@ import eu.linda.analytics.db.ConnectionController;
 import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.weka.utils.Util;
 import java.util.AbstractList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.rosuda.JRI.Rengine;
 import org.rosuda.REngine.Rserve.RConnection;
+import org.rosuda.REngine.Rserve.RserveException;
 
 /**
  *
@@ -93,8 +96,36 @@ public class CSVOutputFormat extends OutputFormat {
     }
     
     @Override
-    public void exportData(Analytics analytics, RConnection dataToExport) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void exportData(Analytics analytics, RConnection re) {
+
+        
+        try {
+            float timeToExportData = 0;
+            long startTimeToExportData = System.currentTimeMillis();
+            
+            helpfulFunctions.nicePrintMessage("Export to CSV");
+            String[] splitedSourceFileName = analytics.getDocument().split("\\.");
+            
+            String targetFileName = (splitedSourceFileName[0] + "_" + analytics.getAlgorithm_name() + "_resultdocument.csv").replace("datasets", "results");
+            
+            String targetFileNameFullPath = Configuration.analyticsRepo + targetFileName;
+            System.out.println("targetFileNameFullPath" + targetFileNameFullPath);
+            re.eval("write.table(df_to_export, file = '" + targetFileNameFullPath + "',row.names=FALSE,sep = ';', dec='.');");
+            re.eval("rm(list=ls());");
+            
+            connectionController.updateLindaAnalytics(targetFileName, "resultdocument", analytics.getId());
+            connectionController.updateLindaAnalyticsVersion(analytics.getVersion(), analytics.getId());
+            
+            // Get elapsed time in milliseconds
+            long elapsedTimeToExportData = System.currentTimeMillis() - startTimeToExportData;
+            // Get elapsed time in seconds
+            timeToExportData = elapsedTimeToExportData / 1000F;
+            System.out.println("timeToExportData" + timeToExportData);
+            analytics.setTimeToCreate_RDF(timeToExportData);
+            connectionController.updateLindaAnalyticsProcessPerformanceTime(analytics);
+        } catch (RserveException ex) {
+            Logger.getLogger(CSVOutputFormat.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
 }

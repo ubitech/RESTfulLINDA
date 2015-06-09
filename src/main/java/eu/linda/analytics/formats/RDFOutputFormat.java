@@ -232,6 +232,8 @@ public class RDFOutputFormat extends OutputFormat {
             
             Model model = rdfGenerator.generateRDFModel(analytics, re);
             
+            re.close();
+            
             String fileName = "";
             
                 

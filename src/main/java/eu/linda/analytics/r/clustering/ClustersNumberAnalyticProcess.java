@@ -55,10 +55,10 @@ public class ClustersNumberAnalyticProcess extends AnalyticProcess {
             analytics.setData_size(0);
             RConnection re;
             if (helpfulFunctions.isRDFInputFormat(analytics.getTrainQuery_id())) {
-                re = input.importData4R1(Integer.toString(analytics.getTrainQuery_id()),"", true, analytics);
+                re = input.importData4R(Integer.toString(analytics.getTrainQuery_id()),"", true, analytics);
                 
             } else {
-                re = input.importData4R1(Configuration.analyticsRepo + analytics.getDocument(),"", true, analytics);
+                re = input.importData4R(Configuration.analyticsRepo + analytics.getDocument(),"", true, analytics);
                 RScript += "loaded_data <- read.csv(file='" + Configuration.analyticsRepo + analytics.getDocument() + "', header=TRUE, sep=',');\n";
                 
             }
@@ -121,7 +121,7 @@ public class ClustersNumberAnalyticProcess extends AnalyticProcess {
                 timeToRun_analytics = elapsedTimeToRunAnalyticsMillis / 1000F;
                 analytics.setTimeToRun_analytics(analytics.getTimeToRun_analytics() + timeToRun_analytics);
                 connectionController.updateLindaAnalyticsProcessPerformanceTime(analytics);
-                
+                 re.close();
             }
         } catch (RserveException ex) {
             Logger.getLogger(ClustersNumberAnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);

@@ -72,10 +72,10 @@ public class KMeansAnalyticProcess extends AnalyticProcess {
             
             RConnection re;
             if (util.isRDFInputFormat(analytics.getTrainQuery_id())) {
-                re = input.importData4R1(Integer.toString(analytics.getTrainQuery_id()),"", true, analytics);
+                re = input.importData4R(Integer.toString(analytics.getTrainQuery_id()),"", true, analytics);
                 
             } else {
-                re = input.importData4R1(Configuration.analyticsRepo + analytics.getDocument(),"", true, analytics);
+                re = input.importData4R(Configuration.analyticsRepo + analytics.getDocument(),"", true, analytics);
                 RScript += "loaded_data <- read.csv(file='" + Configuration.analyticsRepo + analytics.getDocument() + "', header=TRUE, sep=',');\n";
                 
             }

@@ -51,12 +51,12 @@ public class NCFCorrelogramAnalyticProcess extends AnalyticProcess {
             RConnection re;
             if (helpfulFunctions.isRDFInputFormat(analytics.getTrainQuery_id())) {
                 //import train dataset
-                re = input.importData4R1(Integer.toString(analytics.getTrainQuery_id()),"", true, analytics);
+                re = input.importData4R(Integer.toString(analytics.getTrainQuery_id()),"", true, analytics);
                 RScript += "loaded_data <- read.csv('insertqueryid" + analytics.getTrainQuery_id() + "');\n";
 
             } else {
                 //load train dataset
-                re = input.importData4R1(Configuration.analyticsRepo + analytics.getDocument(),"", true, analytics);
+                re = input.importData4R(Configuration.analyticsRepo + analytics.getDocument(),"", true, analytics);
                 RScript += "loaded_data <- read.csv('" + Configuration.analyticsRepo + analytics.getDocument() + "');\n";
 
             }
@@ -162,6 +162,7 @@ public class NCFCorrelogramAnalyticProcess extends AnalyticProcess {
                     analytics.setTimeToRun_analytics(timeToRun_analytics);
 
                     connectionController.updateLindaAnalyticsProcessPerformanceTime(analytics);
+                    re.close();
                 }
             }
         } catch (RserveException ex) {

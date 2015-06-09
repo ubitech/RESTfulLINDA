@@ -20,10 +20,8 @@ import org.rosuda.REngine.Rserve.RConnection;
 abstract public class InputFormat { 
 
     abstract public AbstractList importData4weka(String pathToFile,boolean isForRDFOutput,Analytics analytics);
-    
-    //abstract public Rengine importData4R(String pathToFile,boolean isForRDFOutput,Analytics analytics);
-    
-    abstract public RConnection importData4R1(String trainDataset,String evaluationDataset,boolean isForRDFOutput,Analytics analytics);
+        
+    abstract public RConnection importData4R(String trainDataset,String evaluationDataset,boolean isForRDFOutput,Analytics analytics);
 
 }
 

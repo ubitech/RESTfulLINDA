@@ -13,7 +13,6 @@ import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.weka.utils.Util;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.rosuda.JRI.REXP;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.Rserve.RConnection;
 import org.rosuda.REngine.Rserve.RserveException;
@@ -55,7 +54,7 @@ public class KrigingAnalyticProcess extends AnalyticProcess {
             if (helpfulFunctions.isRDFInputFormat(analytics.getTrainQuery_id())) {
 
                 //import train & eval dataset
-                re = input.importData4R1(Integer.toString(analytics.getTrainQuery_id()), Integer.toString(analytics.getEvaluationQuery_id()), true, analytics);
+                re = input.importData4R(Integer.toString(analytics.getTrainQuery_id()), Integer.toString(analytics.getEvaluationQuery_id()), true, analytics);
 
                 org.rosuda.REngine.REXP is_train_query_responsive = re.eval("is_train_query_responsive");
                 org.rosuda.REngine.REXP is_evaluation_query_responsive = re.eval("is_eval_query_responsive");
@@ -77,7 +76,7 @@ public class KrigingAnalyticProcess extends AnalyticProcess {
 
             } else {
                 //import train & eval dataset
-                re = input.importData4R1(Configuration.analyticsRepo + analytics.getDocument(),Configuration.analyticsRepo + analytics.getTestdocument(), true, analytics);
+                re = input.importData4R(Configuration.analyticsRepo + analytics.getDocument(),Configuration.analyticsRepo + analytics.getTestdocument(), true, analytics);
                 re.eval("loaded_data_train <- loaded_data;"
                         + "loaded_data_eval <- loaded_data_eval; "
                         + "df_to_export<- loaded_data_eval;");
@@ -89,8 +88,6 @@ public class KrigingAnalyticProcess extends AnalyticProcess {
 
             }
 
-            //re.eval("loaded_data_train <- loaded_data;");
-            //re.eval("loaded_data_eval <- loaded_data;");
             re.eval("xcol<-match(\"x\",names(loaded_data_train)); "
                     + "ycol<-match(\"y\",names(loaded_data_train)); "
                     + "loaded_data_train <- subset(loaded_data_train, !duplicated(loaded_data_train[xcol:ycol])); "
@@ -100,9 +97,8 @@ public class KrigingAnalyticProcess extends AnalyticProcess {
                     + "library(gstat); "
                     + "column_number<-ncol(loaded_data_train); "
                     + "column_to_predict <-colnames(loaded_data_train[column_number]); "
-                    + "rows_number<-nrow(loaded_data_train); "
-                    + "valuesToClean<-loaded_data_train[column_to_predict]; "
-                    + "valuesToCleanNum<-rows_number; ");
+                    + "rows_number<-nrow(loaded_data_train); ");
+
 
             RScript += "xcol<-match(\"x\",names(loaded_data_train)); \n "
                     + "ycol<-match(\"y\",names(loaded_data_train)); \n "
@@ -114,31 +110,13 @@ public class KrigingAnalyticProcess extends AnalyticProcess {
                     + "library(gstat);\n "
                     + "column_number<-ncol(loaded_data_train);\n "
                     + "column_to_predict <-colnames(loaded_data_train[column_number]);\n "
-                    + "rows_number<-nrow(loaded_data_train);\n "
-                    + "valuesToClean<-loaded_data_train[column_to_predict];\n "
-                    + "valuesToCleanNum<-rows_number;\n ";
-
-            re.eval("trimmedValues<- data.frame();");
-            RScript += "trimmedValues<- data.frame();\n";
-
-            re.eval("for(i in 1:valuesToCleanNum){ valueToTrim <- as.character(valuesToClean[i,1]);  if(grepl(\"#\", valueToTrim)) {  position<-which(strsplit(valueToTrim, \"\")[[1]]==\"^\");  trimmedValues[i,1]<-substr(valueToTrim, 1, position[1]-1); }else{ trimmedValues[i,1]<-valueToTrim;}  }");
-            RScript += "for(i in 1:valuesToCleanNum){ valueToTrim <- as.character(valuesToClean[i,1]);  if(grepl(\"#\", valueToTrim)) {  position<-which(strsplit(valueToTrim, \"\")[[1]]==\"^\");  trimmedValues[i,1]<-substr(valueToTrim, 1, position[1]-1); }else{ trimmedValues[i,1]<-valueToTrim;}  }\n";
-
-            re.eval("result_column_number<-ncol(loaded_data_train);");
-            RScript += "result_column_number<-ncol(loaded_data_train);\n";
-
-            re.eval("colnames(trimmedValues)[1]<- column_to_predict;");
-            RScript += "colnames(trimmedValues)[1]<- column_to_predict;\n";
+                    + "rows_number<-nrow(loaded_data_train);\n ";
+            
 
             // ---- get analyzedFieldValue ----
             org.rosuda.REngine.REXP column_to_predict = re.eval("column_to_predict");
             String analyzedFieldValue = column_to_predict.asString();
 
-            re.eval("trimmedValues$" + analyzedFieldValue + "<-as.numeric(trimmedValues$" + analyzedFieldValue + ");");
-            RScript += "trimmedValues$" + analyzedFieldValue + "<-as.numeric(trimmedValues$" + analyzedFieldValue + ");\n";
-
-            re.eval("loaded_data_train[[column_to_predict]] <- trimmedValues;");
-            RScript += "loaded_data_train[[column_to_predict]] <- trimmedValues;\n";
 
             re.eval("loaded_data_train$" + analyzedFieldValue + "<-as.numeric(unlist(loaded_data_train$" + analyzedFieldValue + "));");
             RScript += "loaded_data_train$" + analyzedFieldValue + "<-as.numeric(unlist(loaded_data_train$" + analyzedFieldValue + "));\n";
