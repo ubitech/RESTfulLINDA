@@ -98,10 +98,18 @@ public class MultipleLinearRegressionInR extends AnalyticProcess {
                 RScript += "myvars <- names(loaded_data) %in% c('rowID',column_with_uri); \n";
 
                 re.eval("loaded_data <- loaded_data[!myvars]; "
-                        + "loaded_data_eval <- loaded_data_eval[!myvars]; ");
+                        + "nums <- sapply(loaded_data, is.numeric); "
+                        + "loaded_data<-loaded_data[ , nums]; "
+                        + "loaded_data_eval <- loaded_data_eval[!myvars]; "
+                        + "nums <- sapply(loaded_data_eval, is.numeric); "
+                        + "loaded_data_eval<-loaded_data_eval[ , nums]; ");
                 
-                RScript += "loaded_data <- loaded_data[!myvars]\n "
-                        + "loaded_data_eval <- loaded_data_eval[!myvars]; \n";
+                RScript += "loaded_data <- loaded_data[!myvars]; \n"
+                        + "nums <- sapply(loaded_data, is.numeric); \n"
+                        + "loaded_data<-loaded_data[ , nums]; \n"
+                        + "loaded_data_eval <- loaded_data_eval[!myvars]; \n"
+                        + "nums <- sapply(loaded_data_eval, is.numeric); \n"
+                        + "loaded_data_eval<-loaded_data_eval[ , nums]; \n";
 
                 re.eval("column_number<-ncol(loaded_data);");
                 RScript += "column_number<-ncol(loaded_data); \n";
