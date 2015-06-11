@@ -8,6 +8,7 @@ package eu.linda.analytics.r.geospatial;
 import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.controller.AnalyticProcess;
 import eu.linda.analytics.db.ConnectionController;
+import eu.linda.analytics.db.DBSynchronizer;
 import eu.linda.analytics.formats.InputFormat;
 import eu.linda.analytics.formats.OutputFormat;
 import eu.linda.analytics.model.Analytics;
@@ -161,7 +162,7 @@ public class NCFCorrelogramAnalyticProcess extends AnalyticProcess {
                     timeToRun_analytics = elapsedTimeToRunAnalyticsMillis / 1000F;
                     analytics.setTimeToRun_analytics(timeToRun_analytics);
 
-                    connectionController.updateLindaAnalyticsProcessPerformanceTime(analytics);
+                    DBSynchronizer.updateLindaAnalyticsProcessPerformanceTime(analytics);
                     re.close();
                 }
             }

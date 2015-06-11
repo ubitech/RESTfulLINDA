@@ -6,6 +6,7 @@
 package eu.linda.analytics.formats;
 
 import eu.linda.analytics.db.ConnectionController;
+import eu.linda.analytics.db.DBSynchronizer;
 import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.weka.utils.Util;
 import java.io.File;
@@ -43,7 +44,7 @@ public class RDFInputFormat extends InputFormat {
     @Override
     public AbstractList importData4weka(String query_id, boolean isForRDFOutput, Analytics analytics) {
 
-        String queryURI = connectionController.getQueryURI(query_id);
+        String queryURI = DBSynchronizer.getQueryURI(Integer.parseInt(query_id));
 
         helpfulFunctions.nicePrintMessage("import data from uri " + queryURI);
 
@@ -90,7 +91,7 @@ public class RDFInputFormat extends InputFormat {
             analytics.setTimeToGet_data(analytics.getTimeToGet_data() + timeToGetQuery);
             System.out.println("timeToGetQuery" + timeToGetQuery);
 
-            connectionController.updateLindaAnalyticsInputDataPerformanceTime(analytics);
+            DBSynchronizer.updateLindaAnalyticsInputDataPerformanceTime(analytics);
 
         } catch (Exception ex) {
             Logger.getLogger(ArffInputFormat.class.getName()).log(Level.SEVERE, null, ex);
@@ -117,7 +118,7 @@ public class RDFInputFormat extends InputFormat {
             float timeToGetQuery = 0;
             long startTimeToGetQuery = System.currentTimeMillis();
 
-            String trainQueryURI = connectionController.getQueryURI(train_query_id);
+            String trainQueryURI = DBSynchronizer.getQueryURI(Integer.parseInt(train_query_id));
             URL train_url = new URL(trainQueryURI);
             helpfulFunctions.nicePrintMessage("import data from train uri " + trainQueryURI);
 
@@ -153,7 +154,7 @@ public class RDFInputFormat extends InputFormat {
 
                 if (!evaluation_query_id.equalsIgnoreCase("") && !train_query_id.equalsIgnoreCase(evaluation_query_id)) {
 
-                    String evalQueryURI = connectionController.getQueryURI(evaluation_query_id);
+                    String evalQueryURI = DBSynchronizer.getQueryURI(Integer.parseInt(evaluation_query_id));
                     helpfulFunctions.nicePrintMessage("import data from uri " + evalQueryURI);
                     URL eval_url = new URL(evalQueryURI);
 
@@ -192,7 +193,7 @@ public class RDFInputFormat extends InputFormat {
             System.out.println("timeToGetQuery" + timeToGetQuery);
             analytics.setTimeToGet_data(analytics.getTimeToGet_data() + timeToGetQuery);
 
-            connectionController.updateLindaAnalyticsInputDataPerformanceTime(analytics);
+            DBSynchronizer.updateLindaAnalyticsInputDataPerformanceTime(analytics);
 
         } catch (RserveException ex) {
             Logger.getLogger(RDFInputFormat.class.getName()).log(Level.SEVERE, null, ex);

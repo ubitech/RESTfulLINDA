@@ -26,7 +26,7 @@ public class MessageRestService {
         
         ConnectionController connectionController = ConnectionController.getInstance();
         connectionController.readProperties();
-        Analytics analytics = connectionController.connectToAnalyticsTable(Integer.parseInt(analytics_id));
+        Analytics analytics = DBSynchronizer.getlindaAnalytics_analytics(Integer.parseInt(analytics_id));
         analyticsController.setAnalytics(analytics);
         
         
@@ -41,23 +41,21 @@ public class MessageRestService {
 
         analyticsController.runAnalytics(inputSuffix, analytics.getAlgorithm_name(), analytics.getExportFormat());
         
-        connectionController.closeConnection();
         return Response.status(200).entity("Analytic Process has runned").build();
 
     }
 
-    @GET
-    @Path("/loadtotriplestore/{id}")
-    public Response loadToTriplestore(@PathParam("id") String analytics_id) throws Exception {
-        ConnectionController connectionController = ConnectionController.getInstance();
-
-        Analytics analytics = connectionController.connectToAnalyticsTable(Integer.parseInt(analytics_id));
-        ManageOpenrdfLindaRepo manageOpenrdfLindaRepo = new ManageOpenrdfLindaRepo();
-
-        manageOpenrdfLindaRepo.loadtotriplestore(analytics);
-         connectionController.closeConnection();
-        return Response.status(200).entity("RDF file has been succesfully published at Linda common server triplestore").build();
-
-    }
+//    @GET
+//    @Path("/loadtotriplestore/{id}")
+//    public Response loadToTriplestore(@PathParam("id") String analytics_id) throws Exception {
+//        ConnectionController connectionController = ConnectionController.getInstance();
+//
+//        Analytics analytics = connectionController.connectToAnalyticsTable(Integer.parseInt(analytics_id));
+//        ManageOpenrdfLindaRepo manageOpenrdfLindaRepo = new ManageOpenrdfLindaRepo();
+//
+//        manageOpenrdfLindaRepo.loadtotriplestore(analytics);
+//        return Response.status(200).entity("RDF file has been succesfully published at Linda common server triplestore").build();
+//
+//    }
 
 }

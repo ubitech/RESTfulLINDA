@@ -7,6 +7,7 @@ package eu.linda.analytics.formats;
 
 import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.db.ConnectionController;
+import eu.linda.analytics.db.DBSynchronizer;
 import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.weka.utils.Util;
 import java.util.AbstractList;
@@ -48,8 +49,8 @@ public class CSVOutputFormat extends OutputFormat {
             String targetFileNameCSVFull = Configuration.analyticsRepo + targetFileNameCSV;
 
             helpfulFunctions.saveFileAsCSV(targetFileNameFullPath, targetFileNameCSVFull);
-            connectionController.updateLindaAnalytics(targetFileNameCSV, "resultdocument", analytics.getId());
-            connectionController.updateLindaAnalyticsVersion(analytics.getVersion(), analytics.getId());
+            DBSynchronizer.updateLindaAnalytics(targetFileNameCSV, "resultdocument", analytics.getId());
+            DBSynchronizer.updateLindaAnalyticsVersion(analytics.getVersion(), analytics.getId());
 
             // Get elapsed time in milliseconds
             long elapsedTimeToExportData = System.currentTimeMillis() - startTimeToExportData;
@@ -57,7 +58,7 @@ public class CSVOutputFormat extends OutputFormat {
             timeToExportData = elapsedTimeToExportData / 1000F;
             System.out.println("timeToExportData" + timeToExportData);
             analytics.setTimeToCreate_RDF(timeToExportData);
-            connectionController.updateLindaAnalyticsProcessPerformanceTime(analytics);
+            DBSynchronizer.updateLindaAnalyticsProcessPerformanceTime(analytics);
 
         } else {
             helpfulFunctions.nicePrintMessage("There are no data to be exported to CSV");
@@ -82,8 +83,8 @@ public class CSVOutputFormat extends OutputFormat {
         re.eval("write.table(df_to_export, file = '" + targetFileNameFullPath + "',row.names=FALSE,sep = ';', dec='.');");
         re.eval("rm(list=ls());");
 
-        connectionController.updateLindaAnalytics(targetFileName, "resultdocument", analytics.getId());
-        connectionController.updateLindaAnalyticsVersion(analytics.getVersion(), analytics.getId());
+       DBSynchronizer.updateLindaAnalytics(targetFileName, "resultdocument", analytics.getId());
+        DBSynchronizer.updateLindaAnalyticsVersion(analytics.getVersion(), analytics.getId());
 
         // Get elapsed time in milliseconds
         long elapsedTimeToExportData = System.currentTimeMillis() - startTimeToExportData;
@@ -91,7 +92,7 @@ public class CSVOutputFormat extends OutputFormat {
         timeToExportData = elapsedTimeToExportData / 1000F;
         System.out.println("timeToExportData" + timeToExportData);
         analytics.setTimeToCreate_RDF(timeToExportData);
-        connectionController.updateLindaAnalyticsProcessPerformanceTime(analytics);
+        DBSynchronizer.updateLindaAnalyticsProcessPerformanceTime(analytics);
 
     }
     
@@ -113,8 +114,8 @@ public class CSVOutputFormat extends OutputFormat {
             re.eval("write.table(df_to_export, file = '" + targetFileNameFullPath + "',row.names=FALSE,sep = ';', dec='.');");
             re.eval("rm(list=ls());");
             
-            connectionController.updateLindaAnalytics(targetFileName, "resultdocument", analytics.getId());
-            connectionController.updateLindaAnalyticsVersion(analytics.getVersion(), analytics.getId());
+           DBSynchronizer.updateLindaAnalytics(targetFileName, "resultdocument", analytics.getId());
+            DBSynchronizer.updateLindaAnalyticsVersion(analytics.getVersion(), analytics.getId());
             
             // Get elapsed time in milliseconds
             long elapsedTimeToExportData = System.currentTimeMillis() - startTimeToExportData;
@@ -122,7 +123,7 @@ public class CSVOutputFormat extends OutputFormat {
             timeToExportData = elapsedTimeToExportData / 1000F;
             System.out.println("timeToExportData" + timeToExportData);
             analytics.setTimeToCreate_RDF(timeToExportData);
-            connectionController.updateLindaAnalyticsProcessPerformanceTime(analytics);
+            DBSynchronizer.updateLindaAnalyticsProcessPerformanceTime(analytics);
         } catch (RserveException ex) {
             Logger.getLogger(CSVOutputFormat.class.getName()).log(Level.SEVERE, null, ex);
         }

@@ -8,6 +8,7 @@ package eu.linda.analytics.weka.classifiers;
 import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.controller.AnalyticProcess;
 import eu.linda.analytics.db.ConnectionController;
+import eu.linda.analytics.db.DBSynchronizer;
 import eu.linda.analytics.formats.InputFormat;
 import eu.linda.analytics.formats.OutputFormat;
 import eu.linda.analytics.model.Analytics;
@@ -170,7 +171,7 @@ public class J48AnalyticProcess extends AnalyticProcess {
             testdata.setClassIndex(testdata.numAttributes() - 1);
 
             if (traindata.numAttributes() != testdata.numAttributes()) {
-                connectionController.updateProcessMessageToAnalyticsTable("Train Dataset has not the same"
+                DBSynchronizer.updateLindaAnalyticsProcessMessage("Train Dataset has not the same"
                         + " attributes with Evaluation dataset! Please create a new analytic process!", analytics.getId());
                 return;
             }
@@ -214,7 +215,7 @@ public class J48AnalyticProcess extends AnalyticProcess {
 
         } catch (Exception ex) {
             Logger.getLogger(J48AnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);
-            connectionController.updateProcessMessageToAnalyticsTable(ex.toString(), analytics.getId());
+             DBSynchronizer.updateLindaAnalyticsProcessMessage(ex.toString(), analytics.getId());
             //return (AbstractList) new LinkedList();
 
         }

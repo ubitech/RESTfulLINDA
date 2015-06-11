@@ -92,7 +92,7 @@ public class ManageOpenrdfLindaRepo {
     public void cleanLocalAnalyticsRepo(Analytics a, String rdfContextURL) {
 
         ConnectionController connectionController = ConnectionController.getInstance();
-        connectionController.updateLindaAnalyticsRDFInfo(rdfContextURL, true, a.getId());
+         DBSynchronizer.updateLindaAnalyticsRDFInfo(rdfContextURL, true, a.getId());
 
     }
 

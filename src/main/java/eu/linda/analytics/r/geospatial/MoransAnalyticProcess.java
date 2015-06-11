@@ -8,6 +8,7 @@ package eu.linda.analytics.r.geospatial;
 import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.controller.AnalyticProcess;
 import eu.linda.analytics.db.ConnectionController;
+import eu.linda.analytics.db.DBSynchronizer;
 import eu.linda.analytics.formats.InputFormat;
 import eu.linda.analytics.formats.OutputFormat;
 import eu.linda.analytics.model.Analytics;
@@ -146,25 +147,28 @@ public class MoransAnalyticProcess extends AnalyticProcess {
                     re.eval("morans_result<-Moran.I(loaded_data$" + analyzedFieldValue + "[1:rows_number,], loaded_data.dists.inv[1:rows_number, 1:rows_number]);");
                     RScript += "morans_result<-Moran.I(loaded_data$" + analyzedFieldValue + "[1:rows_number,], loaded_data.dists.inv[1:rows_number, 1:rows_number]);\n";
 
-                    re.eval("if (exists('morans_result'))   {  result <-  morans_result$p;   } else {  result <- 0.0;}");
-                    RScript += "if (exists('morans_result'))   {  result <-  morans_result$p;   } else {  result <- 0.0;}\n";
+                    //Save model Readable
+                    String modelFileName = "models/analyticsID" + analytics.getId() + "_" + analytics.getAlgorithm_id() + "ModelReadable" + ".txt";
+                    String modelFileNameFullPath = Configuration.analyticsRepo + modelFileName;
 
-                    double pvalue = re.eval("result").asDouble();
-                    System.out.println("pvalue:" + pvalue);
+                    org.rosuda.REngine.REXP s = re.eval("capture.output(morans_result)");
+                    String[] output = s.asStrings();
+                    for (String string : output) {
+                        System.out.println(string);
+                    }
+
+                    util.saveFile(modelFileNameFullPath, output);
+                   DBSynchronizer.updateLindaAnalytics(modelFileName, "modelReadable", analytics.getId());
 
                     double moranObservedValue = re.eval("morans_result$observed").asDouble();
                     System.out.println("moranObservedValue:" + moranObservedValue);
 
-                    String processMessage = "Moran's I Result for analyzed Field: " + analyzedFieldValue + ". \n";
-                    //processMessage += "$p.value  : " + re.eval("morans_result$p").asDouble() + ".\n";
-                    processMessage += "$observed.value  : " + moranObservedValue + ".\n";
-                    processMessage += "$expected.value  : " + re.eval("morans_result$expected").asDouble() + ".\n";
-                    processMessage += "$expected.sd  : " + re.eval("morans_result$sd").asDouble() + ".\n";
 
+                    String processMessage = "";
                     if (moranObservedValue > 0) {
-                        processMessage += "\n There is a significant spatial autocorrelation in your data \n and you should take into account in next analytic processes \n. You could double check this result with NCF Correlogram Algorithm";
+                        processMessage += "There is a significant spatial autocorrelation in your data \n and you should take into account in next analytic processes \n. You could double check this result with NCF Correlogram Algorithm";
                     } else {
-                        processMessage += "\n Moran's I did not detect a significant spatial autocorrelation in your data. \n You could double check this result with NCF Correlogram Algorithm";
+                        processMessage += "Moran's I did not detect a significant spatial autocorrelation in your data. \n You could double check this result with NCF Correlogram Algorithm";
 
                     }
                     util.updateProcessMessageToAnalyticsTable(processMessage, analytics.getId());
@@ -176,7 +180,7 @@ public class MoransAnalyticProcess extends AnalyticProcess {
                     // Get elapsed time in seconds
                     timeToRun_analytics = elapsedTimeToRunAnalyticsMillis / 1000F;
                     analytics.setTimeToRun_analytics(analytics.getTimeToRun_analytics() + timeToRun_analytics);
-                    connectionController.updateLindaAnalyticsProcessPerformanceTime(analytics);
+                    DBSynchronizer.updateLindaAnalyticsProcessPerformanceTime(analytics);
                     re.close();
                 }
             }

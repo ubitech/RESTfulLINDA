@@ -8,6 +8,7 @@ package eu.linda.analytics.r.regression;
 import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.controller.AnalyticProcess;
 import eu.linda.analytics.db.ConnectionController;
+import eu.linda.analytics.db.DBSynchronizer;
 import eu.linda.analytics.formats.InputFormat;
 import eu.linda.analytics.formats.OutputFormat;
 import eu.linda.analytics.model.Analytics;
@@ -149,7 +150,7 @@ public class MultipleLinearRegressionInR extends AnalyticProcess {
                 }
 
                 helpfulFunctions.saveFile(modelFileNameFullPath, output);
-                connectionController.updateLindaAnalytics(modelFileName, "modelReadable", analytics.getId());
+                DBSynchronizer.updateLindaAnalytics(modelFileName, "modelReadable", analytics.getId());
 
                 helpfulFunctions.writeToFile(RScript, "processinfo", analytics);
 
@@ -157,7 +158,7 @@ public class MultipleLinearRegressionInR extends AnalyticProcess {
                 // Get elapsed time in seconds
                 timeToRun_analytics = elapsedTimeToRunAnalyticsMillis / 1000F;
                 analytics.setTimeToRun_analytics(analytics.getTimeToRun_analytics() + timeToRun_analytics);
-                connectionController.updateLindaAnalyticsProcessPerformanceTime(analytics);
+                DBSynchronizer.updateLindaAnalyticsProcessPerformanceTime(analytics);
                 out.exportData(analytics, re);
             }
         } catch (RserveException ex) {

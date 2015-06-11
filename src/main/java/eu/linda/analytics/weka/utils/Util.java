@@ -1,9 +1,8 @@
 package eu.linda.analytics.weka.utils;
 
-import com.sun.jna.Library;
-import com.sun.jna.Native;
 import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.db.ConnectionController;
+import eu.linda.analytics.db.DBSynchronizer;
 import eu.linda.analytics.model.Analytics;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -16,7 +15,6 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import static java.sql.Types.NULL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
@@ -53,7 +51,7 @@ public class Util {
         return instance;
     }
 
-    public Analytics saveModel(Classifier model, Analytics analytics) throws Exception {
+    public static Analytics saveModel(Classifier model, Analytics analytics) throws Exception {
         String[] splitedSourceFileName = analytics.getDocument().split("\\.");
 
         // String targetFileName = (splitedSourceFileName[0] + "_" + analytics.getAlgorithm_name() + "Model" + ".model").replace("datasets", "models");
@@ -68,7 +66,7 @@ public class Util {
 //            weka.core.SerializationHelper.write(Configuration.docroot + targetFileName, model);
             weka.core.SerializationHelper.write(Configuration.analyticsRepo + targetFileName, model);
 
-            connectionController.updateLindaAnalyticsModel(targetFileName, analytics.getId());
+            DBSynchronizer.updateLindaAnalyticsModel(targetFileName, analytics.getId());
 
             analytics.setModel(targetFileName);
 
@@ -85,7 +83,7 @@ public class Util {
             bw.write(model.toString());
             bw.close();
 
-            connectionController.updateLindaAnalyticsModelReadable(targetFileNameTXT, analytics.getId());
+             DBSynchronizer.updateLindaAnalyticsModelReadable(targetFileNameTXT, analytics.getId());
             analytics.setModelReadable(targetFileNameTXT);
 
         } catch (IOException e) {
@@ -94,7 +92,7 @@ public class Util {
         return analytics;
     }
 
-    public boolean writeToFile(String content, String column, Analytics analytics) {
+    public static boolean writeToFile(String content, String column, Analytics analytics) {
 
         //prepare target file name
         String[] splitedSourceFileName = analytics.getDocument().split(".arff");
@@ -106,7 +104,7 @@ public class Util {
             targetFileName = ("results/analyticsID" + analytics.getId() + "_" + analytics.getAlgorithm_id() + "_processinfo.txt").replace("datasets", "results");
             String targetFileNameFullPath = Configuration.analyticsRepo + targetFileName;
             saveFile(targetFileNameFullPath, content);
-            connectionController.updateLindaAnalytics(targetFileName, column, analytics.getId());
+            DBSynchronizer.updateLindaAnalytics(targetFileName, column, analytics.getId());
 
         }
         return true;
@@ -114,7 +112,7 @@ public class Util {
     
     
 
-    public boolean saveFile(String targetFileNameFullPath, String content) {
+    public static boolean saveFile(String targetFileNameFullPath, String content) {
 
         try {
 
@@ -136,7 +134,7 @@ public class Util {
         return true;
     }
     
-        public boolean saveFile(String targetFileNameFullPath, String[] content) {
+        public static boolean saveFile(String targetFileNameFullPath, String[] content) {
 
         try {
 
@@ -162,7 +160,7 @@ public class Util {
         return true;
     }
 
-    public void deleteFile(String fileToDelete) {
+    public static void deleteFile(String fileToDelete) {
         File file = new File(fileToDelete);
 
         if (file.exists()) {
@@ -170,7 +168,7 @@ public class Util {
         }
     }
 
-    public boolean saveFileAsCSV(String targetFileNameFullPath, String targetFileNameCSVFull) {
+    public static boolean saveFileAsCSV(String targetFileNameFullPath, String targetFileNameCSVFull) {
 
         try {
             System.out.println("targetFileNameArffPath" + targetFileNameFullPath);
@@ -194,7 +192,7 @@ public class Util {
         return true;
     }
 
-    public Analytics saveModelasVector(Vector model, Analytics analytics) throws Exception {
+    public static Analytics saveModelasVector(Vector model, Analytics analytics) throws Exception {
 
         String targetFileName = "models/analyticsID" + analytics.getId() + "_" + analytics.getAlgorithm_name() + "Model" + ".model";
 
@@ -207,7 +205,7 @@ public class Util {
             SerializationHelper.write(Configuration.analyticsRepo + targetFileName, model);
             weka.core.SerializationHelper.write(Configuration.analyticsRepo + targetFileName, model);
 
-            connectionController.updateLindaAnalyticsModel(targetFileName, analytics.getId());
+            DBSynchronizer.updateLindaAnalyticsModel(targetFileName, analytics.getId());
 
             analytics.setModel(targetFileName);
 
@@ -223,7 +221,7 @@ public class Util {
             bw.write(model.toString());
             bw.close();
 
-            connectionController.updateLindaAnalyticsModelReadable(targetFileNameTXT, analytics.getId());
+             DBSynchronizer.updateLindaAnalyticsModelReadable(targetFileNameTXT, analytics.getId());
             analytics.setModelReadable(targetFileNameTXT);
 
         } catch (IOException e) {
@@ -232,13 +230,13 @@ public class Util {
         return analytics;
     }
 
-    public void nicePrintMessage(String msg) {
+    public static void nicePrintMessage(String msg) {
         System.out.println("------------ " + msg + " ------------");
         System.out.println("-------------------------------------------------------");
 
     }
 
-    public HashMap separateDataFromMetadataInfo(Instances data) {
+    public static HashMap separateDataFromMetadataInfo(Instances data) {
         //until to correct rdf2any converter
         String[] options1 = new String[2];
         options1[0] = "-R";    // "range"
@@ -283,7 +281,7 @@ public class Util {
         return resultMap;
     }
 
-    public Instances mergeDataAndMetadataInfo(Instances data, Instances metadata) {
+    public static Instances mergeDataAndMetadataInfo(Instances data, Instances metadata) {
 
         Instances mergedData = null;
 
@@ -306,41 +304,35 @@ public class Util {
         return mergedData;
     }
 
-    public boolean isRDFExportFormat(String exportFormat) {
-        if (exportFormat.equalsIgnoreCase("RDFXML")
+    public static boolean isRDFExportFormat(String exportFormat) {
+        return exportFormat.equalsIgnoreCase("RDFXML")
                 || exportFormat.equalsIgnoreCase("TTL")
-                || exportFormat.equalsIgnoreCase("N-Tripples")) {
-            return true;
-        }
-        return false;
+                || exportFormat.equalsIgnoreCase("N-Tripples");
     }
 
-    public boolean isRDFInputFormat(int analytics_id) {
-        if (analytics_id > 0) {
-            return true;
-        }
-        return false;
+    public static boolean isRDFInputFormat(int analytics_id) {
+        return analytics_id > 0;
     }
 
-    public void cleanPreviousInfo(Analytics analytics) {
+    public static void cleanPreviousInfo(Analytics analytics) {
 
-        this.nicePrintMessage("Clean Previous Analytic Info");
+        nicePrintMessage("Clean Previous Analytic Info");
         //delete result document
         deleteFile(analytics.getResultdocument());
         deleteFile(analytics.getProcessinfo());
         //empty the analytic result document & processMessage
-        connectionController.emptyLindaAnalyticsResultInfo(analytics.getId());
+        DBSynchronizer.emptyLindaAnalyticsResultInfo(analytics.getId());
 
     }
 
-    public long manageNewPlot(Analytics analytics, String description, String filepath, String plot) {
+    public static long manageNewPlot(Analytics analytics, String description, String filepath, String plot) {
 
         //add plot to db
-        long plot_id = connectionController.addPlot(description, filepath);
-        connectionController.updatePlot((int) plot_id, "plots/plotid" + plot_id + ".png");
+        long plot_id = DBSynchronizer.addPlot(description, filepath);
+        DBSynchronizer.updatePlot((int) plot_id, "plots/plotid" + plot_id + ".png");
 
         //add plot to analytics        
-        connectionController.updateLindaAnalyticsPlot(analytics, plot_id, plot);
+        DBSynchronizer.updateLindaAnalyticsPlot(analytics.getId(), plot_id, plot);
 
         String oldPlotFileName;
         int oldPlotID;
@@ -352,27 +344,27 @@ public class Util {
             oldPlotID = analytics.getPlot2_id();
         }
         deleteFile(oldPlotFileName);
-        connectionController.deletePlot(oldPlotID);
+        DBSynchronizer.deletePlot(oldPlotID);
 
         return plot_id;
     }
 
-    public void updateProcessMessageToAnalyticsTable(String message, int id) {
-        connectionController.updateProcessMessageToAnalyticsTable(message, id);
+    public static void updateProcessMessageToAnalyticsTable(String message, int id) {
+         DBSynchronizer.updateLindaAnalyticsProcessMessage(message, id);
 
     }
 
-    public boolean isURLResponsive(URL url) {
+    public static boolean isURLResponsive(URL url) {
         try {
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("HEAD");
             connection.setConnectTimeout(10000);
             int responseCode = connection.getResponseCode();
             if (responseCode != 200) {
-                this.nicePrintMessage("url http url connection failed");
+                nicePrintMessage("url http url connection failed");
                 return false;
             }
-            this.nicePrintMessage("url http url connection succesfull");
+            nicePrintMessage("url http url connection succesfull");
         } catch (IOException ex) {
             Logger.getLogger(Util.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -380,7 +372,7 @@ public class Util {
 
     }
 
-    public boolean isURLValid(String url) {
+    public static boolean isURLValid(String url) {
 
         UrlValidator urlValidator = new UrlValidator();
         System.out.println("ti exei to url" + url);
@@ -400,7 +392,7 @@ public class Util {
 //        }
     }
 
-    public boolean cleanTmpFileFromDatatypes(String csvFile) {
+    public static boolean cleanTmpFileFromDatatypes(String csvFile) {
 
         BufferedReader br = null;
         String line = "";

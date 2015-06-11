@@ -102,9 +102,9 @@ public class RDFOutputFormat extends OutputFormat {
                 Logger.getLogger(GeneralRDFGenerator.class.getName()).log(Level.SEVERE, null, ex);
             }
 
-            connectionController.updateLindaAnalytics(targetFileName, "resultdocument", analytics.getId());
-            connectionController.updateLindaAnalyticsVersion(analytics.getVersion(), analytics.getId());
-            connectionController.updateLindaAnalyticsRDFInfo("", false, analytics.getId());
+            DBSynchronizer.updateLindaAnalytics(targetFileName, "resultdocument", analytics.getId());
+           DBSynchronizer.updateLindaAnalyticsVersion(analytics.getVersion(), analytics.getId());
+             DBSynchronizer.updateLindaAnalyticsRDFInfo("", false, analytics.getId());
 
             // Get elapsed time in milliseconds
             long elapsedTimeToExportData = System.currentTimeMillis() - startTimeToExportData;
@@ -112,7 +112,7 @@ public class RDFOutputFormat extends OutputFormat {
             timeToExportData = elapsedTimeToExportData / 1000F;
             System.out.println("timeToExportData" + timeToExportData);
             analytics.setTimeToCreate_RDF(timeToExportData);
-            connectionController.updateLindaAnalyticsProcessPerformanceTime(analytics);
+            DBSynchronizer.updateLindaAnalyticsProcessPerformanceTime(analytics);
 
         } else {
             helpfulFuncions.nicePrintMessage("There are no data to be exported to RDF");
@@ -186,9 +186,9 @@ public class RDFOutputFormat extends OutputFormat {
             Logger.getLogger(GeneralRDFGenerator.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        connectionController.updateLindaAnalytics(targetFileName, "resultdocument", analytics.getId());
-        connectionController.updateLindaAnalyticsVersion(analytics.getVersion(), analytics.getId());
-        connectionController.updateLindaAnalyticsRDFInfo("", false, analytics.getId());
+       DBSynchronizer.updateLindaAnalytics(targetFileName, "resultdocument", analytics.getId());
+        DBSynchronizer.updateLindaAnalyticsVersion(analytics.getVersion(), analytics.getId());
+         DBSynchronizer.updateLindaAnalyticsRDFInfo("", false, analytics.getId());
 
         // Get elapsed time in milliseconds
         long elapsedTimeToExportData = System.currentTimeMillis() - startTimeToExportData;
@@ -196,7 +196,7 @@ public class RDFOutputFormat extends OutputFormat {
         timeToExportData = elapsedTimeToExportData / 1000F;
         System.out.println("timeToExportData" + timeToExportData);
         analytics.setTimeToCreate_RDF(timeToExportData);
-        connectionController.updateLindaAnalyticsProcessPerformanceTime(analytics);
+        DBSynchronizer.updateLindaAnalyticsProcessPerformanceTime(analytics);
 
     }
     
@@ -265,9 +265,9 @@ public class RDFOutputFormat extends OutputFormat {
                 
           
             
-            connectionController.updateLindaAnalytics(targetFileName, "resultdocument", analytics.getId());
-            connectionController.updateLindaAnalyticsVersion(analytics.getVersion(), analytics.getId());
-            connectionController.updateLindaAnalyticsRDFInfo("", false, analytics.getId());
+            DBSynchronizer.updateLindaAnalytics(targetFileName, "resultdocument", analytics.getId());
+            DBSynchronizer.updateLindaAnalyticsVersion(analytics.getVersion(), analytics.getId());
+             DBSynchronizer.updateLindaAnalyticsRDFInfo("", false, analytics.getId());
             
             // Get elapsed time in milliseconds
             long elapsedTimeToExportData = System.currentTimeMillis() - startTimeToExportData;
@@ -275,7 +275,7 @@ public class RDFOutputFormat extends OutputFormat {
             timeToExportData = elapsedTimeToExportData / 1000F;
             System.out.println("timeToExportData" + timeToExportData);
             analytics.setTimeToCreate_RDF(timeToExportData);
-            connectionController.updateLindaAnalyticsProcessPerformanceTime(analytics);
+            DBSynchronizer.updateLindaAnalyticsProcessPerformanceTime(analytics);
             
         } catch (RserveException ex) {
             Logger.getLogger(RDFOutputFormat.class.getName()).log(Level.SEVERE, null, ex);

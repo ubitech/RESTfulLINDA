@@ -8,6 +8,7 @@ package eu.linda.analytics.weka.associations;
 import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.controller.AnalyticProcess;
 import eu.linda.analytics.db.ConnectionController;
+import eu.linda.analytics.db.DBSynchronizer;
 import eu.linda.analytics.formats.InputFormat;
 import eu.linda.analytics.formats.OutputFormat;
 import eu.linda.analytics.model.Analytics;
@@ -106,11 +107,11 @@ public class AprioriAnalyticProcess extends AnalyticProcess {
             // Get elapsed time in seconds
             timeToRun_analytics = elapsedTimeToRunAnalyticsMillis / 1000F;
             analytics.setTimeToRun_analytics(timeToRun_analytics);
-            connectionController.updateLindaAnalyticsProcessPerformanceTime(analytics);
+            DBSynchronizer.updateLindaAnalyticsProcessPerformanceTime(analytics);
 
         } catch (Exception ex) {
             Logger.getLogger(AprioriAnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);
-            ConnectionController.getInstance().updateProcessMessageToAnalyticsTable(ex.toString(), analytics.getId());
+             DBSynchronizer.updateLindaAnalyticsProcessMessage(ex.toString(), analytics.getId());
             // helpfulFunctions.updateProcessMessageToAnalyticsTable(ex.toString(), analytics.getId());
         }
 

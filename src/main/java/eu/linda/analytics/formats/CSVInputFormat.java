@@ -6,17 +6,16 @@
 package eu.linda.analytics.formats;
 
 import eu.linda.analytics.db.ConnectionController;
+import eu.linda.analytics.db.DBSynchronizer;
 import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.weka.utils.Util;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URL;
 import java.util.AbstractList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.commons.io.FileUtils;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.Rserve.RConnection;
@@ -76,7 +75,7 @@ public class CSVInputFormat extends InputFormat {
             analytics.setTimeToGet_data(analytics.getTimeToGet_data() + timeToGetQuery);
             System.out.println("timeToGetQuery" + timeToGetQuery);
 
-            connectionController.updateLindaAnalyticsInputDataPerformanceTime(analytics);
+            DBSynchronizer.updateLindaAnalyticsInputDataPerformanceTime(analytics);
 
         } catch (Exception ex) {
             Logger.getLogger(ArffInputFormat.class.getName()).log(Level.SEVERE, null, ex);
@@ -142,7 +141,7 @@ public class CSVInputFormat extends InputFormat {
             analytics.setTimeToGet_data(analytics.getTimeToGet_data() + timeToGetQuery);
             System.out.println("timeToGetQuery" + timeToGetQuery);
 
-            connectionController.updateLindaAnalyticsInputDataPerformanceTime(analytics);
+            DBSynchronizer.updateLindaAnalyticsInputDataPerformanceTime(analytics);
 
         } catch (RserveException ex) {
             Logger.getLogger(CSVInputFormat.class.getName()).log(Level.SEVERE, null, ex);
