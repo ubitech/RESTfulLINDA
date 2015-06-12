@@ -12,7 +12,8 @@ import eu.linda.analytics.db.DBSynchronizer;
 import eu.linda.analytics.formats.InputFormat;
 import eu.linda.analytics.formats.OutputFormat;
 import eu.linda.analytics.model.Analytics;
-import eu.linda.analytics.weka.utils.Util;
+import eu.linda.analytics.utils.AlsCustomException;
+import eu.linda.analytics.utils.Util;
 import java.util.AbstractList;
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -21,6 +22,7 @@ import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.evaluation.output.prediction.PlainText;
 import weka.classifiers.trees.J48;
+import weka.core.Attribute;
 import weka.core.Debug;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -43,14 +45,14 @@ public class J48AnalyticProcess extends AnalyticProcess {
 
     @Override
     public void train(Analytics analytics) {
-        
+
         //clean previous eval info if exists
         Util.cleanPreviousInfo(analytics);
         analytics.setTimeToGet_data(0);
         analytics.setTimeToRun_analytics(0);
         analytics.setData_size(0);
         analytics.setTimeToCreate_RDF(0);
-        
+
         float timeToRun_analytics = 0;
         long startTimeToRun_analytics = System.currentTimeMillis();
 
@@ -70,26 +72,43 @@ public class J48AnalyticProcess extends AnalyticProcess {
             // remove dataset metadata (first two columns)    
             if (Util.isRDFInputFormat(analytics.getTrainQuery_id())) {
 
-                abstractListdata = input.importData4weka(Integer.toString(analytics.getTrainQuery_id()),"", true, analytics);
+                abstractListdata = input.importData4weka(Integer.toString(analytics.getTrainQuery_id()), "", true, analytics);
+                if (abstractListdata == null) {
+                    return;
+                }
                 data = (Instances) abstractListdata;
                 HashMap<String, Instances> separatedData = Util.separateDataFromMetadataInfo(data);
                 data = separatedData.get("newData");
 
             } else if (Util.isRDFExportFormat(analytics.getExportFormat())) {
 
-                abstractListdata = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(),"", true, analytics);
+                abstractListdata = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(), "", true, analytics);
+                if (abstractListdata == null) {
+                    return;
+                }
                 data = (Instances) abstractListdata;
                 HashMap<String, Instances> separatedData = Util.separateDataFromMetadataInfo(data);
                 data = separatedData.get("newData");
 
             } else {
 
-                abstractListdata = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(),"", false, analytics);
+                abstractListdata = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(), "", false, analytics);
+                if (abstractListdata == null) {
+                    return;
+                }
                 data = (Instances) abstractListdata;
 
             }
 
             data.setClassIndex(data.numAttributes() - 1);
+
+            Attribute trainClassAttribute = data.attribute(data.numAttributes() - 1);
+
+            if (trainClassAttribute.isNumeric()) {
+                throw new AlsCustomException("J48 Algorithm can not handle numeric values as Categorization Class."
+                        + "\n Check that the last column of you input data is nominal.", analytics);
+            }
+
             J48 j48ClassifierModel = new J48(); // new instance of tree
 
             j48ClassifierModel.setOptions(options);// set the options
@@ -104,6 +123,8 @@ public class J48AnalyticProcess extends AnalyticProcess {
             // Get elapsed time in seconds
             timeToRun_analytics = elapsedTimeToRunAnalyticsMillis / 1000F;
             analytics.setTimeToRun_analytics(timeToRun_analytics);
+        } catch (AlsCustomException ex) {
+            return;
         } catch (Exception ex) {
             Logger.getLogger(J48AnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -121,7 +142,6 @@ public class J48AnalyticProcess extends AnalyticProcess {
 
         Util.nicePrintMessage("Eval J48");
 
-
         try {
             //Train Data
             AbstractList<Instance> abstractListdata1;
@@ -132,37 +152,55 @@ public class J48AnalyticProcess extends AnalyticProcess {
             Instances testdata;
 
             if (Util.isRDFInputFormat(analytics.getEvaluationQuery_id())) {
-                abstractListdata1 = input.importData4weka(Integer.toString(analytics.getTrainQuery_id()),"", true, analytics);
+                abstractListdata1 = input.importData4weka(Integer.toString(analytics.getTrainQuery_id()), "", true, analytics);
+                if (abstractListdata1 == null) {
+                    return;
+                }
                 traindata = (Instances) abstractListdata1;
                 separatedTrainData = Util.separateDataFromMetadataInfo(traindata);
                 traindata = separatedTrainData.get("newData");
 
-                abstractListdata2 = input.importData4weka(Integer.toString(analytics.getEvaluationQuery_id()),"", true, analytics);
+                abstractListdata2 = input.importData4weka(Integer.toString(analytics.getEvaluationQuery_id()), "", true, analytics);
                 testdata = (Instances) abstractListdata2;
                 separatedEvalData = Util.separateDataFromMetadataInfo(testdata);
                 testdata = separatedEvalData.get("newData");
 
             } else if (Util.isRDFExportFormat(analytics.getExportFormat())) {
-                abstractListdata1 = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(),"", true, analytics);
+                abstractListdata1 = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(), "", true, analytics);
+                if (abstractListdata1 == null) {
+                    return;
+                }
                 traindata = (Instances) abstractListdata1;
                 separatedTrainData = Util.separateDataFromMetadataInfo(traindata);
                 traindata = separatedTrainData.get("newData");
 
-                abstractListdata2 = input.importData4weka(Configuration.analyticsRepo + analytics.getTestdocument(),"", true, analytics);
+                abstractListdata2 = input.importData4weka(Configuration.analyticsRepo + analytics.getTestdocument(), "", true, analytics);
                 testdata = (Instances) abstractListdata2;
                 separatedEvalData = Util.separateDataFromMetadataInfo(testdata);
                 testdata = separatedEvalData.get("newData");
             } else {
 
-                abstractListdata1 = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(),"", false, analytics);
+                abstractListdata1 = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(), "", false, analytics);
+                if (abstractListdata1 == null) {
+                    return;
+                }
                 traindata = (Instances) abstractListdata1;
 
-                abstractListdata2 = input.importData4weka(Configuration.analyticsRepo + analytics.getTestdocument(),"", false, analytics);
+                abstractListdata2 = input.importData4weka(Configuration.analyticsRepo + analytics.getTestdocument(), "", false, analytics);
                 testdata = (Instances) abstractListdata2;
 
             }
 
+            Attribute trainClassAttribute = traindata.attribute(traindata.numAttributes() - 1);
+            Attribute testClassAttribute = traindata.attribute(testdata.numAttributes() - 1);
+            if (trainClassAttribute.isNumeric() || testClassAttribute.isNumeric()) {
+
+                throw new AlsCustomException("J48 Algorithm can not handle numeric values as Categorization Class."
+                        + "\n Check that the last column of you input data is nominal.", analytics);
+            }
+
             traindata.setClassIndex(traindata.numAttributes() - 1);
+
             testdata.setClassIndex(testdata.numAttributes() - 1);
 
             if (traindata.numAttributes() != testdata.numAttributes()) {
@@ -208,15 +246,17 @@ public class J48AnalyticProcess extends AnalyticProcess {
 
             Util.writeToFile(eval.toSummaryString(), "processinfo", analytics);
 
+        } catch (AlsCustomException ex) {
+            return;
         } catch (Exception ex) {
             Logger.getLogger(J48AnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);
-             DBSynchronizer.updateLindaAnalyticsProcessMessage(ex.toString(), analytics.getId());
+            DBSynchronizer.updateLindaAnalyticsProcessMessage(ex.toString(), analytics.getId());
 
         }
         long elapsedTimeToRunAnalyticsMillis = System.currentTimeMillis() - startTimeToRun_analytics;
         // Get elapsed time in seconds
         timeToRun_analytics = elapsedTimeToRunAnalyticsMillis / 1000F;
-        analytics.setTimeToRun_analytics(analytics.getTimeToRun_analytics()+timeToRun_analytics);
+        analytics.setTimeToRun_analytics(analytics.getTimeToRun_analytics() + timeToRun_analytics);
         out.exportData(analytics, dataToReturn);
 
     }

@@ -10,7 +10,7 @@ import eu.linda.analytics.controller.AnalyticProcess;
 import eu.linda.analytics.formats.InputFormat;
 import eu.linda.analytics.formats.OutputFormat;
 import eu.linda.analytics.model.Analytics;
-import eu.linda.analytics.weka.utils.Util;
+import eu.linda.analytics.utils.Util;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -65,18 +65,21 @@ public class M5PAnalyticProcess extends AnalyticProcess {
             // remove dataset metadata (first two columns)    
             if (Util.isRDFInputFormat(analytics.getEvaluationQuery_id())) {
                 abstractListdata1 = input.importData4weka(Integer.toString(analytics.getEvaluationQuery_id()),"", true, analytics);
+                if (abstractListdata1==null) return;
                 data = (Instances) abstractListdata1;
                 HashMap<String, Instances> separatedData = Util.separateDataFromMetadataInfo(data);
                 data = separatedData.get("newData");
 
             } else if (Util.isRDFExportFormat(analytics.getExportFormat())) {
                 abstractListdata1 = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(),"", true, analytics);
+                 if (abstractListdata1==null) return;
                 data = (Instances) abstractListdata1;
                 HashMap<String, Instances> separatedData = Util.separateDataFromMetadataInfo(data);
                 data = separatedData.get("newData");
             } else {
 
                 abstractListdata1 = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(),"", false, analytics);
+                 if (abstractListdata1==null) return;
                 data = (Instances) abstractListdata1;
 
             }
@@ -130,17 +133,20 @@ public class M5PAnalyticProcess extends AnalyticProcess {
             if (Util.isRDFInputFormat(analytics.getEvaluationQuery_id())) {
 
                 abstractList = input.importData4weka(Integer.toString(analytics.getTrainQuery_id()), "",true, analytics);
+                if (abstractList==null) return;
                 data = (Instances) abstractList;
                 separatedData = Util.separateDataFromMetadataInfo(data);
                 data = separatedData.get("newData");
 
             } else if (Util.isRDFExportFormat(analytics.getExportFormat())) {
                 abstractList = input.importData4weka(Configuration.analyticsRepo + analytics.getTestdocument(),"", true, analytics);
+                if (abstractList==null) return;
                 data = (Instances) abstractList;
                 separatedData = Util.separateDataFromMetadataInfo(data);
                 data = separatedData.get("newData");
             } else {
                 abstractList = input.importData4weka(Configuration.analyticsRepo + analytics.getTestdocument(),"", false, analytics);
+                if (abstractList==null) return;
                 data = (Instances) abstractList;
             }
 

@@ -8,7 +8,8 @@ package eu.linda.analytics.formats;
 import eu.linda.analytics.db.ConnectionController;
 import eu.linda.analytics.db.DBSynchronizer;
 import eu.linda.analytics.model.Analytics;
-import eu.linda.analytics.weka.utils.Util;
+import eu.linda.analytics.utils.AlsCustomException;
+import eu.linda.analytics.utils.Util;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -42,71 +43,11 @@ public class RDFInputFormat extends InputFormat {
     @Override
     public Map importData4weka1(String train_query_id, String evaluation_query_id, boolean isForRDFOutput, Analytics analytics) {
 
-        FileInputStream trainfis = null;
-        long trainfisSize = 0;
-        FileInputStream evalfis = null;
-
-        String trainQueryURI = DBSynchronizer.getQueryURI(Integer.parseInt(train_query_id));
-
-        Util.nicePrintMessage("import train data from uri " + trainQueryURI);
-
-        Map data = new Hashtable();
-        Instances train_data = null;
-        Instances test_data = null;
-        try {
-            float timeToGetQuery = 0;
-            long startTimeToGetQuery = System.currentTimeMillis();
-            URL train_url = new URL(trainQueryURI);
-            if (!Util.isURLResponsive(train_url)) {
-                return null;
-            }
-            File tmpfile4lindaquery = File.createTempFile("tmpfile4lindaquery" + train_query_id, ".tmp");
-            FileUtils.copyURLToFile(train_url, tmpfile4lindaquery);
-
-            Util.cleanTmpFileFromDatatypes(tmpfile4lindaquery.getAbsolutePath());
-            System.out.println("Downloaded File Query: " + tmpfile4lindaquery);
-
-            CSVLoader loader = new CSVLoader();
-            loader.setSource(tmpfile4lindaquery);
-            if (isForRDFOutput) {
-                loader.setStringAttributes("1,2");
-            }
-
-            loader.setFieldSeparator(",");
-            train_data = loader.getDataSet();
-            train_data.setClassIndex(train_data.numAttributes() - 1);
-
-            trainfis = new FileInputStream(tmpfile4lindaquery);
-            trainfisSize = trainfis.getChannel().size();
-            System.out.println("fis.getChannel().size() " + trainfisSize);
-            analytics.setData_size(analytics.getData_size() + trainfisSize);
-            trainfis.close();
-            
-            data.put("train_data", train_data);
-
-            if (!evaluation_query_id.equalsIgnoreCase("") && train_query_id.equalsIgnoreCase(evaluation_query_id)) {
-
-                test_data = train_data;
-                data.put("test_data", test_data);
-            }
-
-            // Get elapsed time in milliseconds
-            long elapsedTimeToGetQueryMillis = System.currentTimeMillis() - startTimeToGetQuery;
-            // Get elapsed time in seconds
-            timeToGetQuery = elapsedTimeToGetQueryMillis / 1000F;
-            analytics.setTimeToGet_data(analytics.getTimeToGet_data() + timeToGetQuery);
-            System.out.println("timeToGetQuery" + timeToGetQuery);
-
-            DBSynchronizer.updateLindaAnalyticsInputDataPerformanceTime(analytics);
-
-        } catch (IOException ex) {
-            Logger.getLogger(ArffInputFormat.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return data;
+        return null;
 
     }
-    
-     @Override
+
+    @Override
     public AbstractList importData4weka(String train_query_id, String evaluation_query_id, boolean isForRDFOutput, Analytics analytics) {
 
         FileInputStream trainfis = null;
@@ -125,7 +66,10 @@ public class RDFInputFormat extends InputFormat {
             long startTimeToGetQuery = System.currentTimeMillis();
             URL train_url = new URL(trainQueryURI);
             if (!Util.isURLResponsive(train_url)) {
-                return null;
+                 throw new AlsCustomException("There is a connectivity issue. Could not reach data for predefined train query.\n"
+                        + " Please check your connectivity and the responsiveness of the selected sparql endpoint.\n "
+                        + "Then click on re-Evaluate button to try to run again the analytic process.", analytics);
+
             }
             File tmpfile4lindaquery = File.createTempFile("tmpfile4lindaquery" + train_query_id, ".tmp");
             FileUtils.copyURLToFile(train_url, tmpfile4lindaquery);
@@ -148,13 +92,17 @@ public class RDFInputFormat extends InputFormat {
             System.out.println("fis.getChannel().size() " + trainfisSize);
             analytics.setData_size(analytics.getData_size() + trainfisSize);
             trainfis.close();
-            
+
             data.put("train_data", train_data);
 
             if (!evaluation_query_id.equalsIgnoreCase("") && train_query_id.equalsIgnoreCase(evaluation_query_id)) {
 
                 test_data = train_data;
                 data.put("test_data", test_data);
+            }
+
+            if (!evaluation_query_id.equalsIgnoreCase("") && !train_query_id.equalsIgnoreCase(evaluation_query_id)) {
+
             }
 
             // Get elapsed time in milliseconds
@@ -168,6 +116,9 @@ public class RDFInputFormat extends InputFormat {
 
         } catch (IOException ex) {
             Logger.getLogger(ArffInputFormat.class.getName()).log(Level.SEVERE, null, ex);
+            DBSynchronizer.updateLindaAnalyticsProcessMessage("Input Queries are not responsive. \n", analytics.getId());
+        } catch (AlsCustomException ex) {
+            return null;
         }
         return train_data;
 
@@ -195,12 +146,12 @@ public class RDFInputFormat extends InputFormat {
             Util.nicePrintMessage("import data from train uri " + trainQueryURI);
 
             if (!Util.isURLResponsive(train_url)) {
-                re.eval(" is_train_query_responsive <-FALSE ");
-                System.out.println("is_train_query_responsive <-FALSE ");
+                re.eval("rm(list=ls());");
+                throw new AlsCustomException("There is a connectivity issue. Could not reach data for predefined train query.\n"
+                        + " Please check your connectivity and the responsiveness of the selected sparql endpoint.\n "
+                        + "Then click on re-Evaluate button to try to run again the analytic process.", analytics);
 
             } else {
-                re.eval("is_train_query_responsive <-TRUE  ");
-                System.out.println("is_train_query_responsive <-TRUE ");
 
                 File traintmpfile4lindaquery = File.createTempFile("traintmpfile4lindaquery" + train_query_id, ".tmp");
                 FileUtils.copyURLToFile(train_url, traintmpfile4lindaquery);
@@ -218,10 +169,8 @@ public class RDFInputFormat extends InputFormat {
 
                 if (!evaluation_query_id.equalsIgnoreCase("") && train_query_id.equalsIgnoreCase(evaluation_query_id)) {
 
-                    re.eval("is_eval_query_responsive <-TRUE; "
-                            + "loaded_data_eval <- loaded_data; ");
-                    System.out.println("is_eval_query_responsive <-TRUE; "
-                            + "loaded_data_eval <- loaded_data; ");
+                    re.eval("loaded_data_eval <- loaded_data; ");
+                    System.out.println("loaded_data_eval <- loaded_data; ");
                 }
 
                 if (!evaluation_query_id.equalsIgnoreCase("") && !train_query_id.equalsIgnoreCase(evaluation_query_id)) {
@@ -231,12 +180,12 @@ public class RDFInputFormat extends InputFormat {
                     URL eval_url = new URL(evalQueryURI);
 
                     if (!Util.isURLResponsive(eval_url)) {
-                        re.eval(" is_eval_query_responsive <-FALSE ");
-                        System.out.println("is_eval_query_responsive <-FALSE ");
+                        re.eval("rm(list=ls());");
+                        throw new AlsCustomException("There is a connectivity issue. Could not reach data for predefined evaluation query.\n"
+                                + " Please check your connectivity and the responsiveness of the selected sparql endpoint.\n "
+                                + "Then click on re-Evaluate button to try to run again the analytic process.", analytics);
 
                     } else {
-                        re.eval("is_eval_query_responsive <-TRUE  ");
-                        System.out.println("is_eval_query_responsive <-TRUE ");
 
                         File evaltmpfile4lindaquery = File.createTempFile("evaltmpfile4lindaquery" + evaluation_query_id, ".tmp");
                         FileUtils.copyURLToFile(eval_url, evaltmpfile4lindaquery);
@@ -267,14 +216,18 @@ public class RDFInputFormat extends InputFormat {
 
         } catch (RserveException ex) {
             Logger.getLogger(RDFInputFormat.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (MalformedURLException ex) {
-            Logger.getLogger(RDFInputFormat.class.getName()).log(Level.SEVERE, null, ex);
+            DBSynchronizer.updateLindaAnalyticsProcessMessage("Rserve server not responsive. \n Reiniciate the Rserve Server or Contact the administrator.", analytics.getId());
         } catch (REXPMismatchException ex) {
             Logger.getLogger(RDFInputFormat.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(RDFInputFormat.class.getName()).log(Level.SEVERE, null, ex);
+            DBSynchronizer.updateLindaAnalyticsProcessMessage("Input Queries are not responsive. \n", analytics.getId());
+        } catch (AlsCustomException ex) {
+            return null;
         }
         return re;
     }
+
+   
 
 }

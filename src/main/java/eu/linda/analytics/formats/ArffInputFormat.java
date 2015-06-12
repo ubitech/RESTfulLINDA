@@ -7,7 +7,7 @@
 package eu.linda.analytics.formats;
 
 import eu.linda.analytics.model.Analytics;
-import eu.linda.analytics.weka.utils.Util;
+import eu.linda.analytics.utils.Util;
 import java.util.AbstractList;
 import java.util.Map;
 import java.util.logging.Level;

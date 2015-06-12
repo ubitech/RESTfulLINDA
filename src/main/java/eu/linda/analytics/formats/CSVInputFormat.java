@@ -8,7 +8,7 @@ package eu.linda.analytics.formats;
 import eu.linda.analytics.db.ConnectionController;
 import eu.linda.analytics.db.DBSynchronizer;
 import eu.linda.analytics.model.Analytics;
-import eu.linda.analytics.weka.utils.Util;
+import eu.linda.analytics.utils.Util;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

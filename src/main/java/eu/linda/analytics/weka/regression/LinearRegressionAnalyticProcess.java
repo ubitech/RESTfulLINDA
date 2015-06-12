@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package eu.linda.analytics.weka.generic;
+package eu.linda.analytics.weka.regression;
 
 import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.controller.AnalyticProcess;
@@ -11,7 +11,7 @@ import eu.linda.analytics.db.DBSynchronizer;
 import eu.linda.analytics.formats.InputFormat;
 import eu.linda.analytics.formats.OutputFormat;
 import eu.linda.analytics.model.Analytics;
-import eu.linda.analytics.weka.utils.Util;
+import eu.linda.analytics.utils.Util;
 import java.util.AbstractList;
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -28,7 +28,6 @@ import weka.core.Instances;
  * @author eleni
  */
 public class LinearRegressionAnalyticProcess extends AnalyticProcess {
-
 
     InputFormat input;
 
@@ -58,7 +57,10 @@ public class LinearRegressionAnalyticProcess extends AnalyticProcess {
             Instances data = null;
 
             if (Util.isRDFInputFormat(analytics.getTrainQuery_id())) {
-                data1 = input.importData4weka(Integer.toString(analytics.getTrainQuery_id()),"", true, analytics);
+                data1 = input.importData4weka(Integer.toString(analytics.getTrainQuery_id()), "", true, analytics);
+                if (data1 == null) {
+                    return;
+                }
                 data = (Instances) data1;
                 HashMap<String, Instances> separatedData = Util.separateDataFromMetadataInfo(data);
                 data = separatedData.get("newData");
@@ -67,13 +69,19 @@ public class LinearRegressionAnalyticProcess extends AnalyticProcess {
 
                 if (Util.isRDFExportFormat(analytics.getExportFormat())) {
                     // remove dataset metadata (first two columns)   
-                    data1 = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(),"", true, analytics);
+                    data1 = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(), "", true, analytics);
+                    if (data1 == null) {
+                        return;
+                    }
                     data = (Instances) data1;
                     HashMap<String, Instances> separatedData = Util.separateDataFromMetadataInfo(data);
                     data = separatedData.get("newData");
 
                 } else {
-                    data1 = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(),"", false, analytics);
+                    data1 = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(), "", false, analytics);
+                    if (data1 == null) {
+                        return;
+                    }
                     data = (Instances) data1;
                 }
 
@@ -123,7 +131,10 @@ public class LinearRegressionAnalyticProcess extends AnalyticProcess {
             Instances data;
 
             if (Util.isRDFInputFormat(analytics.getEvaluationQuery_id())) {
-                abstractlistdata = input.importData4weka(Integer.toString(analytics.getEvaluationQuery_id()),"", true, analytics);
+                abstractlistdata = input.importData4weka(Integer.toString(analytics.getEvaluationQuery_id()), "", true, analytics);
+                if (abstractlistdata == null) {
+                    return;
+                }
                 data = (Instances) abstractlistdata;
 
                 separatedData = Util.separateDataFromMetadataInfo(data);
@@ -132,13 +143,19 @@ public class LinearRegressionAnalyticProcess extends AnalyticProcess {
             } else if (!analytics.getDocument().equalsIgnoreCase("")) {
 
                 if (Util.isRDFExportFormat(analytics.getExportFormat())) {
-                    abstractlistdata = input.importData4weka(Configuration.analyticsRepo + analytics.getTestdocument(),"", true, analytics);
+                    abstractlistdata = input.importData4weka(Configuration.analyticsRepo + analytics.getTestdocument(), "", true, analytics);
+                    if (abstractlistdata == null) {
+                        return;
+                    }
                     data = (Instances) abstractlistdata;
 
                     separatedData = Util.separateDataFromMetadataInfo(data);
                     data = separatedData.get("newData");
                 } else {
-                    abstractlistdata = input.importData4weka(Configuration.analyticsRepo + analytics.getTestdocument(),"", false, analytics);
+                    abstractlistdata = input.importData4weka(Configuration.analyticsRepo + analytics.getTestdocument(), "", false, analytics);
+                    if (abstractlistdata == null) {
+                        return;
+                    }
                     data = (Instances) abstractlistdata;
 
                 }
@@ -185,8 +202,8 @@ public class LinearRegressionAnalyticProcess extends AnalyticProcess {
             Boolean outputDistribution = true;
             eval.crossValidateModel(model, data, 10, new Debug.Random(1), output, attsToOutput, outputDistribution);
 
-             Util.writeToFile(eval.toSummaryString(), "processinfo", analytics);
-             
+            Util.writeToFile(eval.toSummaryString(), "processinfo", analytics);
+
         } catch (Exception ex) {
             Logger.getLogger(LinearRegressionAnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);
         }

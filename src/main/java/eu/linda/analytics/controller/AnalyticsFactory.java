@@ -26,7 +26,7 @@ import eu.linda.analytics.r.regression.MultipleLinearRegressionInR;
 import eu.linda.analytics.weka.associations.AprioriAnalyticProcess;
 import eu.linda.analytics.weka.classifiers.J48AnalyticProcess;
 import eu.linda.analytics.weka.classifiers.M5PAnalyticProcess;
-import eu.linda.analytics.weka.generic.LinearRegressionAnalyticProcess;
+import eu.linda.analytics.weka.regression.LinearRegressionAnalyticProcess;
 
 /**
  *

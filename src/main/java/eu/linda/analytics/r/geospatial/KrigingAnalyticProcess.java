@@ -11,7 +11,7 @@ import eu.linda.analytics.db.DBSynchronizer;
 import eu.linda.analytics.formats.InputFormat;
 import eu.linda.analytics.formats.OutputFormat;
 import eu.linda.analytics.model.Analytics;
-import eu.linda.analytics.weka.utils.Util;
+import eu.linda.analytics.utils.Util;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.rosuda.REngine.REXPMismatchException;
@@ -54,17 +54,7 @@ public class KrigingAnalyticProcess extends AnalyticProcess {
 
                 //import train & eval dataset
                 re = input.importData4R(Integer.toString(analytics.getTrainQuery_id()), Integer.toString(analytics.getEvaluationQuery_id()), true, analytics);
-
-                org.rosuda.REngine.REXP is_train_query_responsive = re.eval("is_train_query_responsive");
-                org.rosuda.REngine.REXP is_evaluation_query_responsive = re.eval("is_eval_query_responsive");
-
-                if (is_train_query_responsive.asString().equalsIgnoreCase("FALSE") || is_evaluation_query_responsive.asString().equalsIgnoreCase("FALSE")) {
-                    DBSynchronizer.updateLindaAnalyticsProcessMessage("There is a connectivity issue. Could not reach data for predefined query.\n"
-                            + " Please check your connectivity and the responsiveness of the selected sparql endpoint.\n "
-                            + "Then click on re-Evaluate button to try to run again the analytic process.", analytics.getId());
-                    re.eval("rm(list=ls());");
-                    return;
-                }
+                if (re==null) return;
 
                 re.eval("loaded_data_train <- loaded_data; "
                         + "df_to_export<- loaded_data_eval;");
@@ -76,6 +66,7 @@ public class KrigingAnalyticProcess extends AnalyticProcess {
             } else {
                 //import train & eval dataset
                 re = input.importData4R(Configuration.analyticsRepo + analytics.getDocument(),Configuration.analyticsRepo + analytics.getTestdocument(), true, analytics);
+                if (re==null) return;
                 re.eval("loaded_data_train <- loaded_data;"
                         + "loaded_data_eval <- loaded_data_eval; "
                         + "df_to_export<- loaded_data_eval;");

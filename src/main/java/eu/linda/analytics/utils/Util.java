@@ -1,4 +1,4 @@
-package eu.linda.analytics.weka.utils;
+package eu.linda.analytics.utils;
 
 import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.db.ConnectionController;
@@ -310,6 +310,8 @@ public class Util {
         //delete result document
         deleteFile(analytics.getResultdocument());
         deleteFile(analytics.getProcessinfo());
+        deleteFile(analytics.getModelReadable());
+        deleteFile(analytics.getModel());
         //empty the analytic result document & processMessage
         DBSynchronizer.emptyLindaAnalyticsResultInfo(analytics.getId());
 
@@ -339,8 +341,8 @@ public class Util {
         return plot_id;
     }
 
-    public static boolean isURLResponsive(URL url) {
-        try {
+    public static boolean isURLResponsive(URL url) throws IOException {
+        
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("HEAD");
             connection.setConnectTimeout(10000);
@@ -350,9 +352,7 @@ public class Util {
                 return false;
             }
             nicePrintMessage("url http url connection succesfull");
-        } catch (IOException ex) {
-            Logger.getLogger(Util.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        
         return true;
 
     }

@@ -7,7 +7,7 @@ import eu.linda.analytics.db.DBSynchronizer;
 import eu.linda.analytics.formats.InputFormat;
 import eu.linda.analytics.formats.OutputFormat;
 import eu.linda.analytics.model.Analytics;
-import eu.linda.analytics.weka.utils.Util;
+import eu.linda.analytics.utils.Util;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.rosuda.REngine.REXPMismatchException;
@@ -18,8 +18,6 @@ import org.rosuda.REngine.Rserve.RserveException;
  *
  * @author eleni
  */
-
-
 public class ModelBasedClusteringAnalyticProcess extends AnalyticProcess {
 
     InputFormat input;
@@ -49,73 +47,64 @@ public class ModelBasedClusteringAnalyticProcess extends AnalyticProcess {
             analytics.setData_size(0);
             RConnection re;
             if (Util.isRDFInputFormat(analytics.getTrainQuery_id())) {
-                re = input.importData4R(Integer.toString(analytics.getTrainQuery_id()),"", true, analytics);
-                
+                re = input.importData4R(Integer.toString(analytics.getTrainQuery_id()), "", true, analytics);
+
             } else {
-                re = input.importData4R(Configuration.analyticsRepo + analytics.getDocument(),"", true, analytics);
+                re = input.importData4R(Configuration.analyticsRepo + analytics.getDocument(), "", true, analytics);
                 RScript += "loaded_data <- read.csv(file='" + Configuration.analyticsRepo + analytics.getDocument() + "', header=TRUE, sep=',');\n";
-                
+
             }
-            
-            org.rosuda.REngine.REXP is_train_query_responsive = re.eval("is_train_query_responsive");
-            
-            if (is_train_query_responsive.asString().equalsIgnoreCase("FALSE")) {
-                DBSynchronizer.updateLindaAnalyticsProcessMessage("There is a connectivity issue. Could not reach data for predefined query.\n"
-                        + " Please check your connectivity and the responsiveness of the selected sparql endpoint.\n "
-                        + "Then click on re-Evaluate button to try to run again the analytic process.", analytics.getId());
-                re.eval("rm(list=ls());");
-            } else {
-                //TODO Check that all values are numeric
-                
-                re.eval("column_with_uri <-colnames(loaded_data[2]);");
-                RScript += "# Prepare Data \n column_with_uri <-colnames(loaded_data[2]); \n";
-                
-                re.eval("myvars <- names(loaded_data) %in% c('rowID',column_with_uri);");
-                RScript += "# Prepare Data \n myvars <- names(loaded_data) %in% c('rowID',column_with_uri); \n";
-                
-                re.eval("loaded_data <- loaded_data[!myvars]");
-                RScript += "loaded_data <- loaded_data[!myvars]\n";
-                
-                re.eval("loaded_data <- na.omit(loaded_data)");
-                RScript += "loaded_data <- na.omit(loaded_data) # listwise deletion of missing\n";
-                
-                re.eval("loaded_data <- scale(loaded_data)");
-                RScript += "loaded_data <- scale(loaded_data) # standardize variables\n";
-                
-                // Model Based Clustering
-                re.eval("library(mclust);");
-                RScript += " # Model Based Clustering \n library(mclust); \n";
-                
-                re.eval("fit <- Mclust(loaded_data);");
-                RScript += " fit <- Mclust(loaded_data); \n";
-                
-                long plot1_id = Util.manageNewPlot(analytics, "Model Based Clustering ", "plots/plotid" + analytics.getPlot1_id() + ".png", "plot1_id");
-                
-                re.eval("png(file='" + Configuration.analyticsRepo + "plots/plotid" + plot1_id + ".png',width=600);");
-                re.eval("print(plot(fit ,what='classification'));");
-                re.eval("dev.off();");
-                
-                RScript += "# display dendogram  \n ";
-                RScript += "png(file='" + Configuration.analyticsRepo + "plots/plotid" + plot1_id + ".png',width=600);\n";
-                RScript += "print(plot(fit ,what='classification'));\n";
-                RScript += "dev.off();\n";
-                
-                re.eval("summary(fit);");
-                RScript += " summary(fit); # display the best model \n";
-                
-                Util.writeToFile(RScript, "processinfo", analytics);
-                
-                re.eval("rm(list=ls());");
-                long elapsedTimeToRunAnalyticsMillis = System.currentTimeMillis() - startTimeToRun_analytics;
-                // Get elapsed time in seconds
-                timeToRun_analytics = elapsedTimeToRunAnalyticsMillis / 1000F;
-                analytics.setTimeToRun_analytics(analytics.getTimeToRun_analytics() + timeToRun_analytics);
-                DBSynchronizer.updateLindaAnalyticsProcessPerformanceTime(analytics);
-                 re.close();
+            if (re == null) {
+                return;
             }
+            //TODO Check that all values are numeric
+            re.eval("column_with_uri <-colnames(loaded_data[2]);");
+            RScript += "# Prepare Data \n column_with_uri <-colnames(loaded_data[2]); \n";
+
+            re.eval("myvars <- names(loaded_data) %in% c('rowID',column_with_uri);");
+            RScript += "# Prepare Data \n myvars <- names(loaded_data) %in% c('rowID',column_with_uri); \n";
+
+            re.eval("loaded_data <- loaded_data[!myvars]");
+            RScript += "loaded_data <- loaded_data[!myvars]\n";
+
+            re.eval("loaded_data <- na.omit(loaded_data)");
+            RScript += "loaded_data <- na.omit(loaded_data) # listwise deletion of missing\n";
+
+            re.eval("loaded_data <- scale(loaded_data)");
+            RScript += "loaded_data <- scale(loaded_data) # standardize variables\n";
+
+            // Model Based Clustering
+            re.eval("library(mclust);");
+            RScript += " # Model Based Clustering \n library(mclust); \n";
+
+            re.eval("fit <- Mclust(loaded_data);");
+            RScript += " fit <- Mclust(loaded_data); \n";
+
+            long plot1_id = Util.manageNewPlot(analytics, "Model Based Clustering ", "plots/plotid" + analytics.getPlot1_id() + ".png", "plot1_id");
+
+            re.eval("png(file='" + Configuration.analyticsRepo + "plots/plotid" + plot1_id + ".png',width=600);");
+            re.eval("print(plot(fit ,what='classification'));");
+            re.eval("dev.off();");
+
+            RScript += "# display dendogram  \n ";
+            RScript += "png(file='" + Configuration.analyticsRepo + "plots/plotid" + plot1_id + ".png',width=600);\n";
+            RScript += "print(plot(fit ,what='classification'));\n";
+            RScript += "dev.off();\n";
+
+            re.eval("summary(fit);");
+            RScript += " summary(fit); # display the best model \n";
+
+            Util.writeToFile(RScript, "processinfo", analytics);
+
+            re.eval("rm(list=ls());");
+            long elapsedTimeToRunAnalyticsMillis = System.currentTimeMillis() - startTimeToRun_analytics;
+            // Get elapsed time in seconds
+            timeToRun_analytics = elapsedTimeToRunAnalyticsMillis / 1000F;
+            analytics.setTimeToRun_analytics(analytics.getTimeToRun_analytics() + timeToRun_analytics);
+            DBSynchronizer.updateLindaAnalyticsProcessPerformanceTime(analytics);
+            re.close();
+
         } catch (RserveException ex) {
-            Logger.getLogger(ModelBasedClusteringAnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (REXPMismatchException ex) {
             Logger.getLogger(ModelBasedClusteringAnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);
         }
 

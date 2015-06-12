@@ -12,7 +12,7 @@ import eu.linda.analytics.db.DBSynchronizer;
 import eu.linda.analytics.formats.InputFormat;
 import eu.linda.analytics.formats.OutputFormat;
 import eu.linda.analytics.model.Analytics;
-import eu.linda.analytics.weka.utils.Util;
+import eu.linda.analytics.utils.Util;
 import java.util.AbstractList;
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -66,6 +66,7 @@ public class AprioriAnalyticProcess extends AnalyticProcess {
             // remove dataset metadata (first two columns) 
             if (Util.isRDFInputFormat(analytics.getEvaluationQuery_id())) {
                 abstractListdata = input.importData4weka(Integer.toString(analytics.getEvaluationQuery_id()),"", true, analytics);
+                if (abstractListdata==null) return;
                 data = (Instances) abstractListdata;
                 HashMap<String, Instances> separatedData = Util.separateDataFromMetadataInfo(data);
                 data = separatedData.get("newData");
@@ -73,6 +74,7 @@ public class AprioriAnalyticProcess extends AnalyticProcess {
             } else if (Util.isRDFExportFormat(analytics.getExportFormat())) {
 
                 abstractListdata = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(),"", true, analytics);
+                 if (abstractListdata==null) return;
                 data = (Instances) abstractListdata;
                 HashMap<String, Instances> separatedData = Util.separateDataFromMetadataInfo(data);
                 data = separatedData.get("newData");

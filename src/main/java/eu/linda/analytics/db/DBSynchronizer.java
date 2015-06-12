@@ -3,7 +3,7 @@ package eu.linda.analytics.db;
 import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.model.Query;
-import eu.linda.analytics.weka.utils.Util;
+import eu.linda.analytics.utils.Util;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,8 +15,7 @@ import org.apache.commons.httpclient.util.URIUtil;
 
 public class DBSynchronizer {
 
-   
-    public DBSynchronizer() {   
+    public DBSynchronizer() {
     }
 
     /*
@@ -78,13 +77,12 @@ public class DBSynchronizer {
     public static synchronized String getQueryURI(int id) {
         Query query = null;
         PreparedStatement preparedStatement = null;
-        String  query_uri="";
+        String query_uri = "";
         try {
 
-            String querytodb = "SELECT  * FROM linda_app_query  AS query WHERE query.id =? ";            
+            String querytodb = "SELECT  * FROM linda_app_query  AS query WHERE query.id =? ";
             Connection connection = ConnectionFactory.getInstance();
             preparedStatement = connection.prepareStatement(querytodb);
-
 
             preparedStatement.setInt(1, id);
             ResultSet rs = preparedStatement.executeQuery();
@@ -107,7 +105,7 @@ public class DBSynchronizer {
         } catch (URIException ex) {
             Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         return query_uri;
     }//EoM  
 
@@ -259,13 +257,15 @@ public class DBSynchronizer {
     public static synchronized void emptyLindaAnalyticsResultInfo(int analytics_id) {
         PreparedStatement preparedStatement = null;
         try {
-            String query = "update analytics_analytics set processinfo=? , resultdocument=? , processMessage=?, plot1_id=null , plot2_id=null, timeToGet_data=0 , data_size=0 , timeToRun_analytics=0 , timeToCreate_RDF=0 where id=?";
+            String query = "update analytics_analytics set processinfo=? , resultdocument=? , processMessage=?, model=?, modelReadable=?, plot1_id=null , plot2_id=null, timeToGet_data=0 , data_size=0 , timeToRun_analytics=0 , timeToCreate_RDF=0 where id=?";
             Connection connection = ConnectionFactory.getInstance();
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, "");
             preparedStatement.setString(2, "");
             preparedStatement.setString(3, "");
-            preparedStatement.setInt(4, analytics_id);
+            preparedStatement.setString(4, "");
+            preparedStatement.setString(5, "");
+            preparedStatement.setInt(6, analytics_id);
             preparedStatement.executeUpdate();
             preparedStatement.close();
             connection.close();

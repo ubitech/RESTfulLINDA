@@ -9,7 +9,7 @@ import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.db.ConnectionController;
 import eu.linda.analytics.db.DBSynchronizer;
 import eu.linda.analytics.model.Analytics;
-import eu.linda.analytics.weka.utils.Util;
+import eu.linda.analytics.utils.Util;
 import java.util.AbstractList;
 import org.rosuda.JRI.Rengine;
 import org.rosuda.REngine.Rserve.RConnection;

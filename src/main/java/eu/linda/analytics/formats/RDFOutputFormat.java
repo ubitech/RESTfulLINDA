@@ -11,7 +11,7 @@ import eu.linda.analytics.controller.RDFGenerationFactory;
 import eu.linda.analytics.db.ConnectionController;
 import eu.linda.analytics.db.DBSynchronizer;
 import eu.linda.analytics.model.Analytics;
-import eu.linda.analytics.weka.utils.Util;
+import eu.linda.analytics.utils.Util;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
