@@ -7,6 +7,7 @@ package eu.linda.analytics.weka.generic;
 
 import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.controller.AnalyticProcess;
+import eu.linda.analytics.db.DBSynchronizer;
 import eu.linda.analytics.formats.InputFormat;
 import eu.linda.analytics.formats.OutputFormat;
 import eu.linda.analytics.model.Analytics;
@@ -77,7 +78,7 @@ public class LinearRegressionAnalyticProcess extends AnalyticProcess {
                 }
 
             } else {
-                Util.updateProcessMessageToAnalyticsTable("Train Dataset in not defined. \n Could not run analytics process. \n Propably Train data were deleted after the creation of the analytic process.", analytics.getId());
+                DBSynchronizer.updateLindaAnalyticsProcessMessage("Train Dataset in not defined. \n Could not run analytics process. \n Propably Train data were deleted after the creation of the analytic process.", analytics.getId());
                 return;
             }
 
@@ -143,7 +144,7 @@ public class LinearRegressionAnalyticProcess extends AnalyticProcess {
                 }
             } else {
 
-                Util.updateProcessMessageToAnalyticsTable("Evaluation Dataset in not defined. \n Could not run analytics process. \n Propably Evaluation data were deleted after the creation of the analytic process. ", analytics.getId());
+                DBSynchronizer.updateLindaAnalyticsProcessMessage("Evaluation Dataset in not defined. \n Could not run analytics process. \n Propably Evaluation data were deleted after the creation of the analytic process. ", analytics.getId());
                 return;
 
             }

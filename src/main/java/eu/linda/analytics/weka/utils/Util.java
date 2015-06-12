@@ -7,7 +7,6 @@ import eu.linda.analytics.model.Analytics;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -54,8 +53,6 @@ public class Util {
     public static Analytics saveModel(Classifier model, Analytics analytics) throws Exception {
         String[] splitedSourceFileName = analytics.getDocument().split("\\.");
 
-        // String targetFileName = (splitedSourceFileName[0] + "_" + analytics.getAlgorithm_name() + "Model" + ".model").replace("datasets", "models");
-        //String targetFileNameTXT = (splitedSourceFileName[0] + "_" + analytics.getAlgorithm_name() + "ModelReadable" + ".txt").replace("datasets", "models");
         String targetFileName = ("models/analyticsID" + analytics.getId() + "_" + analytics.getAlgorithm_name() + "Model" + ".model");
         String targetFileNameTXT = ("models/analyticsID" + analytics.getId() + "_" + analytics.getAlgorithm_name() + "ModelReadable" + ".txt");
 
@@ -63,14 +60,12 @@ public class Util {
         try {
 
             // serialize && save model
-//            weka.core.SerializationHelper.write(Configuration.docroot + targetFileName, model);
             weka.core.SerializationHelper.write(Configuration.analyticsRepo + targetFileName, model);
 
             DBSynchronizer.updateLindaAnalyticsModel(targetFileName, analytics.getId());
 
             analytics.setModel(targetFileName);
 
-//            File file = new File(Configuration.docroot + targetFileNameTXT);
             File file = new File(Configuration.analyticsRepo + targetFileNameTXT);
 
             // if file doesnt exists, then create it
@@ -83,7 +78,7 @@ public class Util {
             bw.write(model.toString());
             bw.close();
 
-             DBSynchronizer.updateLindaAnalyticsModelReadable(targetFileNameTXT, analytics.getId());
+            DBSynchronizer.updateLindaAnalyticsModelReadable(targetFileNameTXT, analytics.getId());
             analytics.setModelReadable(targetFileNameTXT);
 
         } catch (IOException e) {
@@ -109,15 +104,11 @@ public class Util {
         }
         return true;
     }
-    
-    
 
     public static boolean saveFile(String targetFileNameFullPath, String content) {
 
         try {
-
             File file = new File(targetFileNameFullPath);
-
             // if file doesnt exists, then create it
             if (!file.exists()) {
                 file.createNewFile();
@@ -127,14 +118,14 @@ public class Util {
             BufferedWriter bw = new BufferedWriter(fw);
             bw.write(content);
             bw.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException ex) {
+            Logger.getLogger(Util.class.getName()).log(Level.SEVERE, null, ex);
         }
+
         return true;
     }
-    
-        public static boolean saveFile(String targetFileNameFullPath, String[] content) {
+
+    public static boolean saveFile(String targetFileNameFullPath, String[] content) {
 
         try {
 
@@ -147,15 +138,15 @@ public class Util {
 
             FileWriter fw = new FileWriter(file.getAbsoluteFile());
             BufferedWriter bw = new BufferedWriter(fw);
-            
+
             for (String string : content) {
-               bw.write(string +"\n"); 
+                bw.write(string + "\n");
             }
-            
+
             bw.close();
 
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException ex) {
+            Logger.getLogger(Util.class.getName()).log(Level.SEVERE, null, ex);
         }
         return true;
     }
@@ -185,8 +176,8 @@ public class Util {
             saver.setDestination(new File(targetFileNameCSVFull));
             saver.writeBatch();
 
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException ex) {
+            Logger.getLogger(Util.class.getName()).log(Level.SEVERE, null, ex);
             return false;
         }
         return true;
@@ -221,11 +212,12 @@ public class Util {
             bw.write(model.toString());
             bw.close();
 
-             DBSynchronizer.updateLindaAnalyticsModelReadable(targetFileNameTXT, analytics.getId());
+            DBSynchronizer.updateLindaAnalyticsModelReadable(targetFileNameTXT, analytics.getId());
             analytics.setModelReadable(targetFileNameTXT);
 
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException ex) {
+            Logger.getLogger(Util.class.getName()).log(Level.SEVERE, null, ex);
+
         }
         return analytics;
     }
@@ -288,13 +280,11 @@ public class Util {
         try {
             mergedData = new Instances(data);
             // add new attributes
-            //mergedData.insertAttributeAt(new Attribute("basens", (List<String>) null), 0);
             mergedData.insertAttributeAt(new Attribute("uri", (List<String>) null), 0);
 
             for (int i = 0; i < mergedData.numInstances(); i++) {
                 // fill colums with data
                 mergedData.instance(i).setValue(0, metadata.get(i).stringValue(0));
-                //mergedData.instance(i).setValue(1, metadata.get(i).stringValue(1));
             }
 
         } catch (Exception ex) {
@@ -349,11 +339,6 @@ public class Util {
         return plot_id;
     }
 
-    public static void updateProcessMessageToAnalyticsTable(String message, int id) {
-         DBSynchronizer.updateLindaAnalyticsProcessMessage(message, id);
-
-    }
-
     public static boolean isURLResponsive(URL url) {
         try {
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -375,21 +360,7 @@ public class Util {
     public static boolean isURLValid(String url) {
 
         UrlValidator urlValidator = new UrlValidator();
-        System.out.println("ti exei to url" + url);
-        //valid URL
-
-        if (urlValidator.isValid(url)) {
-            return true;
-        } else {
-            return false;
-        }
-
-//        
-//        if (urlValidator.isValid(url)) {
-//            return true;
-//        } else {
-//            return false;
-//        }
+        return urlValidator.isValid(url);
     }
 
     public static boolean cleanTmpFileFromDatatypes(String csvFile) {
@@ -434,11 +405,9 @@ public class Util {
 
             bw.close();
 
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        }catch (IOException ex) {
+            Logger.getLogger(Util.class.getName()).log(Level.SEVERE, null, ex);
+        } 
 
         return true;
     }

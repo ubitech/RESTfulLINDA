@@ -62,7 +62,7 @@ public class ClustersNumberAnalyticProcess extends AnalyticProcess {
             
             
             if (is_train_query_responsive.asString().equalsIgnoreCase("FALSE")) {
-                Util.updateProcessMessageToAnalyticsTable("There is a connectivity issue. Could not reach data for predefined query.\n"
+               DBSynchronizer.updateLindaAnalyticsProcessMessage("There is a connectivity issue. Could not reach data for predefined query.\n"
                         + " Please check your connectivity and the responsiveness of the selected sparql endpoint.\n "
                         + "Then click on re-Evaluate button to try to run again the analytic process.", analytics.getId());
                 re.eval("rm(list=ls());");

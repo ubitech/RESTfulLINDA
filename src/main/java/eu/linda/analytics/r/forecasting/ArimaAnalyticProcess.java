@@ -7,6 +7,7 @@ package eu.linda.analytics.r.forecasting;
 
 import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.controller.AnalyticProcess;
+import eu.linda.analytics.db.DBSynchronizer;
 import eu.linda.analytics.formats.InputFormat;
 import eu.linda.analytics.formats.OutputFormat;
 import eu.linda.analytics.model.Analytics;
@@ -98,7 +99,7 @@ public class ArimaAnalyticProcess extends AnalyticProcess {
             org.rosuda.REngine.REXP is_train_query_responsive = re.eval("is_train_query_responsive");
 
             if (is_train_query_responsive.asString().equalsIgnoreCase("FALSE")) {
-                Util.updateProcessMessageToAnalyticsTable("There is a connectivity issue. Could not reach data for predefined query.\n"
+                DBSynchronizer.updateLindaAnalyticsProcessMessage("There is a connectivity issue. Could not reach data for predefined query.\n"
                         + " Please check your connectivity and the responsiveness of the selected sparql endpoint.\n "
                         + "Then click on re-Evaluate button to try to run again the analytic process.", analytics.getId());
                 re.eval("rm(list=ls());");
@@ -108,7 +109,7 @@ public class ArimaAnalyticProcess extends AnalyticProcess {
                 org.rosuda.REngine.REXP exists_date = re.eval("exists_date");
 
                 if (startDate.equalsIgnoreCase("") && exists_date.asString().equalsIgnoreCase("FALSE")) {
-                    Util.updateProcessMessageToAnalyticsTable("The data you provided has no information about time.\n Please enter a dataset with a date column or provide the adecuate parameters.", analytics.getId());
+                   DBSynchronizer.updateLindaAnalyticsProcessMessage("The data you provided has no information about time.\n Please enter a dataset with a date column or provide the adecuate parameters.", analytics.getId());
                     re.eval("rm(list=ls());");
                 } else {
                     String RScript = "loaded_data <- read.csv(file='" + Configuration.docroot + analytics.getDocument() + "', header=TRUE, sep=',');\n";

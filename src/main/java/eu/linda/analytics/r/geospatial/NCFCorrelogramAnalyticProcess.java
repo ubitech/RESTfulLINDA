@@ -64,7 +64,7 @@ public class NCFCorrelogramAnalyticProcess extends AnalyticProcess {
 
             if (is_train_query_responsive.asString().equalsIgnoreCase("FALSE")) {
 
-                Util.updateProcessMessageToAnalyticsTable("There is a connectivity issue. Could not reach data for predefined query.\n"
+                DBSynchronizer.updateLindaAnalyticsProcessMessage("There is a connectivity issue. Could not reach data for predefined query.\n"
                         + " Please check your connectivity and the responsiveness of the selected sparql endpoint.\n "
                         + "Then click on re-Evaluate button to try to run again the analytic process.", analytics.getId());
                 re.eval("rm(list=ls());");
@@ -75,7 +75,7 @@ public class NCFCorrelogramAnalyticProcess extends AnalyticProcess {
                 org.rosuda.REngine.REXP exists_geo_info = re.eval("exists_geo_info");
 
                 if (exists_geo_info.asString().equalsIgnoreCase("FALSE")) {
-                    Util.updateProcessMessageToAnalyticsTable("The data you provided has no geospatial information.\n Please enter a dataset or query with a x & y information or provide the adecuate parameters.", analytics.getId());
+                    DBSynchronizer.updateLindaAnalyticsProcessMessage("The data you provided has no geospatial information.\n Please enter a dataset or query with a x & y information or provide the adecuate parameters.", analytics.getId());
                     re.eval("rm(list=ls());");
                 } else {
                     re.eval("library(ncf);");

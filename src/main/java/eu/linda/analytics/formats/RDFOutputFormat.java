@@ -52,7 +52,7 @@ public class RDFOutputFormat extends OutputFormat {
             Instances triplets = (Instances) dataToExport;
 
             if (!helpfulFuncions.isURLValid(triplets.get(1).toString(0))) {
-                helpfulFuncions.updateProcessMessageToAnalyticsTable("There is no valid URL as analytics input  node. \n So no RDF was created.\n"
+                DBSynchronizer.updateLindaAnalyticsProcessMessage("There is no valid URL as analytics input  node. \n So no RDF was created.\n"
                         + "Please select a different output format. ", analytics.getId());
                 return;
             }
@@ -135,7 +135,7 @@ public class RDFOutputFormat extends OutputFormat {
         if (urisAsStringArray.length != 0) {
 
             if (!helpfulFuncions.isURLValid(urisAsStringArray[0])) {
-                helpfulFuncions.updateProcessMessageToAnalyticsTable("There is no valid URL as analytics input  node. \n So no RDF was created.\n"
+                DBSynchronizer.updateLindaAnalyticsProcessMessage("There is no valid URL as analytics input  node. \n So no RDF was created.\n"
                         + "Please select a different output format. ", analytics.getId());
                 return;
             }
@@ -216,7 +216,7 @@ public class RDFOutputFormat extends OutputFormat {
             if (urisAsStringArray.length != 0) {
                 
                 if (!helpfulFuncions.isURLValid(urisAsStringArray[0])) {
-                    helpfulFuncions.updateProcessMessageToAnalyticsTable("There is no valid URL as analytics input  node. \n So no RDF was created.\n"
+                    DBSynchronizer.updateLindaAnalyticsProcessMessage("There is no valid URL as analytics input  node. \n So no RDF was created.\n"
                             + "Please select a different output format. ", analytics.getId());
                     return;
                 }
