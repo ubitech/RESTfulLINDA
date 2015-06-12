@@ -28,13 +28,12 @@ import weka.filters.Filter;
  */
 public class AprioriAnalyticProcess extends AnalyticProcess {
 
-    Util helpfulFunctions;
+
     InputFormat input;
     ConnectionController connectionController;
 
     public AprioriAnalyticProcess(InputFormat input) {
-        helpfulFunctions = Util.getInstance();
-        helpfulFunctions.nicePrintMessage("Create analytic process for Apriori");
+        Util.nicePrintMessage("Create analytic process for Apriori");
         connectionController = ConnectionController.getInstance();
         this.input = input;
 
@@ -52,10 +51,10 @@ public class AprioriAnalyticProcess extends AnalyticProcess {
         try {
             float timeToRun_analytics = 0;
             long startTimeToRun_analytics = System.currentTimeMillis();
-            helpfulFunctions.nicePrintMessage("Eval Apriori");
+            Util.nicePrintMessage("Eval Apriori");
 
             //clean previous eval info if exists
-            helpfulFunctions.cleanPreviousInfo(analytics);
+            Util.cleanPreviousInfo(analytics);
             analytics.setTimeToGet_data(0);
             analytics.setTimeToRun_analytics(0);
             analytics.setData_size(0);
@@ -65,21 +64,21 @@ public class AprioriAnalyticProcess extends AnalyticProcess {
             Instances data;
 
             // remove dataset metadata (first two columns) 
-            if (helpfulFunctions.isRDFInputFormat(analytics.getEvaluationQuery_id())) {
-                abstractListdata = input.importData4weka(Integer.toString(analytics.getEvaluationQuery_id()), true, analytics);
+            if (Util.isRDFInputFormat(analytics.getEvaluationQuery_id())) {
+                abstractListdata = input.importData4weka(Integer.toString(analytics.getEvaluationQuery_id()),"", true, analytics);
                 data = (Instances) abstractListdata;
-                HashMap<String, Instances> separatedData = helpfulFunctions.separateDataFromMetadataInfo(data);
+                HashMap<String, Instances> separatedData = Util.separateDataFromMetadataInfo(data);
                 data = separatedData.get("newData");
 
-            } else if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
+            } else if (Util.isRDFExportFormat(analytics.getExportFormat())) {
 
-                abstractListdata = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(), true, analytics);
+                abstractListdata = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(),"", true, analytics);
                 data = (Instances) abstractListdata;
-                HashMap<String, Instances> separatedData = helpfulFunctions.separateDataFromMetadataInfo(data);
+                HashMap<String, Instances> separatedData = Util.separateDataFromMetadataInfo(data);
                 data = separatedData.get("newData");
             } else {
 
-                abstractListdata = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(), false, analytics);
+                abstractListdata = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(),"", false, analytics);
                 data = (Instances) abstractListdata;
 
             }
@@ -101,7 +100,7 @@ public class AprioriAnalyticProcess extends AnalyticProcess {
             // output associator
             System.out.println(apriori);
 
-            helpfulFunctions.writeToFile(apriori.toString(), "processinfo", analytics);
+            Util.writeToFile(apriori.toString(), "processinfo", analytics);
 
             long elapsedTimeToRunAnalyticsMillis = System.currentTimeMillis() - startTimeToRun_analytics;
             // Get elapsed time in seconds
@@ -112,7 +111,6 @@ public class AprioriAnalyticProcess extends AnalyticProcess {
         } catch (Exception ex) {
             Logger.getLogger(AprioriAnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);
              DBSynchronizer.updateLindaAnalyticsProcessMessage(ex.toString(), analytics.getId());
-            // helpfulFunctions.updateProcessMessageToAnalyticsTable(ex.toString(), analytics.getId());
         }
 
     }

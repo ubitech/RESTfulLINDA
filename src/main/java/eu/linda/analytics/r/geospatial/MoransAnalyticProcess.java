@@ -25,13 +25,11 @@ import org.rosuda.REngine.Rserve.RserveException;
  */
 public class MoransAnalyticProcess extends AnalyticProcess {
 
-    Util util;
     InputFormat input;
     ConnectionController connectionController;
 
     public MoransAnalyticProcess(InputFormat input) {
-        util = Util.getInstance();
-        util.nicePrintMessage("Create analytic process for Moran's I Algorithm");
+        Util.nicePrintMessage("Create analytic process for Moran's I Algorithm");
         this.input = input;
         connectionController = ConnectionController.getInstance();
 
@@ -48,12 +46,12 @@ public class MoransAnalyticProcess extends AnalyticProcess {
             long startTimeToRun_analytics = System.currentTimeMillis();
             String RScript = "";
             //clean previous eval info if exists
-            util.cleanPreviousInfo(analytics);
+            Util.cleanPreviousInfo(analytics);
             analytics.setTimeToGet_data(0);
             analytics.setTimeToRun_analytics(0);
             analytics.setData_size(0);
             RConnection re;
-            if (util.isRDFInputFormat(analytics.getTrainQuery_id())) {
+            if (Util.isRDFInputFormat(analytics.getTrainQuery_id())) {
                 re = input.importData4R(Integer.toString(analytics.getTrainQuery_id()), "", true, analytics);
 
             } else {
@@ -65,7 +63,7 @@ public class MoransAnalyticProcess extends AnalyticProcess {
             org.rosuda.REngine.REXP is_train_query_responsive = re.eval("is_train_query_responsive");
 
             if (is_train_query_responsive.asString().equalsIgnoreCase("FALSE")) {
-                util.updateProcessMessageToAnalyticsTable("There is a connectivity issue. Could not reach data for predefined query.\n"
+                Util.updateProcessMessageToAnalyticsTable("There is a connectivity issue. Could not reach data for predefined query.\n"
                         + " Please check your connectivity and the responsiveness of the selected sparql endpoint.\n "
                         + "Then click on re-Evaluate button to try to run again the analytic process.", analytics.getId());
                 re.eval("rm(list=ls());");
@@ -76,7 +74,7 @@ public class MoransAnalyticProcess extends AnalyticProcess {
                 org.rosuda.REngine.REXP exists_geo_info = re.eval("exists_geo_info");
 
                 if (exists_geo_info.asString().equalsIgnoreCase("FALSE")) {
-                    util.updateProcessMessageToAnalyticsTable("The data you provided has no geospatial information.\n Please enter a dataset or query with a x & y information or provide the adecuate parameters.", analytics.getId());
+                    Util.updateProcessMessageToAnalyticsTable("The data you provided has no geospatial information.\n Please enter a dataset or query with a x & y information or provide the adecuate parameters.", analytics.getId());
                     re.eval("rm(list=ls());");
                 } else {
 
@@ -157,7 +155,7 @@ public class MoransAnalyticProcess extends AnalyticProcess {
                         System.out.println(string);
                     }
 
-                    util.saveFile(modelFileNameFullPath, output);
+                    Util.saveFile(modelFileNameFullPath, output);
                    DBSynchronizer.updateLindaAnalytics(modelFileName, "modelReadable", analytics.getId());
 
                     double moranObservedValue = re.eval("morans_result$observed").asDouble();
@@ -171,9 +169,9 @@ public class MoransAnalyticProcess extends AnalyticProcess {
                         processMessage += "Moran's I did not detect a significant spatial autocorrelation in your data. \n You could double check this result with NCF Correlogram Algorithm";
 
                     }
-                    util.updateProcessMessageToAnalyticsTable(processMessage, analytics.getId());
+                    Util.updateProcessMessageToAnalyticsTable(processMessage, analytics.getId());
 
-                    util.writeToFile(RScript, "processinfo", analytics);
+                    Util.writeToFile(RScript, "processinfo", analytics);
 
                     re.eval("rm(list=ls());");
                     long elapsedTimeToRunAnalyticsMillis = System.currentTimeMillis() - startTimeToRun_analytics;

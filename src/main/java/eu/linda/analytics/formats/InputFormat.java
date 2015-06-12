@@ -8,6 +8,7 @@ package eu.linda.analytics.formats;
 
 import eu.linda.analytics.model.Analytics;
 import java.util.AbstractList;
+import java.util.Map;
 import org.rosuda.JRI.Rengine;
 import org.rosuda.REngine.Rserve.RConnection;
 
@@ -19,8 +20,10 @@ import org.rosuda.REngine.Rserve.RConnection;
 
 abstract public class InputFormat { 
 
-    abstract public AbstractList importData4weka(String pathToFile,boolean isForRDFOutput,Analytics analytics);
-        
+    abstract public AbstractList importData4weka(String trainDataset,String evaluationDataset,boolean isForRDFOutput,Analytics analytics);
+     
+    abstract public Map importData4weka1(String trainDataset,String evaluationDataset,boolean isForRDFOutput,Analytics analytics);
+ 
     abstract public RConnection importData4R(String trainDataset,String evaluationDataset,boolean isForRDFOutput,Analytics analytics);
 
 }

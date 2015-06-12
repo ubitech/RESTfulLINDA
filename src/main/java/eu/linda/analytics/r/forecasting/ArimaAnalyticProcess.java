@@ -23,12 +23,10 @@ import org.rosuda.REngine.Rserve.RserveException;
  */
 public class ArimaAnalyticProcess extends AnalyticProcess {
 
-    Util helpfulFunctions;
     InputFormat input;
 
     public ArimaAnalyticProcess(InputFormat input) {
-        helpfulFunctions = Util.getInstance();
-        helpfulFunctions.nicePrintMessage("Create analytic process for Forecasting Arima Algorithm");
+        Util.nicePrintMessage("Create analytic process for Forecasting Arima Algorithm");
         this.input = input;
 
     }
@@ -50,7 +48,7 @@ public class ArimaAnalyticProcess extends AnalyticProcess {
             String timePredicion = "1";
 
             //clean previous eval info if exists
-            helpfulFunctions.cleanPreviousInfo(analytics);
+            Util.cleanPreviousInfo(analytics);
             analytics.setTimeToGet_data(0);
             analytics.setTimeToRun_analytics(0);
             analytics.setData_size(0);
@@ -91,7 +89,7 @@ public class ArimaAnalyticProcess extends AnalyticProcess {
             }
 
             RConnection re;
-            if (helpfulFunctions.isRDFInputFormat(analytics.getTrainQuery_id())) {
+            if (Util.isRDFInputFormat(analytics.getTrainQuery_id())) {
                 re = input.importData4R(Integer.toString(analytics.getTrainQuery_id()),"", true, analytics);
             } else {
                 re = input.importData4R(Configuration.analyticsRepo + analytics.getDocument(),"", true, analytics);
@@ -100,7 +98,7 @@ public class ArimaAnalyticProcess extends AnalyticProcess {
             org.rosuda.REngine.REXP is_train_query_responsive = re.eval("is_train_query_responsive");
 
             if (is_train_query_responsive.asString().equalsIgnoreCase("FALSE")) {
-                helpfulFunctions.updateProcessMessageToAnalyticsTable("There is a connectivity issue. Could not reach data for predefined query.\n"
+                Util.updateProcessMessageToAnalyticsTable("There is a connectivity issue. Could not reach data for predefined query.\n"
                         + " Please check your connectivity and the responsiveness of the selected sparql endpoint.\n "
                         + "Then click on re-Evaluate button to try to run again the analytic process.", analytics.getId());
                 re.eval("rm(list=ls());");
@@ -110,7 +108,7 @@ public class ArimaAnalyticProcess extends AnalyticProcess {
                 org.rosuda.REngine.REXP exists_date = re.eval("exists_date");
 
                 if (startDate.equalsIgnoreCase("") && exists_date.asString().equalsIgnoreCase("FALSE")) {
-                    helpfulFunctions.updateProcessMessageToAnalyticsTable("The data you provided has no information about time.\n Please enter a dataset with a date column or provide the adecuate parameters.", analytics.getId());
+                    Util.updateProcessMessageToAnalyticsTable("The data you provided has no information about time.\n Please enter a dataset with a date column or provide the adecuate parameters.", analytics.getId());
                     re.eval("rm(list=ls());");
                 } else {
                     String RScript = "loaded_data <- read.csv(file='" + Configuration.docroot + analytics.getDocument() + "', header=TRUE, sep=',');\n";
@@ -159,32 +157,31 @@ public class ArimaAnalyticProcess extends AnalyticProcess {
                         re.eval(" lastdate <- as.Date('" + endDate + "'); ");
                         RScript += "lastdate <- as.Date('" + endDate + "');\n";
 
-                    } else if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
+                    } else if (Util.isRDFExportFormat(analytics.getExportFormat())) {
+                        
                         re.eval(" firstdate<-as.Date(data_matrix[1,3]);");
                         RScript += "firstdate<-as.Date(data_matrix[1,3]);\n";
 
                         re.eval(" lastdate <- as.Date(data_matrix[rows_number,3]); ");
                         RScript += "lastdate <- as.Date(data_matrix[rows_number,3]);\n";
+                        
                     } else {
-                        re.eval(" firstdate<-as.Date(data_matrix[1]);");
-                        RScript += " firstdate<-as.Date(data_matrix[1]);\n";
+                        re.eval(" firstdate<-as.Date(data_matrix[1]); "
+                                + "lastdate <- as.Date(data_matrix[rows_number]); ");
+                        
+                        RScript += " firstdate<-as.Date(data_matrix[1]); \n"
+                                + "lastdate <- as.Date(data_matrix[rows_number]); \n";
 
-                        re.eval(" lastdate <- as.Date(data_matrix[rows_number]); ");
-                        RScript += "lastdate <- as.Date(data_matrix[rows_number]);\n";
                     }
 
-                    re.eval(" year_to_start <-as.numeric(format(firstdate, format='%Y'));");
-                    RScript += "year_to_start <-as.numeric(format(firstdate, format='%Y'));\n";
-
-                    re.eval(" month_to_start <-as.numeric(format(firstdate, format='%m'));");
-                    RScript += "month_to_start <-as.numeric(format(firstdate, format='%m'));\n";
-
-                    re.eval(" day_to_start <-as.numeric(format(firstdate, format='%d'));");
-                    RScript += "day_to_start <-as.numeric(format(firstdate, format='%d'));\n";
-
-                    //clean column to predict from sparql datatypes
-                    re.eval("valuesToClean<-loaded_data[column_to_predict];");
-                    RScript += "valuesToClean<-loaded_data[column_to_predict];\n";
+                    re.eval(" year_to_start <-as.numeric(format(firstdate, format='%Y')); "
+                            + "month_to_start <-as.numeric(format(firstdate, format='%m')); "
+                            + "day_to_start <-as.numeric(format(firstdate, format='%d')); ");
+                    
+                    
+                    RScript += "year_to_start <-as.numeric(format(firstdate, format='%Y'));\n "
+                            + "month_to_start <-as.numeric(format(firstdate, format='%m'));\n "
+                            + "day_to_start <-as.numeric(format(firstdate, format='%d'));\n ";
 
                     re.eval(" datats <- ts(loaded_data[column_to_predict], frequency=" + frequency + ", start=c(year_to_start,month_to_start)); ");
                     RScript += "datats <- ts(loaded_data[column_to_predict], frequency=" + frequency + ", start=c(year_to_start,month_to_start));\n";
@@ -204,20 +201,11 @@ public class ArimaAnalyticProcess extends AnalyticProcess {
                     re.eval("m.ar2 <- auto.arima(datats);");
                     RScript += "m.ar2 <- auto.arima(datats);\n";
 
-                    long plot1_id = helpfulFunctions.manageNewPlot(analytics, "Forecasting Time Series for analyzed field: " + analyzedFieldValue, "plots/plotid" + analytics.getPlot1_id() + ".png", "plot1_id");
+                    long plot1_id = Util.manageNewPlot(analytics, "Forecasting Time Series for analyzed field: " + analyzedFieldValue, "plots/plotid" + analytics.getPlot1_id() + ".png", "plot1_id");
 
                     re.eval("png(file='" + Configuration.analyticsRepo + "plots/plotid" + plot1_id + ".png',width=600); a<-plot(forecast(m.ar2,h=" + timePredicion + ")); print(a); dev.off();");
                     RScript += "png(file='" + Configuration.analyticsRepo + "plots/plotid" + plot1_id + ".png',width=600);a<-plot(forecast(m.ar2,h=" + timePredicion + ")); print(a); dev.off();\n";
 
-                    re.eval("png(file='" + Configuration.analyticsRepo + "plots/plotid" + plot1_id + ".png',width=600)");
-                    re.eval("arimaplottosave<-plot(forecast(m.ar2,h=" + timePredicion + "));");
-                    re.eval("print(arimaplottosave);");
-                    re.eval("dev.off();");
-
-                    RScript += "arimaplottosave<-plot(forecast(m.ar2,h=" + timePredicion + "));\n";
-                    RScript += "png(file='" + Configuration.analyticsRepo + "plots/plotid" + plot1_id + ".png',width=600);\n";
-                    RScript += "print(arimaplottosave);\n";
-                    RScript += "dev.off();\n";
 
                     re.eval("p <- predict(m.ar2, n.ahead = " + timePredicion + ");");
                     RScript += "p <- predict(m.ar2, n.ahead = " + timePredicion + ");\n";
@@ -234,7 +222,7 @@ public class ArimaAnalyticProcess extends AnalyticProcess {
                     re.eval("colnames(df_to_export)[result_column_number] <- column_to_predict;");
                     RScript += "colnames(df_to_export)[result_column_number] <- column_to_predict;\n";
 
-                    helpfulFunctions.writeToFile(RScript, "processinfo", analytics);
+                    Util.writeToFile(RScript, "processinfo", analytics);
 
                     long elapsedTimeToRunAnalyticsMillis = System.currentTimeMillis() - startTimeToRun_analytics;
                     // Get elapsed time in seconds

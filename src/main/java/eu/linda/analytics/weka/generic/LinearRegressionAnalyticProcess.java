@@ -13,17 +13,14 @@ import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.weka.utils.Util;
 import java.util.AbstractList;
 import java.util.HashMap;
-import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.evaluation.output.prediction.PlainText;
 import weka.classifiers.functions.LinearRegression;
 import weka.core.Debug;
 import weka.core.Instance;
 import weka.core.Instances;
-import weka.core.SerializationHelper;
 
 /**
  *
@@ -31,13 +28,11 @@ import weka.core.SerializationHelper;
  */
 public class LinearRegressionAnalyticProcess extends AnalyticProcess {
 
-    Util helpfulFunctions;
+
     InputFormat input;
 
     public LinearRegressionAnalyticProcess(InputFormat input) {
-
-        helpfulFunctions = Util.getInstance();
-        helpfulFunctions.nicePrintMessage("Create analytic process for LinearRegression");
+        Util.nicePrintMessage("Create analytic process for LinearRegression");
         this.input = input;
 
     }
@@ -45,12 +40,12 @@ public class LinearRegressionAnalyticProcess extends AnalyticProcess {
     //Get LinearRegression Estimations
     @Override
     public void train(Analytics analytics) {
-        helpfulFunctions.nicePrintMessage("Train LinearRegression");
+        Util.nicePrintMessage("Train LinearRegression");
 
         float timeToRun_analytics = 0;
         long startTimeToRun_analytics = System.currentTimeMillis();
         //clean previous eval info if exists
-        helpfulFunctions.cleanPreviousInfo(analytics);
+        Util.cleanPreviousInfo(analytics);
         analytics.setTimeToGet_data(0);
         analytics.setTimeToRun_analytics(0);
         analytics.setData_size(0);
@@ -61,28 +56,28 @@ public class LinearRegressionAnalyticProcess extends AnalyticProcess {
             AbstractList<Instance> data1;
             Instances data = null;
 
-            if (helpfulFunctions.isRDFInputFormat(analytics.getTrainQuery_id())) {
-                data1 = input.importData4weka(Integer.toString(analytics.getTrainQuery_id()), true, analytics);
+            if (Util.isRDFInputFormat(analytics.getTrainQuery_id())) {
+                data1 = input.importData4weka(Integer.toString(analytics.getTrainQuery_id()),"", true, analytics);
                 data = (Instances) data1;
-                HashMap<String, Instances> separatedData = helpfulFunctions.separateDataFromMetadataInfo(data);
+                HashMap<String, Instances> separatedData = Util.separateDataFromMetadataInfo(data);
                 data = separatedData.get("newData");
 
             } else if (!analytics.getDocument().equalsIgnoreCase("")) {
 
-                if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
+                if (Util.isRDFExportFormat(analytics.getExportFormat())) {
                     // remove dataset metadata (first two columns)   
-                    data1 = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(), true, analytics);
+                    data1 = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(),"", true, analytics);
                     data = (Instances) data1;
-                    HashMap<String, Instances> separatedData = helpfulFunctions.separateDataFromMetadataInfo(data);
+                    HashMap<String, Instances> separatedData = Util.separateDataFromMetadataInfo(data);
                     data = separatedData.get("newData");
 
                 } else {
-                    data1 = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(), false, analytics);
+                    data1 = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(),"", false, analytics);
                     data = (Instances) data1;
                 }
 
             } else {
-                helpfulFunctions.updateProcessMessageToAnalyticsTable("Train Dataset in not defined. \n Could not run analytics process. \n Propably Train data were deleted after the creation of the analytic process.", analytics.getId());
+                Util.updateProcessMessageToAnalyticsTable("Train Dataset in not defined. \n Could not run analytics process. \n Propably Train data were deleted after the creation of the analytic process.", analytics.getId());
                 return;
             }
 
@@ -93,13 +88,13 @@ public class LinearRegressionAnalyticProcess extends AnalyticProcess {
             LinearRegression linearRegressionmodel = new LinearRegression();
             linearRegressionmodel.buildClassifier(data); //the last instance with missing    class is   not used
 
-            helpfulFunctions.nicePrintMessage(linearRegressionmodel.toString());
+            Util.nicePrintMessage(linearRegressionmodel.toString());
 
             //classify the last instance
             Instance instancesToPredict = data.lastInstance();
             double price = linearRegressionmodel.classifyInstance(instancesToPredict);
 
-            helpfulFunctions.saveModel(linearRegressionmodel, analytics);
+            Util.saveModel(linearRegressionmodel, analytics);
 
         } catch (Exception ex) {
             Logger.getLogger(LinearRegressionAnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);
@@ -117,7 +112,7 @@ public class LinearRegressionAnalyticProcess extends AnalyticProcess {
         float timeToRun_analytics = 0;
         long startTimeToRun_analytics = System.currentTimeMillis();
 
-        helpfulFunctions.nicePrintMessage("Eval Linear Regresion");
+        Util.nicePrintMessage("Eval Linear Regresion");
 
         AbstractList dataToReturn = null;
         HashMap<String, Instances> separatedData = null;
@@ -126,29 +121,29 @@ public class LinearRegressionAnalyticProcess extends AnalyticProcess {
             AbstractList<Instance> abstractlistdata;
             Instances data;
 
-            if (helpfulFunctions.isRDFInputFormat(analytics.getEvaluationQuery_id())) {
-                abstractlistdata = input.importData4weka(Integer.toString(analytics.getEvaluationQuery_id()), true, analytics);
+            if (Util.isRDFInputFormat(analytics.getEvaluationQuery_id())) {
+                abstractlistdata = input.importData4weka(Integer.toString(analytics.getEvaluationQuery_id()),"", true, analytics);
                 data = (Instances) abstractlistdata;
 
-                separatedData = helpfulFunctions.separateDataFromMetadataInfo(data);
+                separatedData = Util.separateDataFromMetadataInfo(data);
                 data = separatedData.get("newData");
 
             } else if (!analytics.getDocument().equalsIgnoreCase("")) {
 
-                if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
-                    abstractlistdata = input.importData4weka(Configuration.analyticsRepo + analytics.getTestdocument(), true, analytics);
+                if (Util.isRDFExportFormat(analytics.getExportFormat())) {
+                    abstractlistdata = input.importData4weka(Configuration.analyticsRepo + analytics.getTestdocument(),"", true, analytics);
                     data = (Instances) abstractlistdata;
 
-                    separatedData = helpfulFunctions.separateDataFromMetadataInfo(data);
+                    separatedData = Util.separateDataFromMetadataInfo(data);
                     data = separatedData.get("newData");
                 } else {
-                    abstractlistdata = input.importData4weka(Configuration.analyticsRepo + analytics.getTestdocument(), false, analytics);
+                    abstractlistdata = input.importData4weka(Configuration.analyticsRepo + analytics.getTestdocument(),"", false, analytics);
                     data = (Instances) abstractlistdata;
 
                 }
             } else {
 
-                helpfulFunctions.updateProcessMessageToAnalyticsTable("Evaluation Dataset in not defined. \n Could not run analytics process. \n Propably Evaluation data were deleted after the creation of the analytic process. ", analytics.getId());
+                Util.updateProcessMessageToAnalyticsTable("Evaluation Dataset in not defined. \n Could not run analytics process. \n Propably Evaluation data were deleted after the creation of the analytic process. ", analytics.getId());
                 return;
 
             }
@@ -173,8 +168,8 @@ public class LinearRegressionAnalyticProcess extends AnalyticProcess {
             }
 
             //<--in linear regression there is no process info text-->
-            if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
-                Instances mergedData = helpfulFunctions.mergeDataAndMetadataInfo(labeled, separatedData.get("metaData"));
+            if (Util.isRDFExportFormat(analytics.getExportFormat())) {
+                Instances mergedData = Util.mergeDataAndMetadataInfo(labeled, separatedData.get("metaData"));
                 dataToReturn = mergedData;
 
             } else {
@@ -186,10 +181,10 @@ public class LinearRegressionAnalyticProcess extends AnalyticProcess {
             PlainText output = new PlainText();
             output.setBuffer(forPredictionsPrinting);
             weka.core.Range attsToOutput = null;
-            Boolean outputDistribution = new Boolean(true);
+            Boolean outputDistribution = true;
             eval.crossValidateModel(model, data, 10, new Debug.Random(1), output, attsToOutput, outputDistribution);
 
-             helpfulFunctions.writeToFile(eval.toSummaryString(), "processinfo", analytics);
+             Util.writeToFile(eval.toSummaryString(), "processinfo", analytics);
              
         } catch (Exception ex) {
             Logger.getLogger(LinearRegressionAnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);

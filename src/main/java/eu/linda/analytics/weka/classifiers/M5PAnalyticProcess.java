@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.evaluation.output.prediction.PlainText;
 import weka.classifiers.trees.M5P;
@@ -26,7 +25,6 @@ import weka.core.Attribute;
 import weka.core.Debug;
 import weka.core.Instance;
 import weka.core.Instances;
-import weka.core.SerializationHelper;
 
 /**
  *
@@ -34,13 +32,10 @@ import weka.core.SerializationHelper;
  */
 public class M5PAnalyticProcess extends AnalyticProcess {
 
-    //M5POutput m5pOutput;
-    Util helpfulFunctions;
     InputFormat input;
 
     public M5PAnalyticProcess(InputFormat input) {
-        helpfulFunctions = Util.getInstance();
-        helpfulFunctions.nicePrintMessage("Create analytic process for M5P");
+        Util.nicePrintMessage("Create analytic process for M5P");
         //m5pOutput = new M5POutput(in);
         this.input = input;
 
@@ -54,13 +49,13 @@ public class M5PAnalyticProcess extends AnalyticProcess {
         long startTimeToRun_analytics = System.currentTimeMillis();
 
         //clean previous eval info if exists
-        helpfulFunctions.cleanPreviousInfo(analytics);
+        Util.cleanPreviousInfo(analytics);
         analytics.setTimeToGet_data(0);
         analytics.setTimeToRun_analytics(0);
         analytics.setData_size(0);
         analytics.setTimeToCreate_RDF(0);
 
-        helpfulFunctions.nicePrintMessage("Train  M5P");
+        Util.nicePrintMessage("Train  M5P");
         Vector M5Pmodel;
         try {
             //  M5Pmodel = m5pOutput.trainModelM5P(Configuration.docroot + analytics.getDocument());
@@ -68,20 +63,20 @@ public class M5PAnalyticProcess extends AnalyticProcess {
             Instances data;
 
             // remove dataset metadata (first two columns)    
-            if (helpfulFunctions.isRDFInputFormat(analytics.getEvaluationQuery_id())) {
-                abstractListdata1 = input.importData4weka(Integer.toString(analytics.getEvaluationQuery_id()), true, analytics);
+            if (Util.isRDFInputFormat(analytics.getEvaluationQuery_id())) {
+                abstractListdata1 = input.importData4weka(Integer.toString(analytics.getEvaluationQuery_id()),"", true, analytics);
                 data = (Instances) abstractListdata1;
-                HashMap<String, Instances> separatedData = helpfulFunctions.separateDataFromMetadataInfo(data);
+                HashMap<String, Instances> separatedData = Util.separateDataFromMetadataInfo(data);
                 data = separatedData.get("newData");
 
-            } else if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
-                abstractListdata1 = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(), true, analytics);
+            } else if (Util.isRDFExportFormat(analytics.getExportFormat())) {
+                abstractListdata1 = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(),"", true, analytics);
                 data = (Instances) abstractListdata1;
-                HashMap<String, Instances> separatedData = helpfulFunctions.separateDataFromMetadataInfo(data);
+                HashMap<String, Instances> separatedData = Util.separateDataFromMetadataInfo(data);
                 data = separatedData.get("newData");
             } else {
 
-                abstractListdata1 = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(), false, analytics);
+                abstractListdata1 = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(),"", false, analytics);
                 data = (Instances) abstractListdata1;
 
             }
@@ -107,7 +102,7 @@ public class M5PAnalyticProcess extends AnalyticProcess {
 
             //helpfulFunctions.saveModelasVector(M5Pmodel, analytics);
             cl.buildClassifier(data);
-            helpfulFunctions.saveModel(cl, analytics);
+            Util.saveModel(cl, analytics);
 
         } catch (Exception ex) {
             Logger.getLogger(M5PAnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);
@@ -123,7 +118,7 @@ public class M5PAnalyticProcess extends AnalyticProcess {
     public void eval(Analytics analytics, OutputFormat out) {
         float timeToRun_analytics = 0;
         long startTimeToRun_analytics = System.currentTimeMillis();
-        helpfulFunctions.nicePrintMessage("Eval M5P");
+        Util.nicePrintMessage("Eval M5P");
 
         HashMap<String, Instances> separatedData = null;
         AbstractList dataToReturn = null;
@@ -132,20 +127,20 @@ public class M5PAnalyticProcess extends AnalyticProcess {
             AbstractList<Instance> abstractList;
             Instances data;
 
-            if (helpfulFunctions.isRDFInputFormat(analytics.getEvaluationQuery_id())) {
+            if (Util.isRDFInputFormat(analytics.getEvaluationQuery_id())) {
 
-                abstractList = input.importData4weka(Integer.toString(analytics.getTrainQuery_id()), true, analytics);
+                abstractList = input.importData4weka(Integer.toString(analytics.getTrainQuery_id()), "",true, analytics);
                 data = (Instances) abstractList;
-                separatedData = helpfulFunctions.separateDataFromMetadataInfo(data);
+                separatedData = Util.separateDataFromMetadataInfo(data);
                 data = separatedData.get("newData");
 
-            } else if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
-                abstractList = input.importData4weka(Configuration.analyticsRepo + analytics.getTestdocument(), true, analytics);
+            } else if (Util.isRDFExportFormat(analytics.getExportFormat())) {
+                abstractList = input.importData4weka(Configuration.analyticsRepo + analytics.getTestdocument(),"", true, analytics);
                 data = (Instances) abstractList;
-                separatedData = helpfulFunctions.separateDataFromMetadataInfo(data);
+                separatedData = Util.separateDataFromMetadataInfo(data);
                 data = separatedData.get("newData");
             } else {
-                abstractList = input.importData4weka(Configuration.analyticsRepo + analytics.getTestdocument(), false, analytics);
+                abstractList = input.importData4weka(Configuration.analyticsRepo + analytics.getTestdocument(),"", false, analytics);
                 data = (Instances) abstractList;
             }
 
@@ -160,7 +155,7 @@ public class M5PAnalyticProcess extends AnalyticProcess {
             PlainText output = new PlainText();
             output.setBuffer(forPredictionsPrinting);
             weka.core.Range attsToOutput = null;
-            Boolean outputDistribution = new Boolean(true);
+            Boolean outputDistribution = true;
 
             //Classifier cl = (Classifier) v.get(0);
             //Instances header = (Instances) v.get(1);
@@ -222,15 +217,15 @@ public class M5PAnalyticProcess extends AnalyticProcess {
 
             }
 
-            if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
-                Instances mergedData = helpfulFunctions.mergeDataAndMetadataInfo(data, separatedData.get("metaData"));
+            if (Util.isRDFExportFormat(analytics.getExportFormat())) {
+                Instances mergedData = Util.mergeDataAndMetadataInfo(data, separatedData.get("metaData"));
                 dataToReturn = mergedData;
 
             } else {
                 dataToReturn = data;
             }
 
-            helpfulFunctions.writeToFile(eval.toSummaryString(), "processinfo", analytics);
+            Util.writeToFile(eval.toSummaryString(), "processinfo", analytics);
 
         } catch (Exception ex) {
             Logger.getLogger(M5PAnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);

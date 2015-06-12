@@ -25,13 +25,11 @@ import org.rosuda.REngine.Rserve.RserveException;
  */
 public class NCFCorrelogramAnalyticProcess extends AnalyticProcess {
 
-    Util helpfulFunctions;
     InputFormat input;
     ConnectionController connectionController;
 
     public NCFCorrelogramAnalyticProcess(InputFormat input) {
-        helpfulFunctions = Util.getInstance();
-        helpfulFunctions.nicePrintMessage("Create analytic process for Geospatial Algorithm - NCF Correlogram Kriging");
+        Util.nicePrintMessage("Create analytic process for Geospatial Algorithm - NCF Correlogram Kriging");
         this.input = input;
         connectionController = ConnectionController.getInstance();
 
@@ -45,12 +43,12 @@ public class NCFCorrelogramAnalyticProcess extends AnalyticProcess {
 
             String RScript = "";
             //clean previous eval info if exists
-            helpfulFunctions.cleanPreviousInfo(analytics);
+            Util.cleanPreviousInfo(analytics);
             analytics.setTimeToGet_data(0);
             analytics.setTimeToRun_analytics(0);
             analytics.setData_size(0);
             RConnection re;
-            if (helpfulFunctions.isRDFInputFormat(analytics.getTrainQuery_id())) {
+            if (Util.isRDFInputFormat(analytics.getTrainQuery_id())) {
                 //import train dataset
                 re = input.importData4R(Integer.toString(analytics.getTrainQuery_id()),"", true, analytics);
                 RScript += "loaded_data <- read.csv('insertqueryid" + analytics.getTrainQuery_id() + "');\n";
@@ -66,7 +64,7 @@ public class NCFCorrelogramAnalyticProcess extends AnalyticProcess {
 
             if (is_train_query_responsive.asString().equalsIgnoreCase("FALSE")) {
 
-                helpfulFunctions.updateProcessMessageToAnalyticsTable("There is a connectivity issue. Could not reach data for predefined query.\n"
+                Util.updateProcessMessageToAnalyticsTable("There is a connectivity issue. Could not reach data for predefined query.\n"
                         + " Please check your connectivity and the responsiveness of the selected sparql endpoint.\n "
                         + "Then click on re-Evaluate button to try to run again the analytic process.", analytics.getId());
                 re.eval("rm(list=ls());");
@@ -77,7 +75,7 @@ public class NCFCorrelogramAnalyticProcess extends AnalyticProcess {
                 org.rosuda.REngine.REXP exists_geo_info = re.eval("exists_geo_info");
 
                 if (exists_geo_info.asString().equalsIgnoreCase("FALSE")) {
-                    helpfulFunctions.updateProcessMessageToAnalyticsTable("The data you provided has no geospatial information.\n Please enter a dataset or query with a x & y information or provide the adecuate parameters.", analytics.getId());
+                    Util.updateProcessMessageToAnalyticsTable("The data you provided has no geospatial information.\n Please enter a dataset or query with a x & y information or provide the adecuate parameters.", analytics.getId());
                     re.eval("rm(list=ls());");
                 } else {
                     re.eval("library(ncf);");
@@ -132,7 +130,7 @@ public class NCFCorrelogramAnalyticProcess extends AnalyticProcess {
                     re.eval("fit1 <-correlog(loaded_data$x, loaded_data$y, var, w = NULL, increment=2, resamp = 50, latlon = TRUE, na.rm = FALSE, quiet = FALSE);");
                     RScript += "fit1 <-correlog(loaded_data$x, loaded_data$y, var, w = NULL, increment=2, resamp = 50, latlon = TRUE, na.rm = FALSE, quiet = FALSE);\n";
 
-                    long plot1_id = helpfulFunctions.manageNewPlot(analytics, "NCF Correlogram Plot for the analyzed field: " + analyzedFieldValue, "plots/plotid" + analytics.getPlot1_id() + ".png", "plot1_id");
+                    long plot1_id = Util.manageNewPlot(analytics, "NCF Correlogram Plot for the analyzed field: " + analyzedFieldValue, "plots/plotid" + analytics.getPlot1_id() + ".png", "plot1_id");
 
                     //re.eval("correlogram<-plot(fit1)");
                     re.eval("png(file='" + Configuration.analyticsRepo + "plots/plotid" + plot1_id + ".png',width=600);");
@@ -154,7 +152,7 @@ public class NCFCorrelogramAnalyticProcess extends AnalyticProcess {
                     org.rosuda.REngine.REXP correlation_percent = re.eval("(sub/total_rows*100);");
                     System.out.println("correlation_percent" + correlation_percent);
 
-                    helpfulFunctions.writeToFile(RScript, "processinfo", analytics);
+                    Util.writeToFile(RScript, "processinfo", analytics);
 
                     re.eval("rm(list=ls());");
                     long elapsedTimeToRunAnalyticsMillis = System.currentTimeMillis() - startTimeToRun_analytics;

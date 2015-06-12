@@ -23,12 +23,10 @@ import org.rosuda.REngine.Rserve.RserveException;
  */
 public class KrigingAnalyticProcess extends AnalyticProcess {
 
-    Util helpfulFunctions;
     InputFormat input;
 
     public KrigingAnalyticProcess(InputFormat input) {
-        helpfulFunctions = Util.getInstance();
-        helpfulFunctions.nicePrintMessage("Create analytic process for Geospatial Algorithm - Ordinary Kriging");
+        Util.nicePrintMessage("Create analytic process for Geospatial Algorithm - Ordinary Kriging");
         this.input = input;
 
     }
@@ -44,14 +42,14 @@ public class KrigingAnalyticProcess extends AnalyticProcess {
         long startTimeToRun_analytics = System.currentTimeMillis();
         String RScript = "";
         //clean previous eval info if exists
-        helpfulFunctions.cleanPreviousInfo(analytics);
+        Util.cleanPreviousInfo(analytics);
         analytics.setTimeToGet_data(0);
         analytics.setTimeToRun_analytics(0);
         analytics.setData_size(0);
         analytics.setTimeToCreate_RDF(0);
         RConnection re;
         try {
-            if (helpfulFunctions.isRDFInputFormat(analytics.getTrainQuery_id())) {
+            if (Util.isRDFInputFormat(analytics.getTrainQuery_id())) {
 
                 //import train & eval dataset
                 re = input.importData4R(Integer.toString(analytics.getTrainQuery_id()), Integer.toString(analytics.getEvaluationQuery_id()), true, analytics);
@@ -60,7 +58,7 @@ public class KrigingAnalyticProcess extends AnalyticProcess {
                 org.rosuda.REngine.REXP is_evaluation_query_responsive = re.eval("is_eval_query_responsive");
 
                 if (is_train_query_responsive.asString().equalsIgnoreCase("FALSE") || is_evaluation_query_responsive.asString().equalsIgnoreCase("FALSE")) {
-                    helpfulFunctions.updateProcessMessageToAnalyticsTable("There is a connectivity issue. Could not reach data for predefined query.\n"
+                    Util.updateProcessMessageToAnalyticsTable("There is a connectivity issue. Could not reach data for predefined query.\n"
                             + " Please check your connectivity and the responsiveness of the selected sparql endpoint.\n "
                             + "Then click on re-Evaluate button to try to run again the analytic process.", analytics.getId());
                     re.eval("rm(list=ls());");
@@ -136,7 +134,7 @@ public class KrigingAnalyticProcess extends AnalyticProcess {
             re.eval("m <- fit.variogram(v, vgm(1, 'Sph', 300, 1))");
             RScript += "m <- fit.variogram(v, vgm(1, 'Sph', 300, 1))\n";
 
-            long plot1_id = helpfulFunctions.manageNewPlot(analytics, "Variogram Plot : Visualization of the spatial autocorrelation of the analyzed field: " + analyzedFieldValue, "plots/plotid" + analytics.getPlot1_id() + ".png", "plot1_id");
+            long plot1_id = Util.manageNewPlot(analytics, "Variogram Plot : Visualization of the spatial autocorrelation of the analyzed field: " + analyzedFieldValue, "plots/plotid" + analytics.getPlot1_id() + ".png", "plot1_id");
 
             re.eval("variogramplot<-plot(v, model = m)");
             re.eval("png(file='" + Configuration.analyticsRepo + "plots/plotid" + plot1_id + ".png',width=600)");
@@ -154,14 +152,14 @@ public class KrigingAnalyticProcess extends AnalyticProcess {
             re.eval("df_to_export[[column_to_predict]] <- df$sim1");
             RScript += "df_to_export[[column_to_predict]] <- df$sim1 \n";
 
-            long plot2_id = helpfulFunctions.manageNewPlot(analytics, "Spatial data spplot map for analyzed field :" + analyzedFieldValue, "plots/plotid" + analytics.getPlot2_id() + ".png", "plot2_id");
+            long plot2_id = Util.manageNewPlot(analytics, "Spatial data spplot map for analyzed field :" + analyzedFieldValue, "plots/plotid" + analytics.getPlot2_id() + ".png", "plot2_id");
 
             re.eval("tmp <- spplot(df)");
             re.eval("png(file='" + Configuration.analyticsRepo + "plots/plotid" + plot2_id + ".png',width=600)");
             re.eval("print(tmp)");
             re.eval("dev.off()");
 
-            helpfulFunctions.writeToFile(RScript, "processinfo", analytics);
+            Util.writeToFile(RScript, "processinfo", analytics);
 
             long elapsedTimeToRunAnalyticsMillis = System.currentTimeMillis() - startTimeToRun_analytics;
             // Get elapsed time in seconds

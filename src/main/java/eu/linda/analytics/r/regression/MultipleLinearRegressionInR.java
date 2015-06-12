@@ -25,13 +25,11 @@ import org.rosuda.REngine.Rserve.RserveException;
  */
 public class MultipleLinearRegressionInR extends AnalyticProcess {
 
-    Util helpfulFunctions;
     InputFormat input;
     ConnectionController connectionController;
 
     public MultipleLinearRegressionInR(InputFormat input) {
-        helpfulFunctions = Util.getInstance();
-        helpfulFunctions.nicePrintMessage("Create analytic process for Multiple LinearRegression In R Algorithm");
+        Util.nicePrintMessage("Create analytic process for Multiple LinearRegression In R Algorithm");
         this.input = input;
         connectionController = ConnectionController.getInstance();
     }
@@ -49,12 +47,12 @@ public class MultipleLinearRegressionInR extends AnalyticProcess {
             long startTimeToRun_analytics = System.currentTimeMillis();
             String RScript = "";
             //clean previous eval info if exists
-            helpfulFunctions.cleanPreviousInfo(analytics);
+            Util.cleanPreviousInfo(analytics);
             analytics.setTimeToGet_data(0);
             analytics.setTimeToRun_analytics(0);
             analytics.setData_size(0);
             RConnection re;
-            if (helpfulFunctions.isRDFInputFormat(analytics.getTrainQuery_id())) {
+            if (Util.isRDFInputFormat(analytics.getTrainQuery_id())) {
                 re = input.importData4R(Integer.toString(analytics.getTrainQuery_id()), Integer.toString(analytics.getEvaluationQuery_id()), true, analytics);
 
             } else {
@@ -68,7 +66,7 @@ public class MultipleLinearRegressionInR extends AnalyticProcess {
 
             System.out.println("is_train_query_responsive:" + is_train_query_responsive.asString());
             if (is_train_query_responsive.asString().equalsIgnoreCase("FALSE")|| is_evaluation_query_responsive.asString().equalsIgnoreCase("FALSE")) {
-                helpfulFunctions.updateProcessMessageToAnalyticsTable("There is a connectivity issue. Could not reach data for predefined query.\n"
+                Util.updateProcessMessageToAnalyticsTable("There is a connectivity issue. Could not reach data for predefined query.\n"
                         + " Please check your connectivity and the responsiveness of the selected sparql endpoint.\n "
                         + "Then click on re-Evaluate button to try to run again the analytic process.", analytics.getId());
                 re.eval("rm(list=ls());");
@@ -157,10 +155,10 @@ public class MultipleLinearRegressionInR extends AnalyticProcess {
                     System.out.println(string);
                 }
 
-                helpfulFunctions.saveFile(modelFileNameFullPath, output);
+                Util.saveFile(modelFileNameFullPath, output);
                 DBSynchronizer.updateLindaAnalytics(modelFileName, "modelReadable", analytics.getId());
 
-                helpfulFunctions.writeToFile(RScript, "processinfo", analytics);
+                Util.writeToFile(RScript, "processinfo", analytics);
 
                 long elapsedTimeToRunAnalyticsMillis = System.currentTimeMillis() - startTimeToRun_analytics;
                 // Get elapsed time in seconds

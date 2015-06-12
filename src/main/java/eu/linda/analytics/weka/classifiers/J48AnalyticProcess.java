@@ -22,7 +22,6 @@ import weka.classifiers.Evaluation;
 import weka.classifiers.evaluation.output.prediction.PlainText;
 import weka.classifiers.trees.J48;
 import weka.core.Debug;
-import weka.core.FastVector;
 import weka.core.Instance;
 import weka.core.Instances;
 
@@ -32,14 +31,12 @@ import weka.core.Instances;
  */
 public class J48AnalyticProcess extends AnalyticProcess {
 
-    Util helpfulFunctions;
     InputFormat input;
     ConnectionController connectionController;
 
     public J48AnalyticProcess(InputFormat input) {
-        helpfulFunctions = Util.getInstance();
         connectionController = ConnectionController.getInstance();
-        helpfulFunctions.nicePrintMessage("Create analytic process for J48");
+        Util.nicePrintMessage("Create analytic process for J48");
         this.input = input;
 
     }
@@ -48,7 +45,7 @@ public class J48AnalyticProcess extends AnalyticProcess {
     public void train(Analytics analytics) {
         
         //clean previous eval info if exists
-        helpfulFunctions.cleanPreviousInfo(analytics);
+        Util.cleanPreviousInfo(analytics);
         analytics.setTimeToGet_data(0);
         analytics.setTimeToRun_analytics(0);
         analytics.setData_size(0);
@@ -65,29 +62,29 @@ public class J48AnalyticProcess extends AnalyticProcess {
             options[0] = analytics.getParameters();
         }
 
-        helpfulFunctions.nicePrintMessage("Train J48 with options " + options[0]);
+        Util.nicePrintMessage("Train J48 with options " + options[0]);
         try {
             AbstractList<Instance> abstractListdata;
             Instances data;
 
             // remove dataset metadata (first two columns)    
-            if (helpfulFunctions.isRDFInputFormat(analytics.getTrainQuery_id())) {
+            if (Util.isRDFInputFormat(analytics.getTrainQuery_id())) {
 
-                abstractListdata = input.importData4weka(Integer.toString(analytics.getTrainQuery_id()), true, analytics);
+                abstractListdata = input.importData4weka(Integer.toString(analytics.getTrainQuery_id()),"", true, analytics);
                 data = (Instances) abstractListdata;
-                HashMap<String, Instances> separatedData = helpfulFunctions.separateDataFromMetadataInfo(data);
+                HashMap<String, Instances> separatedData = Util.separateDataFromMetadataInfo(data);
                 data = separatedData.get("newData");
 
-            } else if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
+            } else if (Util.isRDFExportFormat(analytics.getExportFormat())) {
 
-                abstractListdata = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(), true, analytics);
+                abstractListdata = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(),"", true, analytics);
                 data = (Instances) abstractListdata;
-                HashMap<String, Instances> separatedData = helpfulFunctions.separateDataFromMetadataInfo(data);
+                HashMap<String, Instances> separatedData = Util.separateDataFromMetadataInfo(data);
                 data = separatedData.get("newData");
 
             } else {
 
-                abstractListdata = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(), false, analytics);
+                abstractListdata = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(),"", false, analytics);
                 data = (Instances) abstractListdata;
 
             }
@@ -101,7 +98,7 @@ public class J48AnalyticProcess extends AnalyticProcess {
             // output associator
             System.out.println(j48ClassifierModel);
             //save model
-            helpfulFunctions.saveModel(j48ClassifierModel, analytics);
+            Util.saveModel(j48ClassifierModel, analytics);
 
             long elapsedTimeToRunAnalyticsMillis = System.currentTimeMillis() - startTimeToRun_analytics;
             // Get elapsed time in seconds
@@ -122,12 +119,10 @@ public class J48AnalyticProcess extends AnalyticProcess {
         HashMap<String, Instances> separatedTrainData = null;
         HashMap<String, Instances> separatedEvalData = null;
 
-        helpfulFunctions.nicePrintMessage("Eval J48");
+        Util.nicePrintMessage("Eval J48");
 
 
         try {
-        //jsonresult = j48Output.getJ48TreeResultDataset(analytics);
-
             //Train Data
             AbstractList<Instance> abstractListdata1;
             Instances traindata;
@@ -136,33 +131,33 @@ public class J48AnalyticProcess extends AnalyticProcess {
             AbstractList<Instance> abstractListdata2;
             Instances testdata;
 
-            if (helpfulFunctions.isRDFInputFormat(analytics.getEvaluationQuery_id())) {
-                abstractListdata1 = input.importData4weka(Integer.toString(analytics.getTrainQuery_id()), true, analytics);
+            if (Util.isRDFInputFormat(analytics.getEvaluationQuery_id())) {
+                abstractListdata1 = input.importData4weka(Integer.toString(analytics.getTrainQuery_id()),"", true, analytics);
                 traindata = (Instances) abstractListdata1;
-                separatedTrainData = helpfulFunctions.separateDataFromMetadataInfo(traindata);
+                separatedTrainData = Util.separateDataFromMetadataInfo(traindata);
                 traindata = separatedTrainData.get("newData");
 
-                abstractListdata2 = input.importData4weka(Integer.toString(analytics.getEvaluationQuery_id()), true, analytics);
+                abstractListdata2 = input.importData4weka(Integer.toString(analytics.getEvaluationQuery_id()),"", true, analytics);
                 testdata = (Instances) abstractListdata2;
-                separatedEvalData = helpfulFunctions.separateDataFromMetadataInfo(testdata);
+                separatedEvalData = Util.separateDataFromMetadataInfo(testdata);
                 testdata = separatedEvalData.get("newData");
 
-            } else if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
-                abstractListdata1 = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(), true, analytics);
+            } else if (Util.isRDFExportFormat(analytics.getExportFormat())) {
+                abstractListdata1 = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(),"", true, analytics);
                 traindata = (Instances) abstractListdata1;
-                separatedTrainData = helpfulFunctions.separateDataFromMetadataInfo(traindata);
+                separatedTrainData = Util.separateDataFromMetadataInfo(traindata);
                 traindata = separatedTrainData.get("newData");
 
-                abstractListdata2 = input.importData4weka(Configuration.analyticsRepo + analytics.getTestdocument(), true, analytics);
+                abstractListdata2 = input.importData4weka(Configuration.analyticsRepo + analytics.getTestdocument(),"", true, analytics);
                 testdata = (Instances) abstractListdata2;
-                separatedEvalData = helpfulFunctions.separateDataFromMetadataInfo(testdata);
+                separatedEvalData = Util.separateDataFromMetadataInfo(testdata);
                 testdata = separatedEvalData.get("newData");
             } else {
 
-                abstractListdata1 = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(), false, analytics);
+                abstractListdata1 = input.importData4weka(Configuration.analyticsRepo + analytics.getDocument(),"", false, analytics);
                 traindata = (Instances) abstractListdata1;
 
-                abstractListdata2 = input.importData4weka(Configuration.analyticsRepo + analytics.getTestdocument(), false, analytics);
+                abstractListdata2 = input.importData4weka(Configuration.analyticsRepo + analytics.getTestdocument(),"", false, analytics);
                 testdata = (Instances) abstractListdata2;
 
             }
@@ -186,7 +181,7 @@ public class J48AnalyticProcess extends AnalyticProcess {
             PlainText output = new PlainText();
             output.setBuffer(forPredictionsPrinting);
             weka.core.Range attsToOutput = null;
-            Boolean outputDistribution = new Boolean(true);
+            Boolean outputDistribution = true;
             eval.crossValidateModel(model, traindata, 10, new Debug.Random(1), output, attsToOutput, outputDistribution);
 
             System.out.println(eval.toSummaryString("\nResults\n======\n", false));
@@ -203,20 +198,19 @@ public class J48AnalyticProcess extends AnalyticProcess {
                 labeled.instance(i).setClassValue(clsLabel);
             }
 
-            if (helpfulFunctions.isRDFExportFormat(analytics.getExportFormat())) {
-                Instances mergedData = helpfulFunctions.mergeDataAndMetadataInfo(labeled, separatedEvalData.get("metaData"));
+            if (Util.isRDFExportFormat(analytics.getExportFormat())) {
+                Instances mergedData = Util.mergeDataAndMetadataInfo(labeled, separatedEvalData.get("metaData"));
                 dataToReturn = mergedData;
 
             } else {
                 dataToReturn = labeled;
             }
 
-            helpfulFunctions.writeToFile(eval.toSummaryString(), "processinfo", analytics);
+            Util.writeToFile(eval.toSummaryString(), "processinfo", analytics);
 
         } catch (Exception ex) {
             Logger.getLogger(J48AnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);
              DBSynchronizer.updateLindaAnalyticsProcessMessage(ex.toString(), analytics.getId());
-            //return (AbstractList) new LinkedList();
 
         }
         long elapsedTimeToRunAnalyticsMillis = System.currentTimeMillis() - startTimeToRun_analytics;

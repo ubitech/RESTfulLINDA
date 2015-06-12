@@ -14,6 +14,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.AbstractList;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.rosuda.REngine.REXP;
@@ -38,18 +39,18 @@ public class CSVInputFormat extends InputFormat {
     }
 
     @Override
-    public AbstractList importData4weka(String pathToFile, boolean isForRDFOutput, Analytics analytics) {
+    public AbstractList importData4weka(String trainDataset, String evaluationDataset, boolean isForRDFOutput, Analytics analytics) {
 
         float timeToGetQuery = 0;
         long startTimeToGetQuery = System.currentTimeMillis();
-        helpfulFuncions.nicePrintMessage("import CSV file ");
+        Util.nicePrintMessage("import CSV file ");
 
-        System.out.println("Import data from file: " + pathToFile);
+        System.out.println("Import data from file: " + trainDataset);
 
         Instances data = null;
         try {
             CSVLoader loader = new CSVLoader();
-            loader.setSource(new File(pathToFile));
+            loader.setSource(new File(trainDataset));
             if (isForRDFOutput) {
                 loader.setStringAttributes("1,2");
             }
@@ -59,14 +60,11 @@ public class CSVInputFormat extends InputFormat {
             data.setClassIndex(data.numAttributes() - 1);
 
             FileInputStream fis = null;
-            try {
 
-                fis = new FileInputStream(pathToFile);
-                System.out.println("fis.getChannel().size() " + fis.getChannel().size());
-                analytics.setData_size(analytics.getData_size() + fis.getChannel().size());
-            } finally {
-                fis.close();
-            }
+            fis = new FileInputStream(trainDataset);
+            System.out.println("fis.getChannel().size() " + fis.getChannel().size());
+            analytics.setData_size(analytics.getData_size() + fis.getChannel().size());
+            fis.close();
 
             // Get elapsed time in milliseconds
             long elapsedTimeToGetQueryMillis = System.currentTimeMillis() - startTimeToGetQuery;
@@ -83,7 +81,7 @@ public class CSVInputFormat extends InputFormat {
         return data;
 
     }
-   
+
     @Override
     public RConnection importData4R(String trainDataset, String evaluationDataset, boolean isForRDFOutput, Analytics analytics) {
 
@@ -102,8 +100,6 @@ public class CSVInputFormat extends InputFormat {
             System.out.println(x.asString());
             re.eval("is_train_query_responsive <-TRUE  ");
             re.eval(" loaded_data <- read.csv(file='" + trainDataset + "', header=TRUE, sep=',', na.strings='---');");
-
-           
 
             trainfis = new FileInputStream(trainDataset);
             trainfisSize = trainfis.getChannel().size();
@@ -177,6 +173,11 @@ public class CSVInputFormat extends InputFormat {
             Logger.getLogger(CSVInputFormat.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+    }
+
+    @Override
+    public Map importData4weka1(String trainDataset, String evaluationDataset, boolean isForRDFOutput, Analytics analytics) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

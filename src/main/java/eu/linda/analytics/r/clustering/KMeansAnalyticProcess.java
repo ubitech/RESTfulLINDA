@@ -27,13 +27,11 @@ import org.rosuda.REngine.Rserve.RserveException;
 
 public class KMeansAnalyticProcess extends AnalyticProcess {
 
-    Util util;
     InputFormat input;
     ConnectionController connectionController;
 
     public KMeansAnalyticProcess(InputFormat input) {
-        util = Util.getInstance();
-        util.nicePrintMessage("Create analytic process for K-Means Algorithm");
+        Util.nicePrintMessage("Create analytic process for K-Means Algorithm");
         this.input = input;
         connectionController = ConnectionController.getInstance();
 
@@ -52,7 +50,7 @@ public class KMeansAnalyticProcess extends AnalyticProcess {
             int clustersNum = 5;
             String RScript = "";
             //clean previous eval info if exists
-            util.cleanPreviousInfo(analytics);
+            Util.cleanPreviousInfo(analytics);
             analytics.setTimeToGet_data(0);
             analytics.setTimeToRun_analytics(0);
             analytics.setData_size(0);
@@ -72,7 +70,7 @@ public class KMeansAnalyticProcess extends AnalyticProcess {
             }
             
             RConnection re;
-            if (util.isRDFInputFormat(analytics.getTrainQuery_id())) {
+            if (Util.isRDFInputFormat(analytics.getTrainQuery_id())) {
                 re = input.importData4R(Integer.toString(analytics.getTrainQuery_id()),"", true, analytics);
                 
             } else {
@@ -84,7 +82,7 @@ public class KMeansAnalyticProcess extends AnalyticProcess {
             org.rosuda.REngine.REXP is_train_query_responsive = re.eval("is_train_query_responsive");
             
             if (is_train_query_responsive.asString().equalsIgnoreCase("FALSE")) {
-                util.updateProcessMessageToAnalyticsTable("There is a connectivity issue. Could not reach data for predefined query.\n"
+                Util.updateProcessMessageToAnalyticsTable("There is a connectivity issue. Could not reach data for predefined query.\n"
                         + " Please check your connectivity and the responsiveness of the selected sparql endpoint.\n "
                         + "Then click on re-Evaluate button to try to run again the analytic process.", analytics.getId());
                 re.eval("rm(list=ls());");
@@ -127,7 +125,7 @@ public class KMeansAnalyticProcess extends AnalyticProcess {
                 re.eval("library(cluster);");
                 RScript += "# Cluster Plot against 1st 2 principal components  \n # vary parameters for most readable graph \n library(cluster); \n";
                 
-                long plot1_id = util.manageNewPlot(analytics, "K-Means Clustering with " + clustersNum + " clusters", "plots/plotid" + analytics.getPlot1_id() + ".png", "plot1_id");
+                long plot1_id = Util.manageNewPlot(analytics, "K-Means Clustering with " + clustersNum + " clusters", "plots/plotid" + analytics.getPlot1_id() + ".png", "plot1_id");
                 
                 re.eval("png(file='" + Configuration.analyticsRepo + "plots/plotid" + plot1_id + ".png',width=600);");
                 re.eval("print(clusplot(loaded_data, fit$cluster, color=TRUE, shade=TRUE, labels=2, lines=0));");
@@ -147,7 +145,7 @@ public class KMeansAnalyticProcess extends AnalyticProcess {
                     System.out.println(string);
                 }
                 
-                util.saveFile(modelFileNameFullPath, output);
+                Util.saveFile(modelFileNameFullPath, output);
                 DBSynchronizer.updateLindaAnalytics(modelFileName, "modelReadable", analytics.getId());
                 
                 re.eval("column_number<-ncol(loaded_data);");
@@ -159,7 +157,7 @@ public class KMeansAnalyticProcess extends AnalyticProcess {
                 re.eval("df_to_export <- data.frame(uri,loaded_data[column_to_predict]);");
                 RScript += "df_to_export <- data.frame(uri,loaded_data[column_to_predict]);\n";
                 
-                util.writeToFile(RScript, "processinfo", analytics);
+                Util.writeToFile(RScript, "processinfo", analytics);
                 
                 long elapsedTimeToRunAnalyticsMillis = System.currentTimeMillis() - startTimeToRun_analytics;
                 // Get elapsed time in seconds
