@@ -26,7 +26,6 @@ import eu.linda.analytics.r.regression.MultipleLinearRegressionInR;
 import eu.linda.analytics.weka.associations.AprioriAnalyticProcess;
 import eu.linda.analytics.weka.classifiers.J48AnalyticProcess;
 import eu.linda.analytics.weka.classifiers.M5PAnalyticProcess;
-import eu.linda.analytics.weka.regression.LinearRegressionAnalyticProcess;
 
 /**
  *
@@ -54,9 +53,7 @@ public class AnalyticsFactory {
             analyticProcess = new J48AnalyticProcess(inputFormat);
         } else if (algorithm.equalsIgnoreCase("M5P")) {
             analyticProcess = new M5PAnalyticProcess(inputFormat);
-        } else if (algorithm.equalsIgnoreCase("LinearRegression")) {
-            analyticProcess = new LinearRegressionAnalyticProcess(inputFormat);
-        } else if (algorithm.equalsIgnoreCase("Apriori")) {
+        }  else if (algorithm.equalsIgnoreCase("Apriori")) {
             analyticProcess = new AprioriAnalyticProcess(inputFormat);
         } else if (algorithm.equalsIgnoreCase("Arima")) {
             analyticProcess = new ArimaAnalyticProcess(inputFormat);

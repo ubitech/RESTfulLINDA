@@ -151,33 +151,7 @@ public class CSVInputFormat extends InputFormat {
         return re;
     }
 
-    public static void main(String[] args) throws Exception {
-        Instances data = null;
-        String[] options = new String[2];
-        options[0] = "-S";        // "range"
-        options[1] = "1,2";
 
-        CSVLoader loader = new CSVLoader();
-        try {
-            loader.setSource(new File("/home/eleni/Desktop/mydatasets/NYRandonResearchTotest2.csv"));
 
-            loader.setStringAttributes("1,2");
-            loader.setFieldSeparator(",");
-
-            data = loader.getDataSet();
-            data.setClassIndex(data.numAttributes() - 1);
-
-        } catch (IOException ex) {
-            Logger.getLogger(CSVInputFormat.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (Exception ex) {
-            Logger.getLogger(CSVInputFormat.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-    }
-
-    @Override
-    public Map importData4weka1(String trainDataset, String evaluationDataset, boolean isForRDFOutput, Analytics analytics) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
 
 }

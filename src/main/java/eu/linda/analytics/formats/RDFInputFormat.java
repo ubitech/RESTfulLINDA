@@ -13,7 +13,6 @@ import eu.linda.analytics.utils.Util;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.AbstractList;
 import java.util.Hashtable;
@@ -41,13 +40,6 @@ public class RDFInputFormat extends InputFormat {
     }
 
     @Override
-    public Map importData4weka1(String train_query_id, String evaluation_query_id, boolean isForRDFOutput, Analytics analytics) {
-
-        return null;
-
-    }
-
-    @Override
     public AbstractList importData4weka(String train_query_id, String evaluation_query_id, boolean isForRDFOutput, Analytics analytics) {
 
         FileInputStream trainfis = null;
@@ -66,7 +58,7 @@ public class RDFInputFormat extends InputFormat {
             long startTimeToGetQuery = System.currentTimeMillis();
             URL train_url = new URL(trainQueryURI);
             if (!Util.isURLResponsive(train_url)) {
-                 throw new AlsCustomException("There is a connectivity issue. Could not reach data for predefined train query.\n"
+                throw new AlsCustomException("There is a connectivity issue. Could not reach data for predefined train query.\n"
                         + " Please check your connectivity and the responsiveness of the selected sparql endpoint.\n "
                         + "Then click on re-Evaluate button to try to run again the analytic process.", analytics);
 
@@ -227,7 +219,5 @@ public class RDFInputFormat extends InputFormat {
         }
         return re;
     }
-
-   
 
 }

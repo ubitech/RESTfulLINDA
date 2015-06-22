@@ -34,9 +34,7 @@ public class ArffInputFormat extends InputFormat {
 
     Util.nicePrintMessage("import Arff file "+trainDataset);
     
-
     Instances data = null;
-    //Instances newData = null;
         try {
             
             data = ConverterUtils.DataSource.read(trainDataset);
@@ -53,12 +51,5 @@ public class ArffInputFormat extends InputFormat {
     public RConnection importData4R(String trainDataset,String evaluationDataset, boolean isForRDFOutput,Analytics analytics) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-
-    @Override
-    public Map importData4weka1(String trainDataset, String evaluationDataset, boolean isForRDFOutput, Analytics analytics) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-
     
 }

@@ -26,11 +26,9 @@ public class AnalyticsController {
     }
 
     public void setAnalytics(Analytics analytics) {
-         this.analytics = analytics;
+        this.analytics = analytics;
     }
 
-    
-    
     public AnalyticsInfo runAnalytics(String inputformat, String algorithm, String ouputformat) {
 
         InputFormat in;
@@ -43,24 +41,14 @@ public class AnalyticsController {
         ap = info.getAnalyticProcess();
         out = info.getOutputformat();
 
-        ap.train(analytics);
-//        AbstractList resultToExport = ap.eval(analytics);
-//        out.exportData(analytics,resultToExport);
+        if (analytics.isCreateModel()== false) {
+            ap.train(analytics);
+        }
 
         ap.eval(analytics, out);
 
         return info;
 
     }
-
-//    public Analytics connectToAnalyticsTable(int id) {
-//        ConnectionController connectionController = ConnectionController.getInstance();
-//        connectionController.readProperties();
-//        DBSynchronizer dbsynchronizer = new DBSynchronizer();
-//        Analytics analytics = dbsynchronizer.getlindaAnalytics_analytics(id);
-//        this.analytics = analytics;
-//        dbsynchronizer.closeConnection();
-//        return analytics;
-//    }
 
 }

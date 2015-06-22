@@ -13,16 +13,23 @@ http://download.jboss.org/wildfly/9.0.0.CR1/wildfly-9.0.0.CR1.zip
 STEP 1.2 -- add LindaAnalytics module to share/wildfly-9.0.0.CR1/modules
 -----------------------------------------------------------------------
 
+-----------------------------------------------------------------------
+STEP 1.3 -- change http port of wildfly to 8181
+-----------------------------------------------------------------------
+Go to wildfly-9.0.0.CR1/standalone/configuration/standalone.xml and change the http port as follows:
+
+<socket-binding name="http" port="${jboss.http.port:8181}"/>
+
 
 -----------------------------------------------------------------------
-STEP 1.3 --DEPLOY LINDA ANALYTICS WAR TO WildFly SERVER 
+STEP 1.4 --DEPLOY LINDA ANALYTICS WAR TO WildFly SERVER 
 -----------------------------------------------------------------------
 put RESTfulLINDA.war at /usr/share/jboss-eap-6.3/standalone/deployments/ 
 cp UBITECH/lindaAnalytics/RESTfulLINDA/target/RESTfulLINDA.war /root/appservers/wildfly-9.0.0.CR1/standalone/deployments/
 
 
 -----------------------------------------------------------------------
-STEP 1.4 START locally WildFly SERVER
+STEP 1.5 START locally WildFly SERVER
 -----------------------------------------------------------------------
 cd /root/appservers/wildfly-9.0.0.CR1/bin/
 nohup sudo ./standalone.sh 

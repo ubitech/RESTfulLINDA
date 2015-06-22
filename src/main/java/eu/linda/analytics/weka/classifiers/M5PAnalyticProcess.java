@@ -7,6 +7,7 @@ package eu.linda.analytics.weka.classifiers;
 
 import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.controller.AnalyticProcess;
+import eu.linda.analytics.db.DBSynchronizer;
 import eu.linda.analytics.formats.InputFormat;
 import eu.linda.analytics.formats.OutputFormat;
 import eu.linda.analytics.model.Analytics;
@@ -100,10 +101,8 @@ public class M5PAnalyticProcess extends AnalyticProcess {
             // save model + header
             M5Pmodel = new Vector();
             M5Pmodel.add(cl);
-            //M5Pmodel.add(new Instances(data, 0));
             M5Pmodel.add(new Instances(data));
 
-            //helpfulFunctions.saveModelasVector(M5Pmodel, analytics);
             cl.buildClassifier(data);
             Util.saveModel(cl, analytics);
 
@@ -151,7 +150,6 @@ public class M5PAnalyticProcess extends AnalyticProcess {
             }
 
             data.setClassIndex(data.numAttributes() - 1);
-           // Vector v = (Vector) SerializationHelper.read(Configuration.analyticsRepo + analytics.getModel());
 
             M5P model = (M5P) weka.core.SerializationHelper.read(Configuration.analyticsRepo + analytics.getModel());
 
@@ -163,32 +161,13 @@ public class M5PAnalyticProcess extends AnalyticProcess {
             weka.core.Range attsToOutput = null;
             Boolean outputDistribution = true;
 
-            //Classifier cl = (Classifier) v.get(0);
-            //Instances header = (Instances) v.get(1);
-
             eval.crossValidateModel(model, data, 10, new Debug.Random(1),
                     output, attsToOutput, outputDistribution);
 
-            // output predictions
-            ArrayList<Attribute> atts = new ArrayList<Attribute>();
-            atts.add(new Attribute("inst#", 0));
-            atts.add(new Attribute("actual", 1));
-            atts.add(new Attribute("predicted", 2));
-            atts.add(new Attribute("error", 3));
-
-            List<Instance> instances = new ArrayList<Instance>();
-
-            // System.out.println("inst# ,    actual, ->  predicted ,   error");
-            String result = "inst# ,    actual,   predicted ,   error  \n";
-            int dataLength = data.numAttributes();
 
             for (int i = 0; i < data.numInstances(); i++) {
                 Instance curr = data.instance(i);
 
-                // create an instance for the classifier that fits the training data
-                // Instances object returned here might differ slightly from the one
-                // used during training the classifier, e.g., different order of
-                // nominal values, different number of attributes.
                 Instance inst = data.lastInstance();
                 inst.setDataset(data);
                 for (int n = 0; n < data.numAttributes(); n++) {
@@ -196,11 +175,6 @@ public class M5PAnalyticProcess extends AnalyticProcess {
                     // original attribute is also present in the current dataset
                     if (att != null) {
                         if (att.isNominal()) {
-                            // is this label also in the original data?
-                            // Note:
-                            // "numValues() > 0" is only used to avoid problems with nominal 
-                            // attributes that have 0 labels, which can easily happen with
-                            // data loaded from a database
                             if ((data.attribute(n).numValues() > 0) && (att.numValues() > 0)) {
                                 String label = curr.stringValue(att);
                                 int index = data.attribute(n).indexOfValue(label);
@@ -218,7 +192,6 @@ public class M5PAnalyticProcess extends AnalyticProcess {
 
                 // predict class
                 double pred = model.classifyInstance(inst);
-                //double error = pred - inst.classValue();
                 curr.setClassValue(pred);
 
             }
@@ -235,7 +208,9 @@ public class M5PAnalyticProcess extends AnalyticProcess {
 
         } catch (Exception ex) {
             Logger.getLogger(M5PAnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);
-        }
+            Util.cleanPreviousInfo(analytics);
+            DBSynchronizer.updateLindaAnalyticsProcessMessage("Not Found trained Model. Please Re-evaluate process WITHOUT keeping training model.\n", analytics.getId());
+        } 
 
         long elapsedTimeToRunAnalyticsMillis = System.currentTimeMillis() - startTimeToRun_analytics;
         // Get elapsed time in seconds

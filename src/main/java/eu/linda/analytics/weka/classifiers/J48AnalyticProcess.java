@@ -250,8 +250,8 @@ public class J48AnalyticProcess extends AnalyticProcess {
             return;
         } catch (Exception ex) {
             Logger.getLogger(J48AnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);
-            DBSynchronizer.updateLindaAnalyticsProcessMessage(ex.toString(), analytics.getId());
-
+            Util.cleanPreviousInfo(analytics);
+            DBSynchronizer.updateLindaAnalyticsProcessMessage("Not Found trained Model. Please Re-evaluate process WITHOUT keeping training model.\n", analytics.getId());
         }
         long elapsedTimeToRunAnalyticsMillis = System.currentTimeMillis() - startTimeToRun_analytics;
         // Get elapsed time in seconds
