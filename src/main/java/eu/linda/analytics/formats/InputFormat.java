@@ -8,7 +8,6 @@ package eu.linda.analytics.formats;
 
 import eu.linda.analytics.model.Analytics;
 import java.util.AbstractList;
-import java.util.Map;
 import org.rosuda.REngine.Rserve.RConnection;
 
 

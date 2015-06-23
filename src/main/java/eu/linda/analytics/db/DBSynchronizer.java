@@ -3,7 +3,6 @@ package eu.linda.analytics.db;
 import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.model.Query;
-import eu.linda.analytics.utils.Util;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

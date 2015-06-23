@@ -47,7 +47,7 @@ public class ClusteringRDFGenerator extends RDFGenerator {
 
     @Override
     public Model generateRDFModel(Analytics analytics, RConnection re) {
-        
+
         // Create the model and define some prefixes (for nice serialization in RDF/XML and TTL)
         Model model = ModelFactory.createDefaultModel();
 
@@ -190,13 +190,9 @@ public class ClusteringRDFGenerator extends RDFGenerator {
                 org.rosuda.REngine.REXP cluster_uriAsCharacter = re.eval("as.character(sub" + i + "[[column_with_uri]])");
 
                 String[] urisAsStringArray = cluster_uriAsCharacter.asStrings();
-                
-                
-                
-                for (String string : urisAsStringArray) {
-                    
 
-                    
+                for (String string : urisAsStringArray) {
+
                     Resource analytic_input_node_statement = model.createResource(string);
                     analytic_input_node_statement.addProperty(RDF.type, analytic_input_node);
                     analytic_cluster_statement.add(analytic_input_node_statement);
@@ -219,7 +215,6 @@ public class ClusteringRDFGenerator extends RDFGenerator {
 //                analytic_result_node_statement.addProperty(predictedValue, String.valueOf(predictedValuesAsDoubleArray[i]));
 //
 //            }
-
             re.eval("rm(list=ls());");
 
         } catch (RserveException ex) {

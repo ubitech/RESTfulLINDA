@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package eu.linda.analytics.formats;
 
 import com.hp.hpl.jena.rdf.model.Model;
@@ -29,14 +24,12 @@ import weka.core.Instances;
  */
 public class RDFOutputFormat extends OutputFormat {
 
-    Util helpfulFuncions;
     RDFGenerationFactory rdfGenerationFactory;
     RDFGenerator rdfGenerator;
     ConnectionController connectionController;
 
     public RDFOutputFormat() {
         super();
-        helpfulFuncions = Util.getInstance();
         connectionController = ConnectionController.getInstance();
         rdfGenerationFactory = new RDFGenerationFactory();
     }
@@ -49,13 +42,13 @@ public class RDFOutputFormat extends OutputFormat {
 
             Instances triplets = (Instances) dataToExport;
 
-            if (!helpfulFuncions.isURLValid(triplets.get(1).toString(0))) {
+            if (!Util.isURLValid(triplets.get(1).toString(0))) {
                 DBSynchronizer.updateLindaAnalyticsProcessMessage("There is no valid URL as analytics input  node. \n So no RDF was created.\n"
                         + "Please select a different output format. ", analytics.getId());
                 return;
             }
 
-            helpfulFuncions.nicePrintMessage("Export to RDF");
+            Util.nicePrintMessage("Export to RDF");
 
             //save rdf file
             String targetFileName = ("results/analyticsID" + analytics.getId() + "_" + analytics.getAlgorithm_name() + "_resultdocument").replace("datasets", "results");
@@ -101,8 +94,8 @@ public class RDFOutputFormat extends OutputFormat {
             }
 
             DBSynchronizer.updateLindaAnalytics(targetFileName, "resultdocument", analytics.getId());
-           DBSynchronizer.updateLindaAnalyticsVersion(analytics.getVersion(), analytics.getId());
-             DBSynchronizer.updateLindaAnalyticsRDFInfo("", false, analytics.getId());
+            DBSynchronizer.updateLindaAnalyticsVersion(analytics.getVersion(), analytics.getId());
+            DBSynchronizer.updateLindaAnalyticsRDFInfo("", false, analytics.getId());
 
             // Get elapsed time in milliseconds
             long elapsedTimeToExportData = System.currentTimeMillis() - startTimeToExportData;
@@ -113,84 +106,78 @@ public class RDFOutputFormat extends OutputFormat {
             DBSynchronizer.updateLindaAnalyticsProcessPerformanceTime(analytics);
 
         } else {
-            helpfulFuncions.nicePrintMessage("There are no data to be exported to RDF");
+            Util.nicePrintMessage("There are no data to be exported to RDF");
             if (!analytics.getResultdocument().equalsIgnoreCase("")) {
-                helpfulFuncions.cleanPreviousInfo(analytics);
+                Util.cleanPreviousInfo(analytics);
             }
         }
 
     }
 
-    
     @Override
     public void exportData(Analytics analytics, RConnection re) {
 
-       
         try {
-            
-            
+
             float timeToExportData = 0;
             long startTimeToExportData = System.currentTimeMillis();
-            
+
             org.rosuda.REngine.REXP uriAsCharacter = re.eval("as.character(loaded_data$uri)");
             String[] urisAsStringArray = uriAsCharacter.asStrings();
-            
+
             if (urisAsStringArray.length != 0) {
-                
-                if (!helpfulFuncions.isURLValid(urisAsStringArray[0])) {
+
+                if (!Util.isURLValid(urisAsStringArray[0])) {
                     DBSynchronizer.updateLindaAnalyticsProcessMessage("There is no valid URL as analytics input  node. \n So no RDF was created.\n"
                             + "Please select a different output format. ", analytics.getId());
                     return;
                 }
-                
+
             }
-            
-            helpfulFuncions.nicePrintMessage("Export to RDF");
+
+            Util.nicePrintMessage("Export to RDF");
             String targetFileName = "results/analyticsID" + analytics.getId() + "_" + "version" + analytics.getVersion() + "_" + analytics.getAlgorithm_name() + "_resultdocument";
             String targetFileNameFullPath = Configuration.analyticsRepo + targetFileName;
-            
+
             //create rdf file & save
             rdfGenerator = rdfGenerationFactory.createRDF(analytics.getCategory_id());
-            
+
             Model model = rdfGenerator.generateRDFModel(analytics, re);
-            
+
             re.close();
-            
+
             String fileName = "";
-            
-                
-                FileWriter outToSave = null;
-                if (analytics.getExportFormat().equalsIgnoreCase("RDFXML")) {
-                    
-                    fileName = targetFileNameFullPath + ".rdf";
-                    targetFileName = targetFileName + ".rdf";
-                    outToSave = new FileWriter(fileName);
-                    model.write(outToSave, "RDF/XML-ABBREV");
-                    
-                } else if (analytics.getExportFormat().equalsIgnoreCase("TTL")) {
-                    
-                    fileName = targetFileNameFullPath + ".ttl";
-                    targetFileName = targetFileName + ".ttl";
-                    outToSave = new FileWriter(fileName);
-                    model.write(outToSave, "TTL");
-                    
-                } else if (analytics.getExportFormat().equalsIgnoreCase("N-Tripples")) {
-                    
-                    fileName = targetFileNameFullPath + ".nt";
-                    targetFileName = targetFileName + ".nt";
-                    outToSave = new FileWriter(fileName);
-                    model.write(outToSave, "N3");
-                    
-                }
-                outToSave.close();
-                System.out.println("RDF File save to:" + fileName);
-                
-          
-            
+
+            FileWriter outToSave = null;
+            if (analytics.getExportFormat().equalsIgnoreCase("RDFXML")) {
+
+                fileName = targetFileNameFullPath + ".rdf";
+                targetFileName = targetFileName + ".rdf";
+                outToSave = new FileWriter(fileName);
+                model.write(outToSave, "RDF/XML-ABBREV");
+
+            } else if (analytics.getExportFormat().equalsIgnoreCase("TTL")) {
+
+                fileName = targetFileNameFullPath + ".ttl";
+                targetFileName = targetFileName + ".ttl";
+                outToSave = new FileWriter(fileName);
+                model.write(outToSave, "TTL");
+
+            } else if (analytics.getExportFormat().equalsIgnoreCase("N-Tripples")) {
+
+                fileName = targetFileNameFullPath + ".nt";
+                targetFileName = targetFileName + ".nt";
+                outToSave = new FileWriter(fileName);
+                model.write(outToSave, "N3");
+
+            }
+            outToSave.close();
+            System.out.println("RDF File save to:" + fileName);
+
             DBSynchronizer.updateLindaAnalytics(targetFileName, "resultdocument", analytics.getId());
             DBSynchronizer.updateLindaAnalyticsVersion(analytics.getVersion(), analytics.getId());
-             DBSynchronizer.updateLindaAnalyticsRDFInfo("", false, analytics.getId());
-            
+            DBSynchronizer.updateLindaAnalyticsRDFInfo("", false, analytics.getId());
+
             // Get elapsed time in milliseconds
             long elapsedTimeToExportData = System.currentTimeMillis() - startTimeToExportData;
             // Get elapsed time in seconds
@@ -198,7 +185,7 @@ public class RDFOutputFormat extends OutputFormat {
             System.out.println("timeToExportData" + timeToExportData);
             analytics.setTimeToCreate_RDF(timeToExportData);
             DBSynchronizer.updateLindaAnalyticsProcessPerformanceTime(analytics);
-            
+
         } catch (RserveException ex) {
             Logger.getLogger(RDFOutputFormat.class.getName()).log(Level.SEVERE, null, ex);
         } catch (REXPMismatchException ex) {
@@ -206,7 +193,7 @@ public class RDFOutputFormat extends OutputFormat {
         } catch (IOException ex) {
             Logger.getLogger(RDFOutputFormat.class.getName()).log(Level.SEVERE, null, ex);
         }
-    
+
     }
 
 }

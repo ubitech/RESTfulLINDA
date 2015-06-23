@@ -1,4 +1,3 @@
-
 package eu.linda.analytics.model;
 
 public class Category {

@@ -13,7 +13,6 @@ import eu.linda.analytics.utils.Util;
 import java.util.AbstractList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.rosuda.JRI.Rengine;
 import org.rosuda.REngine.Rserve.RConnection;
 import org.rosuda.REngine.Rserve.RserveException;
 
@@ -24,11 +23,9 @@ import org.rosuda.REngine.Rserve.RserveException;
 public class CSVOutputFormat extends OutputFormat {
 
     ConnectionController connectionController;
-    Util helpfulFunctions;
 
     public CSVOutputFormat() {
         connectionController = ConnectionController.getInstance();
-        helpfulFunctions = Util.getInstance();
     }
 
     @Override
@@ -37,18 +34,18 @@ public class CSVOutputFormat extends OutputFormat {
             float timeToExportData = 0;
             long startTimeToExportData = System.currentTimeMillis();
 
-            helpfulFunctions.nicePrintMessage("Export to CSV");
+            Util.nicePrintMessage("Export to CSV");
             String[] splitedSourceFileName = analytics.getDocument().split("\\.");
 
             String targetFileName = (splitedSourceFileName[0] + "_" + analytics.getAlgorithm_name() + "_resultdocument.arff").replace("datasets", "results");
 
             String targetFileNameFullPath = Configuration.analyticsRepo + targetFileName;
-            helpfulFunctions.saveFile(targetFileNameFullPath, dataToExport.toString());
+            Util.saveFile(targetFileNameFullPath, dataToExport.toString());
 
             String targetFileNameCSV = (splitedSourceFileName[0] + "_" + analytics.getAlgorithm_name() + "_resultdocument." + analytics.getExportFormat()).replace("datasets", "results");
             String targetFileNameCSVFull = Configuration.analyticsRepo + targetFileNameCSV;
 
-            helpfulFunctions.saveFileAsCSV(targetFileNameFullPath, targetFileNameCSVFull);
+            Util.saveFileAsCSV(targetFileNameFullPath, targetFileNameCSVFull);
             DBSynchronizer.updateLindaAnalytics(targetFileNameCSV, "resultdocument", analytics.getId());
             DBSynchronizer.updateLindaAnalyticsVersion(analytics.getVersion(), analytics.getId());
 
@@ -61,9 +58,9 @@ public class CSVOutputFormat extends OutputFormat {
             DBSynchronizer.updateLindaAnalyticsProcessPerformanceTime(analytics);
 
         } else {
-            helpfulFunctions.nicePrintMessage("There are no data to be exported to CSV");
+            Util.nicePrintMessage("There are no data to be exported to CSV");
             if (!analytics.getResultdocument().equalsIgnoreCase("")) {
-                helpfulFunctions.cleanPreviousInfo(analytics);
+                Util.cleanPreviousInfo(analytics);
             }
         }
     }
@@ -76,7 +73,7 @@ public class CSVOutputFormat extends OutputFormat {
             float timeToExportData = 0;
             long startTimeToExportData = System.currentTimeMillis();
             
-            helpfulFunctions.nicePrintMessage("Export to CSV");
+            Util.nicePrintMessage("Export to CSV");
             String[] splitedSourceFileName = analytics.getDocument().split("\\.");
             
             String targetFileName = (splitedSourceFileName[0] + "_" + analytics.getAlgorithm_name() + "_resultdocument.csv").replace("datasets", "results");

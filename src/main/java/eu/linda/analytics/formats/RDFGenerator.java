@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package eu.linda.analytics.formats;
 
 import com.hp.hpl.jena.rdf.model.Model;
@@ -18,8 +13,8 @@ abstract public class RDFGenerator {
 
     //generateRDFModelasweka
     abstract public Model generateRDFModel(Analytics analytics, AbstractList dataToExport);
-    
-//generateRDFModelasR   
+
+    //generateRDFModelasR   
     abstract public Model generateRDFModel(Analytics analytics, RConnection re);
 
 }

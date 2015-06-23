@@ -168,24 +168,15 @@ public class ForecastingRDFGenerator extends RDFGenerator {
             org.rosuda.REngine.REXP datesAsCharacter = re.eval("as.character(df_to_export$Date)");
 
             String[] datesAsStringArray = datesAsCharacter.asStrings();
-//        for (String string : datesAsStringArray) {
-//            System.out.println("datesAsStringArray" + string);
-//        }
 
             System.out.println("colname of predicted value" + analyzedFieldValue);
             org.rosuda.REngine.REXP predictedValues = re.eval("df_to_export$" + analyzedFieldValue);
 
             double[] predictedValuesAsDoubleArray = predictedValues.asDoubles();
 
-//        for (double d : predictedValuesAsDoubleArray) {
-//            System.out.println("predictedValues:" + d);
-//        }
             org.rosuda.REngine.REXP uriAsCharacter = re.eval("as.character(loaded_data[[column_with_uri]])");
             String[] urisAsStringArray = uriAsCharacter.asStrings();
 
-//        for (String string : urisAsStringArray) {
-//            System.out.println("urisAsStringArray" + string);
-//        }
             Date date = new Date();
             DateFormat formatter = new SimpleDateFormat("ddMMyyyy");
             String today = formatter.format(date);

@@ -14,7 +14,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.AbstractList;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.rosuda.REngine.REXP;
@@ -30,11 +29,9 @@ import weka.core.converters.CSVLoader;
  */
 public class CSVInputFormat extends InputFormat {
 
-    Util helpfulFuncions;
     ConnectionController connectionController;
 
     public CSVInputFormat() {
-        helpfulFuncions = Util.getInstance();
         connectionController = ConnectionController.getInstance();
     }
 

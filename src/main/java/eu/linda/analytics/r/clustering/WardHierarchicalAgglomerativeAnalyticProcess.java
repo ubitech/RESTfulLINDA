@@ -15,7 +15,6 @@ import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.utils.Util;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.Rserve.RConnection;
 import org.rosuda.REngine.Rserve.RserveException;
 

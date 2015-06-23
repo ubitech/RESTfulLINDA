@@ -1,5 +1,3 @@
-
-
 package eu.linda.analytics.model;
 
 

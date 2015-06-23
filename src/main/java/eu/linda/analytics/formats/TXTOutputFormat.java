@@ -11,8 +11,6 @@ import eu.linda.analytics.db.DBSynchronizer;
 import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.utils.Util;
 import java.util.AbstractList;
-import org.json.JSONArray;
-import org.rosuda.JRI.Rengine;
 import org.rosuda.REngine.Rserve.RConnection;
 
 
@@ -23,17 +21,15 @@ import org.rosuda.REngine.Rserve.RConnection;
 public class TXTOutputFormat extends OutputFormat {
 
     ConnectionController connectionController;
-    Util helpfulFuncions;
 
     public TXTOutputFormat() {
         connectionController = ConnectionController.getInstance();
-        helpfulFuncions = Util.getInstance();
     }
 
     @Override
     public void exportData(Analytics analytics, AbstractList dataToExport) {
         if (dataToExport.size() != 0) {
-            helpfulFuncions.nicePrintMessage("Export to TXT");
+            Util.nicePrintMessage("Export to TXT");
 
             String[] splitedSourceFileName = analytics.getDocument().split("\\.");
 
@@ -41,15 +37,15 @@ public class TXTOutputFormat extends OutputFormat {
 
             String targetFileNameFullPath = Configuration.docroot + targetFileName;
 
-            helpfulFuncions.saveFile(targetFileNameFullPath, dataToExport.toString());
+            Util.saveFile(targetFileNameFullPath, dataToExport.toString());
 
             DBSynchronizer.updateLindaAnalytics(targetFileName, "resultdocument", analytics.getId());
            DBSynchronizer.updateLindaAnalyticsVersion(analytics.getVersion(), analytics.getId());
 
         } else {
-            helpfulFuncions.nicePrintMessage("There are no data to be exported to TXT");
+            Util.nicePrintMessage("There are no data to be exported to TXT");
             if (!analytics.getResultdocument().equalsIgnoreCase("")) {
-                helpfulFuncions.cleanPreviousInfo(analytics);
+                Util.cleanPreviousInfo(analytics);
             }
         }
     }

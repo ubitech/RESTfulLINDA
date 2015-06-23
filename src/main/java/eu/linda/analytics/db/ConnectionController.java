@@ -6,7 +6,6 @@
 package eu.linda.analytics.db;
 
 import eu.linda.analytics.config.Configuration;
-import eu.linda.analytics.formats.CSVOutputFormat;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
