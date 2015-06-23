@@ -74,7 +74,7 @@ public class KMeansAnalyticProcess extends AnalyticProcess {
             if (re == null) {
                 return;
             }
-                //TODO Check that all values are numeric
+            //TODO Check that all values are numeric
 
             re.eval("uri<-loaded_data[2];");
             RScript += "# Prepare Data \n uri<-loaded_data[2]; \n";
@@ -85,14 +85,26 @@ public class KMeansAnalyticProcess extends AnalyticProcess {
             re.eval("myvars <- names(loaded_data) %in% c('rowID',column_with_uri);");
             RScript += "# Prepare Data \n myvars <- names(loaded_data) %in% c('rowID',column_with_uri); \n";
 
-            re.eval("loaded_data <- loaded_data[!myvars]");
-            RScript += "loaded_data <- loaded_data[!myvars]\n";
+            re.eval("loaded_data <- loaded_data[!myvars]; "
+                    + "nums <- sapply(loaded_data, is.numeric); "
+                    + "loaded_data<-loaded_data[ , nums]; ");
+
+            RScript += "loaded_data <- loaded_data[!myvars]; \n"
+                    + "nums <- sapply(loaded_data, is.numeric); \n "
+                    + "loaded_data<-loaded_data[ , nums]; \n";
 
             re.eval("loaded_data <- na.omit(loaded_data)");
             RScript += "loaded_data <- na.omit(loaded_data) # listwise deletion of missing\n";
 
             re.eval("loaded_data <- scale(loaded_data)");
             RScript += "loaded_data <- scale(loaded_data) # standardize variables\n";
+
+            int num_of_not_numerical_variables = re.eval("table(nums)[\"FALSE\"]").asInteger();
+            if (num_of_not_numerical_variables > 0) {
+                DBSynchronizer.updateLindaAnalyticsProcessMessage("Note : Input queries contain non numeric variables and these have been ignored during the analysis. \n "
+                        + "If you want to analyze data that contain mixed numerical and categorical data, consider using the M5P or J48 algorithms. \n"
+                        + "In case all your variables are categorical, consider use the K-modes algorithm", analytics.getId());
+            }
 
             //Partitioning
             re.eval("fit <- kmeans(loaded_data, " + clustersNum + ")");

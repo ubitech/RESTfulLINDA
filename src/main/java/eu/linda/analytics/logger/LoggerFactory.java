@@ -18,7 +18,8 @@ public class LoggerFactory {
                 if (instance == null) {                   
                     instance = Logger.getLogger("RESTfulLINDALogger");
                     try{
-                        FileHandler fh =  new FileHandler("../standalone/log/RESTfulLINDA.log", true);
+                       FileHandler fh =  new FileHandler("../standalone/log/RESTfulLINDA.log", true);
+                       
                         instance.addHandler(fh);
                         SimpleFormatter formatter = new SimpleFormatter();  
                         fh.setFormatter(formatter);         

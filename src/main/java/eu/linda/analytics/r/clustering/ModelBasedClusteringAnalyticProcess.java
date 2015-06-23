@@ -10,6 +10,7 @@ import eu.linda.analytics.model.Analytics;
 import eu.linda.analytics.utils.Util;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.Rserve.RConnection;
 import org.rosuda.REngine.Rserve.RserveException;
 
@@ -63,14 +64,26 @@ public class ModelBasedClusteringAnalyticProcess extends AnalyticProcess {
             re.eval("myvars <- names(loaded_data) %in% c('rowID',column_with_uri);");
             RScript += "# Prepare Data \n myvars <- names(loaded_data) %in% c('rowID',column_with_uri); \n";
 
-            re.eval("loaded_data <- loaded_data[!myvars]");
-            RScript += "loaded_data <- loaded_data[!myvars]\n";
+            re.eval("loaded_data <- loaded_data[!myvars]; "
+                    + "nums <- sapply(loaded_data, is.numeric); "
+                    + "loaded_data<-loaded_data[ , nums]; ");
+
+            RScript += "loaded_data <- loaded_data[!myvars]; \n"
+                    + "nums <- sapply(loaded_data, is.numeric); \n "
+                    + "loaded_data<-loaded_data[ , nums]; \n";
 
             re.eval("loaded_data <- na.omit(loaded_data)");
             RScript += "loaded_data <- na.omit(loaded_data) # listwise deletion of missing\n";
 
             re.eval("loaded_data <- scale(loaded_data)");
             RScript += "loaded_data <- scale(loaded_data) # standardize variables\n";
+            
+            int num_of_not_numerical_variables = re.eval("table(nums)[\"FALSE\"]").asInteger();
+            if (num_of_not_numerical_variables > 0) {
+                DBSynchronizer.updateLindaAnalyticsProcessMessage("Note : Input queries contain non numeric variables and these have been ignored during the analysis. \n "
+                        + "If you want to analyze data that contain mixed numerical and categorical data,\n consider using the M5P or J48 algorithms. \n"
+                        + "In case all your variables are categorical, consider use the K-modes algorithm", analytics.getId());
+            }
 
             // Model Based Clustering
             re.eval("library(mclust);");
@@ -104,6 +117,8 @@ public class ModelBasedClusteringAnalyticProcess extends AnalyticProcess {
             re.close();
 
         } catch (RserveException ex) {
+            Logger.getLogger(ModelBasedClusteringAnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (REXPMismatchException ex) {
             Logger.getLogger(ModelBasedClusteringAnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);
         }
 

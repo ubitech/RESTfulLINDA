@@ -59,7 +59,7 @@ public class MultipleLinearRegressionInR extends AnalyticProcess {
                 return;
             }
 
-                //TODO Check that all values are numeric
+            //TODO Check that all values are numeric
             re.eval("loaded_data <- na.omit(loaded_data); "
                     + "loaded_data_eval <- na.omit(loaded_data); ");
 
@@ -89,6 +89,10 @@ public class MultipleLinearRegressionInR extends AnalyticProcess {
                     + "nums <- sapply(loaded_data_eval, is.numeric); "
                     + "loaded_data_eval<-loaded_data_eval[ , nums]; ");
 
+            int num_of_not_numerical_variables = re.eval("table(nums)[\"FALSE\"]").asInteger();
+            if (num_of_not_numerical_variables > 0) {
+                DBSynchronizer.updateLindaAnalyticsProcessMessage("Note: Input queries contain non numeric variables and these have been ignored during the analysis. \n", analytics.getId());
+            }
             RScript += "loaded_data <- loaded_data[!myvars]; \n"
                     + "nums <- sapply(loaded_data, is.numeric); \n"
                     + "loaded_data<-loaded_data[ , nums]; \n"
