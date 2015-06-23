@@ -27,8 +27,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.rosuda.JRI.REXP;
-import org.rosuda.JRI.Rengine;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.Rserve.RConnection;
 import org.rosuda.REngine.Rserve.RserveException;
@@ -38,12 +36,6 @@ import org.rosuda.REngine.Rserve.RserveException;
  * @author eleni
  */
 public class ClusteringRDFGenerator extends RDFGenerator {
-
-    Util helpfulFuncions;
-
-    public ClusteringRDFGenerator() {
-        helpfulFuncions = Util.getInstance();
-    }
 
     @Override
     public Model generateRDFModel(Analytics analytics, AbstractList dataToExport) {
@@ -60,7 +52,7 @@ public class ClusteringRDFGenerator extends RDFGenerator {
         Model model = ModelFactory.createDefaultModel();
 
         try {
-            helpfulFuncions.nicePrintMessage("Generate Clustering RDFModel for R algorithms ");
+            Util.nicePrintMessage("Generate Clustering RDFModel for R algorithms ");
 
             int clustersNum = 5;
 
@@ -111,9 +103,9 @@ public class ClusteringRDFGenerator extends RDFGenerator {
 
             // Define local properties
             Property analyzedField = model.createProperty(ds + "analyzedField");
-            Property predictedValue = model.createProperty(ds + "predictedValue");
-            Property wasDerivedFrom = model.createProperty("http://www.w3.org/ns/prov#wasDerivedFrom");
-            Property wasGeneratedBy = model.createProperty("http://www.w3.org/ns/prov#wasGeneratedBy");
+//            Property predictedValue = model.createProperty(ds + "predictedValue");
+//            Property wasDerivedFrom = model.createProperty("http://www.w3.org/ns/prov#wasDerivedFrom");
+//            Property wasGeneratedBy = model.createProperty("http://www.w3.org/ns/prov#wasGeneratedBy");
             Property actedOnBehalfOf = model.createProperty("http://www.w3.org/ns/prov#actedOnBehalfOf");
             Property wasAssociatedWith = model.createProperty("http://www.w3.org/ns/prov#wasAssociatedWith");
             Property hasTrainDataset = model.createProperty(ds + "hasTrainDataset");
@@ -159,7 +151,7 @@ public class ClusteringRDFGenerator extends RDFGenerator {
             performance_statement.addProperty(timeToCreateRDFOutPutProperty, Float.toString(analytics.getTimeToCreate_RDF()));
             analytic_process_statement.addProperty(performanceProperty, performance_statement);
 
-            if (helpfulFuncions.isRDFInputFormat(analytics.getTrainQuery_id())) {
+            if (Util.isRDFInputFormat(analytics.getTrainQuery_id())) {
 
                 Resource analytic_train_dataset_statement = model.createResource(Configuration.lindaworkbenchURI + "query-designer/" + analytics.getTrainQuery_id());
                 analytic_process_statement.addProperty(hasTrainDataset, analytic_train_dataset_statement);
@@ -183,7 +175,6 @@ public class ClusteringRDFGenerator extends RDFGenerator {
             linda_user_statement.addProperty(FOAF.accountName, analytics.getUser_name());
             onlineAccount.addProperty(FOAF.homepage, Configuration.lindaworkbenchURI);
 
-            //Resource analytic_result_node = model.createResource(analytics_NS + "analytics_result_node");
             Resource analytic_input_node = model.createResource(analytics_NS + "analytic_input_node");
 
             for (int i = 1; i < clustersNum + 1; i++) {
@@ -195,9 +186,7 @@ public class ClusteringRDFGenerator extends RDFGenerator {
                 analytic_cluster_statement.addProperty(RDFS.label, "cluster" + i);
 
                 re.eval("sub" + i + "<-subset(df_to_export, loaded_data[column_to_predict] == " + i + ");");
-                System.out.println("CLUSTER "+i);
-            
-                
+
                 org.rosuda.REngine.REXP cluster_uriAsCharacter = re.eval("as.character(sub" + i + "[[column_with_uri]])");
 
                 String[] urisAsStringArray = cluster_uriAsCharacter.asStrings();
@@ -206,7 +195,7 @@ public class ClusteringRDFGenerator extends RDFGenerator {
                 
                 for (String string : urisAsStringArray) {
                     
-                    System.out.println("input node "+string);
+
                     
                     Resource analytic_input_node_statement = model.createResource(string);
                     analytic_input_node_statement.addProperty(RDF.type, analytic_input_node);

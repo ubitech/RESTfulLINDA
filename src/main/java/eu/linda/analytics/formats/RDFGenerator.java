@@ -8,7 +8,6 @@ package eu.linda.analytics.formats;
 import com.hp.hpl.jena.rdf.model.Model;
 import eu.linda.analytics.model.Analytics;
 import java.util.AbstractList;
-import org.rosuda.JRI.Rengine;
 import org.rosuda.REngine.Rserve.RConnection;
 
 /**

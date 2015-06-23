@@ -13,6 +13,7 @@ import eu.linda.analytics.utils.Util;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.AbstractList;
 import java.util.Hashtable;
@@ -106,12 +107,14 @@ public class RDFInputFormat extends InputFormat {
 
             DBSynchronizer.updateLindaAnalyticsInputDataPerformanceTime(analytics);
 
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(RDFInputFormat.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(ArffInputFormat.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(RDFInputFormat.class.getName()).log(Level.SEVERE, null, ex);
             DBSynchronizer.updateLindaAnalyticsProcessMessage("Input Queries are not responsive. \n", analytics.getId());
-        } catch (AlsCustomException ex) {
+        }   catch (AlsCustomException ex) {
             return null;
-        }
+        } 
         return train_data;
 
     }

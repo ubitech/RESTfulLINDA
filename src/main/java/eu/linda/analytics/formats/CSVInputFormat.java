@@ -75,9 +75,9 @@ public class CSVInputFormat extends InputFormat {
 
             DBSynchronizer.updateLindaAnalyticsInputDataPerformanceTime(analytics);
 
-        } catch (Exception ex) {
-            Logger.getLogger(ArffInputFormat.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        } catch (IOException ex) {
+            Logger.getLogger(CSVInputFormat.class.getName()).log(Level.SEVERE, null, ex);
+        } 
         return data;
 
     }
