@@ -55,11 +55,6 @@ public class ArffOutputFormat extends OutputFormat {
     }
 
     @Override
-    public void exportData(Analytics analytics, Rengine dataToExport) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-    
-    @Override
     public void exportData(Analytics analytics, RConnection dataToExport) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }

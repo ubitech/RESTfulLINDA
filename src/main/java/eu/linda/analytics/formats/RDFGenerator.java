@@ -19,9 +19,8 @@ abstract public class RDFGenerator {
 
     //generateRDFModelasweka
     abstract public Model generateRDFModel(Analytics analytics, AbstractList dataToExport);
-    //generateRDFModelasR
-    abstract public Model generateRDFModel(Analytics analytics, Rengine re);
     
+//generateRDFModelasR   
     abstract public Model generateRDFModel(Analytics analytics, RConnection re);
 
 }

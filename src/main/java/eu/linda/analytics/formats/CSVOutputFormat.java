@@ -67,34 +67,6 @@ public class CSVOutputFormat extends OutputFormat {
             }
         }
     }
-
-    @Override
-    public void exportData(Analytics analytics, Rengine re) {
-        float timeToExportData = 0;
-        long startTimeToExportData = System.currentTimeMillis();
-
-        helpfulFunctions.nicePrintMessage("Export to CSV");
-        String[] splitedSourceFileName = analytics.getDocument().split("\\.");
-
-        String targetFileName = (splitedSourceFileName[0] + "_" + analytics.getAlgorithm_name() + "_resultdocument.csv").replace("datasets", "results");
-
-        String targetFileNameFullPath = Configuration.analyticsRepo + targetFileName;
-        System.out.println("targetFileNameFullPath" + targetFileNameFullPath);
-        re.eval("write.table(df_to_export, file = '" + targetFileNameFullPath + "',row.names=FALSE,sep = ';', dec='.');");
-        re.eval("rm(list=ls());");
-
-       DBSynchronizer.updateLindaAnalytics(targetFileName, "resultdocument", analytics.getId());
-        DBSynchronizer.updateLindaAnalyticsVersion(analytics.getVersion(), analytics.getId());
-
-        // Get elapsed time in milliseconds
-        long elapsedTimeToExportData = System.currentTimeMillis() - startTimeToExportData;
-        // Get elapsed time in seconds
-        timeToExportData = elapsedTimeToExportData / 1000F;
-        System.out.println("timeToExportData" + timeToExportData);
-        analytics.setTimeToCreate_RDF(timeToExportData);
-        DBSynchronizer.updateLindaAnalyticsProcessPerformanceTime(analytics);
-
-    }
     
     @Override
     public void exportData(Analytics analytics, RConnection re) {
