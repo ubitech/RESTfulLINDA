@@ -103,8 +103,8 @@ sudo add-apt-repository ppa:marutter/rdev
 sudo apt-get install r-base-core
 ```
 Useful links: 
-http://cran.r-project.org/bin/linux/ubuntu/README
-http://numerorojo.wordpress.com/2008/04/27/instalar-r-en-ubuntu/
+> - http://cran.r-project.org/bin/linux/ubuntu/README
+> - http://numerorojo.wordpress.com/2008/04/27/instalar-r-en-ubuntu/
 
 
 ####Step 2.2 : install JRI
@@ -126,9 +126,9 @@ sudo nano /etc/bash.bashrc OR sudo nano /etc/bash.bashrc/etc/bash.bashrc
   sudo cp /usr/lib/R/site-library/rJava/jri/libjri.so  /usr/lib/
 
 Useful links: 
-http://binfalse.de/2011/02/talking-r-through-java/
-http://www.rforge.net/JRI/
-http://blog.pingoured.fr/index.php?post/2009/03/23/Getting-rJava/JRI-to-work%3A
+> - http://binfalse.de/2011/02/talking-r-through-java/
+> - http://www.rforge.net/JRI/
+> - http://blog.pingoured.fr/index.php?post/2009/03/23/Getting-rJava/JRI-to-work%3A
 
 
 ####Step 2.4 : Install extra R packages
@@ -142,7 +142,7 @@ sudo R CMD INSTALL Rserve_1.7-3.tar.gz
 
 packages to install:
 
-Rserve 
+Rserve  (https://rforge.net/Rserve/)
 cluster
 mclust
 forecast
