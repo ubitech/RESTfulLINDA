@@ -19,12 +19,12 @@ Enable the execution of conventional analytic processes against linked data
 
 ##Step 1 Install  WildFly server 
 
-####Step 1.1 Download & Install WildFly 9 from 
+####Step 1.1 Download & Install WildFly 9  
 http://wildfly.org/downloads/
-Actual link:
-http://download.jboss.org/wildfly/9.0.0.CR1/wildfly-9.0.0.CR1.zip
+(Actual link:
+http://download.jboss.org/wildfly/9.0.0.CR1/wildfly-9.0.0.CR1.zip)
 
-####Step 1.2 Add LindaAnalytics module to share/wildfly-9.0.0.CR1/modules
+####Step 1.2 Add properties module to wildfly
 > - create in $WILDFLY_HOME/modules/ 3 folders one inside of the other as  "/lindaAnalytics/configuration/main/".
 
 > - inside "main" folder create module.xml file as follows:
@@ -54,7 +54,7 @@ docroot= /home/eleni/IdeaProjects/LindaWorkbench/linda/
 analyticsRepo = /var/www/LindaAnalytics/
 ```
 
-####Step 1.3 change http port of wildfly to 8181
+####Step 1.3 change http port to 8181
 Go to wildfly-9.0.0.CR1/standalone/configuration/standalone.xml and change the http port as follows:
 ```
 <socket-binding name="http" port="${jboss.http.port:8181}"/>
@@ -71,7 +71,7 @@ $WILDFLY_HOME/bin/jboss-cli.sh --connect --command="undeploy RESTfulLINDA.war"
 ```
 
 
-####Step 1.5 Start locally WildFly SERVER
+####Step 1.5 Start locally WildFly server
 Go to   cd $WILDFLY_HOME/bin/ and execute:
 ```
 nohup sudo ./standalone.sh 
@@ -80,21 +80,21 @@ nohup sudo ./standalone.sh
 
 ###STEP 2: Install R
 
-####Step 2.1 : ADD CRAN repositort
+####Step 2.1 : ADD CRAN repository
 
-//see ubuntu version
+See ubuntu version(for linda common server is trusty)
+```
 lsb_release -a
-(for linda common server is trusty)
-
-//Go To
+```
+Go To
+```
 sudo nano /etc/apt/sources.list 
-
-//Add CRAN Repository
+```
+& add CRAN Repository
 ```
 deb http://cran.r-project.org/bin/linux/ubuntu trusty/
 ```
-
-//add keys
+Add keys
 ```
 sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E084DAB9
 sudo add-apt-repository ppa:marutter/rdev
@@ -113,17 +113,16 @@ sudo aptitude install r-cran-rjava
 ```
 ####Step 2.3 : Add environmental parameters
 
-//add to bashrc
-sudo nano /etc/bash.bashrc OR sudo nano /etc/bash.bashrc/etc/bash.bashrc
-//the following environmental variables
+Add to bashrc the following environmental variables
 ```
   export R_HOME=/usr/lib/R/
   export CLASSPATH=.:/usr/lib/R/site-library/rJava/jri/
   export LD_LIBRARY_PATH=/usr/lib/R/site-library/rJava/jri/
 ```
-
-//mv jars to CLASSPATH
+Move jars to CLASSPATH
+```
   sudo cp /usr/lib/R/site-library/rJava/jri/libjri.so  /usr/lib/
+```
 
 Useful links: 
 > - http://binfalse.de/2011/02/talking-r-through-java/
@@ -133,8 +132,7 @@ Useful links:
 
 ####Step 2.4 : Install extra R packages
 
-From command line you can install them by executing sudo R CMD INSTALL package_name 
-for example
+From command line you can install them by executing sudo R CMD INSTALL package_name . For example:
 ```
 sudo R CMD INSTALL spdep_0.5-82.tar.gz 
 sudo R CMD INSTALL Rserve_1.7-3.tar.gz
@@ -153,7 +151,7 @@ ncf
 
 
 ####Step 2.5 : Start Rserve Server
-start Rserve from R console
+Start Rserve from R console
 ```
 >R
   >library(Rserve)
