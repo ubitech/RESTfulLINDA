@@ -126,7 +126,6 @@ public class DBSynchronizer {
 
         } catch (SQLException ex) {
             Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("ERROR SEVERE" + ex);
         }
     }//EoM updateLindaAnalytics   
 
@@ -148,7 +147,6 @@ public class DBSynchronizer {
 
         } catch (SQLException ex) {
             Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("ERROR SEVERE" + ex);
         }
     }//EoM updateLindaAnalyticsModel   
 
@@ -170,7 +168,6 @@ public class DBSynchronizer {
 
         } catch (SQLException ex) {
             Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("ERROR SEVERE" + ex);
         }
     }//EoM updateLindaAnalyticsModelReadable   
 
@@ -192,7 +189,6 @@ public class DBSynchronizer {
 
         } catch (SQLException ex) {
             Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("ERROR SEVERE" + ex);
         }
     }//EoM updateLindaAnalyticsVersion 
 
@@ -224,7 +220,6 @@ public class DBSynchronizer {
 
         } catch (SQLException ex) {
             Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("ERROR SEVERE" + ex);
         }
     }//EoM updateLindaAnalyticsRDFInfo 
 
@@ -246,7 +241,6 @@ public class DBSynchronizer {
 
         } catch (SQLException ex) {
             Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("ERROR SEVERE" + ex);
         }
     }//EoM updateLindaAnalyticsProcessMessage 
 
@@ -271,7 +265,6 @@ public class DBSynchronizer {
 
         } catch (SQLException ex) {
             Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("ERROR SEVERE" + ex);
         }
 
     }//EoM emptyLindaAnalyticsResultDocument 
@@ -294,7 +287,6 @@ public class DBSynchronizer {
 
         } catch (SQLException ex) {
             Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("ERROR SEVERE" + ex);
         }
 
     }//EoM updateLindaAnalyticsPerformanceTime 
@@ -318,7 +310,6 @@ public class DBSynchronizer {
 
         } catch (SQLException ex) {
             Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("ERROR SEVERE" + ex);
         }
 
     }//EoM updateLindaAnalyticsPerformanceTime 
@@ -346,7 +337,6 @@ public class DBSynchronizer {
 
         } catch (SQLException ex) {
             Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("ERROR SEVERE" + ex);
         }
 
         return plot_id;
@@ -370,7 +360,6 @@ public class DBSynchronizer {
 
         } catch (SQLException ex) {
             Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("ERROR SEVERE" + ex);
         }
 
         return plot_id;
@@ -393,7 +382,6 @@ public class DBSynchronizer {
 
         } catch (SQLException ex) {
             Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("ERROR SEVERE" + ex);
         }
 
     }//EoM updateLindaAnalyticsPlot 
@@ -414,7 +402,6 @@ public class DBSynchronizer {
 
         } catch (SQLException ex) {
             Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("ERROR SEVERE" + ex);
         }
 
     }//EoM updateLindaAnalyticsPlotToNull 
@@ -435,7 +422,6 @@ public class DBSynchronizer {
 
         } catch (SQLException ex) {
             Logger.getLogger(DBSynchronizer.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("ERROR SEVERE" + ex);
         }
 
     }//EoM delete plot

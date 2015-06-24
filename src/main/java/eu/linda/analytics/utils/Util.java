@@ -56,9 +56,6 @@ public class Util {
         String targetFileName = ("models/analyticsID" + analytics.getId() + "_" + analytics.getAlgorithm_name() + "Model" + ".model");
         String targetFileNameTXT = ("models/analyticsID" + analytics.getId() + "_" + analytics.getAlgorithm_name() + "ModelReadable" + ".txt");
 
-        System.out.println("targetFileName: " + targetFileName);
-        try {
-
             // serialize && save model
             weka.core.SerializationHelper.write(Configuration.analyticsRepo + targetFileName, model);
 
@@ -80,10 +77,7 @@ public class Util {
 
             DBSynchronizer.updateLindaAnalyticsModelReadable(targetFileNameTXT, analytics.getId());
             analytics.setModelReadable(targetFileNameTXT);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        
         return analytics;
     }
 
@@ -95,7 +89,6 @@ public class Util {
         String targetFileName = "";
 
         if (column.equalsIgnoreCase("processinfo")) {
-            //targetFileName = (splitedSourceFileName[0] + "_" + analytics.getAlgorithm_id() + "_processinfo.txt").replace("datasets", "results");
             targetFileName = ("results/analyticsID" + analytics.getId() + "_" + analytics.getAlgorithm_id() + "_processinfo.txt").replace("datasets", "results");
             String targetFileNameFullPath = Configuration.analyticsRepo + targetFileName;
             saveFile(targetFileNameFullPath, content);
@@ -120,7 +113,7 @@ public class Util {
             bw.close();
         } catch (IOException ex) {
             Logger.getLogger(Util.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        } 
 
         return true;
     }
@@ -183,44 +176,6 @@ public class Util {
         return true;
     }
 
-    public static Analytics saveModelasVector(Vector model, Analytics analytics) throws Exception {
-
-        String targetFileName = "models/analyticsID" + analytics.getId() + "_" + analytics.getAlgorithm_name() + "Model" + ".model";
-
-        String targetFileNameTXT = "models/analyticsID" + analytics.getId() + "_" + analytics.getAlgorithm_name() + "ModelReadable" + ".txt";
-
-        System.out.println("targetFileName: " + targetFileName);
-        try {
-
-            // serialize && save model
-            SerializationHelper.write(Configuration.analyticsRepo + targetFileName, model);
-            weka.core.SerializationHelper.write(Configuration.analyticsRepo + targetFileName, model);
-
-            DBSynchronizer.updateLindaAnalyticsModel(targetFileName, analytics.getId());
-
-            analytics.setModel(targetFileName);
-
-            File file = new File(Configuration.analyticsRepo + targetFileNameTXT);
-
-            // if file doesnt exists, then create it
-            if (!file.exists()) {
-                file.createNewFile();
-            }
-
-            FileWriter fw = new FileWriter(file.getAbsoluteFile());
-            BufferedWriter bw = new BufferedWriter(fw);
-            bw.write(model.toString());
-            bw.close();
-
-            DBSynchronizer.updateLindaAnalyticsModelReadable(targetFileNameTXT, analytics.getId());
-            analytics.setModelReadable(targetFileNameTXT);
-
-        } catch (IOException ex) {
-            Logger.getLogger(Util.class.getName()).log(Level.SEVERE, null, ex);
-
-        }
-        return analytics;
-    }
 
     public static void nicePrintMessage(String msg) {
         System.out.println("------------ " + msg + " ------------");

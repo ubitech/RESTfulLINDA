@@ -105,8 +105,9 @@ public class RDFInputFormat extends InputFormat {
         } catch (MalformedURLException ex) {
             Logger.getLogger(RDFInputFormat.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(RDFInputFormat.class.getName()).log(Level.SEVERE, null, ex);
-            DBSynchronizer.updateLindaAnalyticsProcessMessage("Input Queries are not responsive. \n", analytics.getId());
+            String ex_message = "Input Queries are not responsive. \n";
+            Logger.getLogger(RDFInputFormat.class.getName()).log(Level.WARNING, ex_message, ex);
+            DBSynchronizer.updateLindaAnalyticsProcessMessage(ex_message, analytics.getId());
         }   catch (AlsCustomException ex) {
             return null;
         } 

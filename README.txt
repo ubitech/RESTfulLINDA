@@ -24,8 +24,19 @@ Go to wildfly-9.0.0.CR1/standalone/configuration/standalone.xml and change the h
 -----------------------------------------------------------------------
 STEP 1.4 --DEPLOY LINDA ANALYTICS WAR TO WildFly SERVER 
 -----------------------------------------------------------------------
-put RESTfulLINDA.war at /usr/share/jboss-eap-6.3/standalone/deployments/ 
-cp UBITECH/lindaAnalytics/RESTfulLINDA/target/RESTfulLINDA.war /root/appservers/wildfly-9.0.0.CR1/standalone/deployments/
+Deploying from command line with WildFly
+
+wildfly comes with a Command Line Interface (CLI) with access to administrative tasks.
+
+The following command deploys an application:
+
+
+$WILDFLY_HOME/bin/jboss-cli.sh --connect --command="deploy --force [PATH_TO_RESTfulLINDA.war]"
+
+Undeploying an application works adequately:
+
+
+$WILDFLY_HOME/bin/jboss-cli.sh --connect --command="undeploy RESTfulLINDA.war"
 
 
 -----------------------------------------------------------------------

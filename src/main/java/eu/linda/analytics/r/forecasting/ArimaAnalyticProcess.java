@@ -221,7 +221,11 @@ public class ArimaAnalyticProcess extends AnalyticProcess {
             }
 
         } catch (RserveException ex) {
-            Logger.getLogger(ArimaAnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);
+            String ex_message = "Rserve server not responsive. \n"
+                    + "Propably Rserve does not acess forecast library. \n"
+                    + "Reiniciate the Rserve Server or Contact the administrator.";
+            Logger.getLogger(ArimaAnalyticProcess.class.getName()).log(Level.SEVERE, ex_message, ex);
+            DBSynchronizer.updateLindaAnalyticsProcessMessage(ex_message, analytics.getId());
         } catch (REXPMismatchException ex) {
             Logger.getLogger(ArimaAnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);
         }

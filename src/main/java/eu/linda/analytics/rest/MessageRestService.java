@@ -30,7 +30,6 @@ public class MessageRestService {
         String inputSuffix;
         if (analytics.getTrainQuery_id() > 0) {
             inputSuffix = "rdf";
-            System.out.println("inputSuffix" + inputSuffix);
         } else {
             String[] suffixes = analytics.getDocument().split("\\.");
             inputSuffix = suffixes[suffixes.length - 1];
@@ -38,7 +37,8 @@ public class MessageRestService {
 
         analyticsController.runAnalytics(inputSuffix, analytics.getAlgorithm_name(), analytics.getExportFormat());
         
-        return Response.status(200).entity("Analytic Process has runned").build();
+        return Response.status(200).entity("Analytic Process for analytic ID "+analytics.getId()+
+                ", with description "+ analytics.getDescription()+" has runned").build();
 
     }
 

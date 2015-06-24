@@ -170,7 +170,11 @@ public class MoransAnalyticProcess extends AnalyticProcess {
                 }
             
         } catch (RserveException ex) {
-            Logger.getLogger(MoransAnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);
+             String ex_message = "Rserve server not responsive. \n"
+                    + "Propably Rserve does not acess ape library. \n"
+                    + "Reiniciate the Rserve Server or Contact the administrator.";
+            Logger.getLogger(MoransAnalyticProcess.class.getName()).log(Level.SEVERE, ex_message, ex);
+            DBSynchronizer.updateLindaAnalyticsProcessMessage(ex_message, analytics.getId());
         } catch (REXPMismatchException ex) {
             Logger.getLogger(MoransAnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);
         }

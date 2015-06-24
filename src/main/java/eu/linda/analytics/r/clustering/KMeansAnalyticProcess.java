@@ -102,7 +102,7 @@ public class KMeansAnalyticProcess extends AnalyticProcess {
             int num_of_not_numerical_variables = re.eval("table(nums)[\"FALSE\"]").asInteger();
             if (num_of_not_numerical_variables > 0) {
                 DBSynchronizer.updateLindaAnalyticsProcessMessage("Note : Input queries contain non numeric variables and these have been ignored during the analysis. \n "
-                        + "If you want to analyze data that contain mixed numerical and categorical data, consider using the M5P or J48 algorithms. \n"
+                        + "If you want to analyze data that contain mixed numerical and categorical data,\n consider using the M5P or J48 algorithms. \n"
                         + "In case all your variables are categorical, consider use the K-modes algorithm", analytics.getId());
             }
 

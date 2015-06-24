@@ -117,7 +117,11 @@ public class ModelBasedClusteringAnalyticProcess extends AnalyticProcess {
             re.close();
 
         } catch (RserveException ex) {
-            Logger.getLogger(ModelBasedClusteringAnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);
+             String ex_message = "Rserve server not responsive. \n"
+                    + "Propably Rserve does not acess mclust library. \n"
+                    + "Reiniciate the Rserve Server or Contact the administrator.";
+            Logger.getLogger(ModelBasedClusteringAnalyticProcess.class.getName()).log(Level.SEVERE, ex_message, ex);
+            DBSynchronizer.updateLindaAnalyticsProcessMessage(ex_message, analytics.getId());
         } catch (REXPMismatchException ex) {
             Logger.getLogger(ModelBasedClusteringAnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);
         }

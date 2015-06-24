@@ -2,6 +2,7 @@ package eu.linda.analytics.r.geospatial;
 
 import eu.linda.analytics.config.Configuration;
 import eu.linda.analytics.controller.AnalyticProcess;
+import eu.linda.analytics.db.DBSynchronizer;
 import eu.linda.analytics.formats.InputFormat;
 import eu.linda.analytics.formats.OutputFormat;
 import eu.linda.analytics.model.Analytics;
@@ -48,23 +49,26 @@ public class KrigingAnalyticProcess extends AnalyticProcess {
 
                 //import train & eval dataset
                 re = input.importData4R(Integer.toString(analytics.getTrainQuery_id()), Integer.toString(analytics.getEvaluationQuery_id()), true, analytics);
-                if (re==null) return;
+                if (re == null) {
+                    return;
+                }
 
                 re.eval("loaded_data_train <- loaded_data; "
                         + "df_to_export<- loaded_data_eval;");
-                
+
                 RScript += "loaded_data_train <- read.csv('insertqueryid" + analytics.getTrainQuery_id() + "');\n "
                         + "loaded_data_eval <- read.csv('insertqueryid" + analytics.getEvaluationQuery_id() + "')\n "
                         + "df_to_export<- read.csv('insertqueryid" + analytics.getEvaluationQuery_id() + "');\n";
 
             } else {
                 //import train & eval dataset
-                re = input.importData4R(Configuration.analyticsRepo + analytics.getDocument(),Configuration.analyticsRepo + analytics.getTestdocument(), true, analytics);
-                if (re==null) return;
+                re = input.importData4R(Configuration.analyticsRepo + analytics.getDocument(), Configuration.analyticsRepo + analytics.getTestdocument(), true, analytics);
+                if (re == null) {
+                    return;
+                }
                 re.eval("loaded_data_train <- loaded_data;"
                         + "loaded_data_eval <- loaded_data_eval; "
                         + "df_to_export<- loaded_data_eval;");
-
 
                 RScript += "loaded_data_train <- read.csv('" + Configuration.analyticsRepo + analytics.getDocument() + "');\n "
                         + "loaded_data_eval <- read.csv('" + Configuration.analyticsRepo + analytics.getTestdocument() + "')\n "
@@ -83,7 +87,6 @@ public class KrigingAnalyticProcess extends AnalyticProcess {
                     + "column_to_predict <-colnames(loaded_data_train[column_number]); "
                     + "rows_number<-nrow(loaded_data_train); ");
 
-
             RScript += "xcol<-match(\"x\",names(loaded_data_train)); \n "
                     + "ycol<-match(\"y\",names(loaded_data_train)); \n "
                     + "#remove any duplicated coordinates\n "
@@ -95,12 +98,10 @@ public class KrigingAnalyticProcess extends AnalyticProcess {
                     + "column_number<-ncol(loaded_data_train);\n "
                     + "column_to_predict <-colnames(loaded_data_train[column_number]);\n "
                     + "rows_number<-nrow(loaded_data_train);\n ";
-            
 
             // ---- get analyzedFieldValue ----
             org.rosuda.REngine.REXP column_to_predict = re.eval("column_to_predict");
             String analyzedFieldValue = column_to_predict.asString();
-
 
             re.eval("loaded_data_train$" + analyzedFieldValue + "<-as.numeric(unlist(loaded_data_train$" + analyzedFieldValue + "));");
             RScript += "loaded_data_train$" + analyzedFieldValue + "<-as.numeric(unlist(loaded_data_train$" + analyzedFieldValue + "));\n";
@@ -154,7 +155,12 @@ public class KrigingAnalyticProcess extends AnalyticProcess {
             out.exportData(analytics, re);
 
         } catch (RserveException ex) {
-            Logger.getLogger(KrigingAnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);
+            String ex_message = "Rserve server not responsive. \n"
+                    + "Propably Rserve does not acess gstat library. \n"
+                    + "Reiniciate the Rserve Server or Contact the administrator.";
+            Logger.getLogger(KrigingAnalyticProcess.class.getName()).log(Level.SEVERE, ex_message, ex);
+            DBSynchronizer.updateLindaAnalyticsProcessMessage(ex_message, analytics.getId());
+
         } catch (REXPMismatchException ex) {
             Logger.getLogger(KrigingAnalyticProcess.class.getName()).log(Level.SEVERE, null, ex);
         }

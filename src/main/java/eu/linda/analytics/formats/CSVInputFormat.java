@@ -88,8 +88,7 @@ public class CSVInputFormat extends InputFormat {
         long trainfisSize = 0;
         FileInputStream evalfis = null;
         RConnection re = null;
-        System.out.println(System.getProperty("java.library.path"));
-        System.out.println("R_HOME" + System.getenv().get("R_HOME"));
+        // System.out.println(System.getProperty("java.library.path"));
 
         try {
             re = new RConnection();
