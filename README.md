@@ -5,19 +5,19 @@ Enable the execution of conventional analytic processes against linked data
 > **Features:**
 > - Select and execute an analytic processes against a specific SPARQL query, through user-friendly interfaces with pre-configured parameters for specific algorithms.
 > - Integration of Weka and R analytic algorithms. Support for J48, M5P, Apriori, LinearRegression, Arima,Morans I, Kriging, NCF correlogram, ClustersNumber, Kmeans, Ward Hierarchical Agglomerative, Model Based Clustering, LinearRegression in R algorithms
-> -Ontology for mapping information relevant to the analytic process and the input and output sources.
-> -Support input and output of analytic results in RDF format (N3, Turtle, RDF / XML).
-> -Support tracking of analytics processes executed per user 
-> -Interconnection with the visualization components for visualising the analytics’ output.
-> -Ability to save / load analytic processes per user
-> -List saved analytic processes
-> -Ability to load datasets / training datasets in CSV or ARFF format
-> -Re-evaluate the analytic process keeping the same trained model 
-> -Before re-evaluation the analytics procsess , the user can a) change the output format, b) change the evaluation query c) Change the parameters of the current algorithm d) search within his analytics, e) Automatic refill of the analytic process description
-> -User feedback on tool usage: a) queries participation on analytics, b) analytics effectiveness, c) data quality and output reuse, d) performance time  of each analytic process.
+> - Ontology for mapping information relevant to the analytic process and the input and output sources.
+> - Support input and output of analytic results in RDF format (N3, Turtle, RDF / XML).
+> - Support tracking of analytics processes executed per user 
+> - Interconnection with the visualization components for visualising the analytics’ output.
+> - Ability to save / load analytic processes per user
+> - List saved analytic processes
+> - Ability to load datasets / training datasets in CSV or ARFF format
+> - Re-evaluate the analytic process keeping the same trained model 
+> - Before re-evaluation the analytics procsess , the user can a) change the output format, b) change the evaluation query c) Change the parameters of the current algorithm d) search within his analytics, e) Automatic refill of the analytic process description
+> - User feedback on tool usage: a) queries participation on analytics, b) analytics effectiveness, c) data quality and output reuse, d) performance time  of each analytic process.
 
 
-##Step 1 --INSTALL WildFly SERVER -- 
+##Step 1 Install  WildFly server 
 
 ####Step 1.1 Download & Install WildFly 9 from 
 http://wildfly.org/downloads/
@@ -78,7 +78,7 @@ nohup sudo ./standalone.sh
 ```
 
 
-###STEP 2: INSTALL R PROJECT
+###STEP 2: Install R
 
 ####Step 2.1 : ADD CRAN repositort
 
@@ -152,7 +152,7 @@ ape
 ncf
 
 
-####Step 2.5 : START Rserve Server
+####Step 2.5 : Start Rserve Server
 start Rserve from R console
 ```
 >R
@@ -163,3 +163,4 @@ start Rserve from R console
 OR put  to  /etc/rc.local the following line:
 ```
 sudo R CMD Rserve
+```
