@@ -16,23 +16,18 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.validator.UrlValidator;
 import weka.classifiers.Classifier;
 import weka.core.Attribute;
 import weka.core.Instances;
-import weka.core.SerializationHelper;
 import weka.core.converters.ArffLoader;
 import weka.core.converters.CSVSaver;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.Remove;
 
-/**
- * Generates a little ARFF file with different attribute types.
- *
- */
+
 public class Util {
 
     ConnectionController connectionController;

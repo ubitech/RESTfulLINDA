@@ -54,6 +54,12 @@ docroot= /home/eleni/IdeaProjects/LindaWorkbench/linda/
 analyticsRepo = /var/www/LindaAnalytics/
 ```
 
+in analyticsRepo folder create  the following folders:
+> - LindaAnalytics 
+  > - LindaAnalytics/models
+  > - LindaAnalytics/results
+  > - LindaAnalytics/plots
+
 ####Step 1.3 change http port to 8181
 Go to wildfly-9.0.0.CR1/standalone/configuration/standalone.xml and change the http port as follows:
 ```
@@ -97,7 +103,6 @@ deb http://cran.r-project.org/bin/linux/ubuntu trusty/
 Add keys
 ```
 sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E084DAB9
-sudo add-apt-repository ppa:marutter/rdev
 ```
 ```
 sudo apt-get install r-base-core
@@ -138,16 +143,27 @@ sudo R CMD INSTALL spdep_0.5-82.tar.gz
 sudo R CMD INSTALL Rserve_1.7-3.tar.gz
 ```
 
+or execute R  and install packages from R command line
+```
+install.packages("Rserve")
+install.packages("forecast")
+install.packages("sp")
+install.packages("gstat")
+install.packages("ncf")
+install.packages("cluster")
+install.packages("mclust","ape")
+```
+
 packages to install:
 
-Rserve  (https://rforge.net/Rserve/)
-cluster
-mclust
-forecast
-sp
-gstat
-ape
-ncf
+> - Rserve  (https://rforge.net/Rserve/)
+> - cluster
+> - mclust
+> - forecast
+> - sp
+> - gstat
+> - ape
+> - ncf
 
 
 ####Step 2.5 : Start Rserve Server

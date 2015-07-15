@@ -196,12 +196,17 @@ public class ArimaAnalyticProcess extends AnalyticProcess {
                 re.eval("png(file='" + Configuration.analyticsRepo + "plots/plotid" + plot1_id + ".png',width=600); a<-plot(forecast(m.ar2,h=" + timePredicion + ")); print(a); dev.off();");
                 RScript += "png(file='" + Configuration.analyticsRepo + "plots/plotid" + plot1_id + ".png',width=600);a<-plot(forecast(m.ar2,h=" + timePredicion + ")); print(a); dev.off();\n";
 
-                re.eval("p <- predict(m.ar2, n.ahead = " + timePredicion + ");");
-                RScript += "p <- predict(m.ar2, n.ahead = " + timePredicion + ");\n";
+                //re.eval("p <- predict(m.ar2, n.ahead = " + timePredicion + ");");
+                //RScript += "p <- predict(m.ar2, n.ahead = " + timePredicion + ");\n";
+                re.eval("p <- forecast(m.ar2, h = " + timePredicion + ");");
+                RScript += "p <- forecast(m.ar2, h = " + timePredicion + ");\n";
 
-                re.eval("rounded_values <-as.numeric(round(p$pred, digits = 3)); ");
-                RScript += "rounded_values <-as.numeric(round(p$pred, digits = 3));\n";
-
+                //re.eval("rounded_values <-as.numeric(round(p$pred, digits = 3)); ");
+                //RScript += "rounded_values <-as.numeric(round(p$pred, digits = 3));\n";
+                
+                re.eval("rounded_values <-as.numeric(round(p$mean, digits = 3)); ");
+                RScript += "rounded_values <-as.numeric(round(p$mean, digits = 3));\n"; 
+                
                 re.eval("df_to_export <- data.frame(Date,rounded_values); ");
                 RScript += "df_to_export <- data.frame(Date,rounded_values);\n";
 

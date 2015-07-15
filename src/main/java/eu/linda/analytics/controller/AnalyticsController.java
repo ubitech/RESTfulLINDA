@@ -7,10 +7,7 @@ package eu.linda.analytics.controller;
 
 import eu.linda.analytics.formats.InputFormat;
 import eu.linda.analytics.formats.OutputFormat;
-import eu.linda.analytics.db.ConnectionController;
-import eu.linda.analytics.db.DBSynchronizer;
 import eu.linda.analytics.model.Analytics;
-import java.util.AbstractList;
 
 /**
  *
