@@ -158,13 +158,11 @@ public class RDFInputFormat extends InputFormat {
                 analytics.setData_size(analytics.getData_size() + trainfisSize);
                 trainfis.close();
 
-                if (!evaluation_query_id.equalsIgnoreCase("") && train_query_id.equalsIgnoreCase(evaluation_query_id)) {
+                if (!evaluation_query_id.equalsIgnoreCase("0") && train_query_id.equalsIgnoreCase(evaluation_query_id)) {
 
                     re.eval("loaded_data_eval <- loaded_data; ");
                     System.out.println("loaded_data_eval <- loaded_data; ");
-                }
-
-                if (!evaluation_query_id.equalsIgnoreCase("") && !train_query_id.equalsIgnoreCase(evaluation_query_id)) {
+                }else if (!evaluation_query_id.equalsIgnoreCase("0") && !train_query_id.equalsIgnoreCase(evaluation_query_id)) {
 
                     String evalQueryURI = DBSynchronizer.getQueryURI(Integer.parseInt(evaluation_query_id));
                     Util.nicePrintMessage("import data from uri " + evalQueryURI);

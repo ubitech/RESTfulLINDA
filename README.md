@@ -178,3 +178,8 @@ OR put  to  /etc/rc.local the following line:
 ```
 sudo R CMD Rserve
 ```
+OR
+```
+/home/ubuntu/R/x86_64-pc-linux-gnu-library/3.0/Rserve/libs//Rserve
+```
+
