@@ -17,9 +17,9 @@ Enable the execution of conventional analytic processes against linked data
 > - User feedback on tool usage: a) queries participation on analytics, b) analytics effectiveness, c) data quality and output reuse, d) performance time  of each analytic process.
 
 
-##Step 1 Install docker to server 
+####Step 1 Install docker to server 
 
-##Step 1 go in RESTfulLINDA directory and execute the following commands
+####Step 2 go in RESTfulLINDA directory and execute the following commands
 
 ```
 #build lindanalytics code
