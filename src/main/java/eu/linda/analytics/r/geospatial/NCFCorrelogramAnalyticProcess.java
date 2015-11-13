@@ -45,12 +45,12 @@ public class NCFCorrelogramAnalyticProcess extends AnalyticProcess {
             RConnection re;
             if (Util.isRDFInputFormat(analytics.getTrainQuery_id())) {
                 //import train dataset
-                re = input.importData4R(Integer.toString(analytics.getTrainQuery_id()), "", true, analytics);
+                re = input.importData4R(Integer.toString(analytics.getTrainQuery_id()), "0", true, analytics);
                 RScript += "loaded_data <- read.csv('insertqueryid" + analytics.getTrainQuery_id() + "');\n";
 
             } else {
                 //load train dataset
-                re = input.importData4R(Configuration.analyticsRepo + analytics.getDocument(), "", true, analytics);
+                re = input.importData4R(Configuration.analyticsRepo + analytics.getDocument(), "0", true, analytics);
                 RScript += "loaded_data <- read.csv('" + Configuration.analyticsRepo + analytics.getDocument() + "');\n";
 
             }

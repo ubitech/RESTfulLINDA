@@ -86,9 +86,9 @@ public class ArimaAnalyticProcess extends AnalyticProcess {
 
             RConnection re;
             if (Util.isRDFInputFormat(analytics.getTrainQuery_id())) {
-                re = input.importData4R(Integer.toString(analytics.getTrainQuery_id()), "", true, analytics);
+                re = input.importData4R(Integer.toString(analytics.getTrainQuery_id()), "0", true, analytics);
             } else {
-                re = input.importData4R(Configuration.analyticsRepo + analytics.getDocument(), "", true, analytics);
+                re = input.importData4R(Configuration.analyticsRepo + analytics.getDocument(), "0", true, analytics);
             }
             if (re == null) {
                 return;
