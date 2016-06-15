@@ -74,6 +74,8 @@ public class ArimaAnalyticProcess extends AnalyticProcess {
                         frequency = "12";
                     } else if (timeGranularity.equalsIgnoreCase("years")) {
                         frequency = "1";
+                    } else if (timeGranularity.equalsIgnoreCase("days")) {
+                        frequency = "365.25";
                     }
                     System.out.println("timeGranularity" + timeGranularity);
                 }
@@ -149,12 +151,16 @@ public class ArimaAnalyticProcess extends AnalyticProcess {
                     RScript += "lastdate <- as.Date('" + endDate + "');\n";
 
                 } else if (Util.isRDFExportFormat(analytics.getExportFormat())) {
+                    
+                            
+                    re.eval(" datecolumn <- which(colnames(loaded_data) == \"date\");");
+                    RScript += "datecolumn <- which(colnames(loaded_data) == \"date\");\n";
 
-                    re.eval(" firstdate<-as.Date(data_matrix[1,3]);");
-                    RScript += "firstdate<-as.Date(data_matrix[1,3]);\n";
+                    re.eval(" firstdate<-as.Date(data_matrix[1,datecolumn]);");
+                    RScript += "firstdate<-as.Date(data_matrix[1,datecolumn]);\n";
 
-                    re.eval(" lastdate <- as.Date(data_matrix[rows_number,3]); ");
-                    RScript += "lastdate <- as.Date(data_matrix[rows_number,3]);\n";
+                    re.eval(" lastdate <- as.Date(data_matrix[rows_number,datecolumn]); ");
+                    RScript += "lastdate <- as.Date(data_matrix[rows_number,datecolumn]);\n";
 
                 } else {
                     re.eval(" firstdate<-as.Date(data_matrix[1]); "
@@ -203,10 +209,9 @@ public class ArimaAnalyticProcess extends AnalyticProcess {
 
                 //re.eval("rounded_values <-as.numeric(round(p$pred, digits = 3)); ");
                 //RScript += "rounded_values <-as.numeric(round(p$pred, digits = 3));\n";
-                
                 re.eval("rounded_values <-as.numeric(round(p$mean, digits = 3)); ");
-                RScript += "rounded_values <-as.numeric(round(p$mean, digits = 3));\n"; 
-                
+                RScript += "rounded_values <-as.numeric(round(p$mean, digits = 3));\n";
+
                 re.eval("df_to_export <- data.frame(Date,rounded_values); ");
                 RScript += "df_to_export <- data.frame(Date,rounded_values);\n";
 

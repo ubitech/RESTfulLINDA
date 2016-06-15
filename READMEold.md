@@ -75,6 +75,10 @@ Undeploying the application works adequately:
 ```
 $WILDFLY_HOME/bin/jboss-cli.sh --connect --command="undeploy RESTfulLINDA.war"
 ```
+Stop wildfly server gracefully:
+```
+sudo ./jboss-cli.sh --connect controller=127.0.0.1 command=:shutdown
+```
 
 
 ####Step 1.5 Start locally WildFly server
